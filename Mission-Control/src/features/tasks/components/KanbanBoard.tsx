@@ -22,10 +22,9 @@ import { BatchActionBar } from './BatchActionBar'
 import type { TaskStatus, TaskWithAssignees } from '@/types/database'
 
 const VISIBLE_STATUSES: TaskStatus[] = [
-  'inbox',
-  'assigned',
+  'backlog',
+  'todo',
   'in_progress',
-  'review',
   'done',
 ]
 
@@ -40,7 +39,7 @@ export function KanbanBoard() {
 
   const [activeTask, setActiveTask] = useState<TaskWithAssignees | null>(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
-  const [createDefaultStatus, setCreateDefaultStatus] = useState<TaskStatus>('inbox')
+  const [createDefaultStatus, setCreateDefaultStatus] = useState<TaskStatus>('backlog')
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -67,10 +66,9 @@ export function KanbanBoard() {
 
   const tasksByStatus = useMemo(() => {
     const grouped: Record<TaskStatus, TaskWithAssignees[]> = {
-      inbox: [],
-      assigned: [],
+      backlog: [],
+      todo: [],
       in_progress: [],
-      review: [],
       done: [],
       archived: [],
     }
@@ -147,7 +145,7 @@ export function KanbanBoard() {
 
   // Listen for create-task event from command palette
   useEffect(() => {
-    const handler = () => handleAddTask('inbox')
+    const handler = () => handleAddTask('backlog')
     window.addEventListener('openclaw:create-task', handler)
     return () => window.removeEventListener('openclaw:create-task', handler)
   }, [handleAddTask])
@@ -162,7 +160,7 @@ export function KanbanBoard() {
       {/* Board header actions */}
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <button
-          onClick={() => handleAddTask('inbox')}
+          onClick={() => handleAddTask('backlog')}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
             bg-white/[0.08] text-white/70 border border-white/[0.1]
             hover:bg-white/[0.12] hover:text-white transition-colors"

@@ -8,10 +8,9 @@ import { X, Trash2, CheckCircle2, Archive, ChevronDown } from 'lucide-react'
 import type { TaskStatus, TaskPriority } from '@/types/database'
 
 const STATUS_OPTIONS: { value: TaskStatus; label: string }[] = [
-  { value: 'inbox', label: 'Inbox' },
-  { value: 'assigned', label: 'Assigned' },
+  { value: 'backlog', label: 'Backlog' },
+  { value: 'todo', label: 'To-do' },
   { value: 'in_progress', label: 'In Progress' },
-  { value: 'review', label: 'Review' },
   { value: 'done', label: 'Done' },
   { value: 'archived', label: 'Archived' },
 ]

@@ -93,7 +93,7 @@ export function useChatHistory() {
   const saveMessages = useCallback(
     async (
       sessionId: string,
-      messages: Array<{ role: 'user' | 'assistant'; content: string; audioUrl?: string }>,
+      messages: Array<{ role: 'user' | 'assistant'; content: string; audioUrl?: string; imageUrl?: string }>,
     ) => {
       const supabase = createClient()
       await supabase.from('chat_messages').insert(

@@ -9,10 +9,9 @@ export const PRIORITY_CONFIG: Record<TaskPriority, { label: string; icon: string
 }
 
 export const STATUS_CONFIG: Record<TaskStatus, { label: string; icon: string; color: string }> = {
-  inbox: { label: 'Inbox', icon: '○', color: 'text-white/40' },
-  assigned: { label: 'Assigned', icon: '◐', color: 'text-blue-400' },
+  backlog: { label: 'Backlog', icon: '○', color: 'text-white/40' },
+  todo: { label: 'To-do', icon: '◐', color: 'text-blue-400' },
   in_progress: { label: 'In Progress', icon: '◑', color: 'text-yellow-400' },
-  review: { label: 'Review', icon: '◕', color: 'text-purple-400' },
   done: { label: 'Done', icon: '●', color: 'text-emerald-400' },
   archived: { label: 'Archived', icon: '◌', color: 'text-white/20' },
 }

@@ -6,10 +6,9 @@ import { TaskCard } from './TaskCard'
 import type { TaskStatus, TaskWithAssignees } from '@/types/database'
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
-  inbox: 'Inbox',
-  assigned: 'Assigned',
+  backlog: 'Backlog',
+  todo: 'To-do',
   in_progress: 'In Progress',
-  review: 'Review',
   done: 'Done',
   archived: 'Archived',
 }

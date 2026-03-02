@@ -3,20 +3,14 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { AgentCard } from '@/features/agents/components/AgentCard'
-import { AgentManageModal } from '@/features/agents/components/AgentManageModal'
 import { useFiltersStore } from '@/shared/stores/filters-store'
 import { useAuth } from '@/hooks/useAuth'
 import {
   LayoutGrid,
   Activity,
-  Clock,
-  Calendar,
   Settings,
-  Inbox,
-  Zap,
   Users,
-  Plus,
+  CircleUserRound,
   Bookmark,
   X,
   ChevronDown,
@@ -24,11 +18,10 @@ import {
   PenLine,
   Bot,
   LogOut,
-  UserCircle,
 } from 'lucide-react'
 import { canAccessRoute } from '@/lib/permissions'
 import { signout } from '@/actions/auth'
-import type { Agent, TaskStatus, TaskPriority } from '@/types/database'
+import type { Profile, TaskStatus, TaskPriority } from '@/types/database'
 
 interface SavedView {
   id: string
@@ -40,83 +33,54 @@ const NAV_LINKS = [
   { href: '/', label: 'Board', icon: LayoutGrid },
   { href: '/chat', label: 'Chat', icon: Bot },
   { href: '/activity', label: 'Activity', icon: Activity },
-  { href: '/cron', label: 'Cron', icon: Clock },
-  { href: '/calendar', label: 'Calendar', icon: Calendar },
   { href: '/draw', label: 'Draw', icon: PenLine },
   { href: '/settings', label: 'Settings', icon: Settings },
 ] as const
 
-interface SidebarNavProps {
-  agents: Agent[]
-  loading: boolean
-  selectedAgentId?: string
-  onSelectAgent?: (id: string | undefined) => void
-  onAgentChange?: () => void
-}
-
-export function SidebarNav({ agents, loading, selectedAgentId, onSelectAgent, onAgentChange }: SidebarNavProps) {
+export function SidebarNav() {
   const pathname = usePathname()
   const router = useRouter()
   const { setFilter, resetFilters } = useFiltersStore()
-  const { isOwner, role } = useAuth()
-  const activeCount = agents.filter(a => a.status === 'active').length
+  const assigneeFilter = useFiltersStore((s) => s.filters.assigneeId)
+  const { isOwner, role, profile } = useAuth()
 
-  const [modalOpen, setModalOpen] = useState(false)
-  const [editAgent, setEditAgent] = useState<Agent | null>(null)
+  const [members, setMembers] = useState<Profile[]>([])
+  const [membersLoading, setMembersLoading] = useState(true)
   const [savedViews, setSavedViews] = useState<SavedView[]>([])
   const [viewsExpanded, setViewsExpanded] = useState(false)
-  const [agentsExpanded, setAgentsExpanded] = useState(true)
-  const [taskCounts, setTaskCounts] = useState({ inbox: 0, active: 0 })
+  const [teamExpanded, setTeamExpanded] = useState(false)
 
   const fetchSidebarData = useCallback(async () => {
     const supabase = createClient()
-    const [viewsRes, inboxRes, activeRes] = await Promise.all([
+    const [viewsRes, profilesRes] = await Promise.all([
       supabase.from('saved_views').select('id, name, filters').order('name'),
-      supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('status', 'inbox' as TaskStatus),
-      supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('status', 'in_progress' as TaskStatus),
+      supabase.from('profiles').select('*').order('full_name'),
     ])
     if (viewsRes.data) setSavedViews(viewsRes.data as unknown as SavedView[])
-    setTaskCounts({
-      inbox: inboxRes.count ?? 0,
-      active: activeRes.count ?? 0,
-    })
+    if (profilesRes.data) {
+      setMembers(profilesRes.data as Profile[])
+      setMembersLoading(false)
+    }
   }, [])
 
   useEffect(() => {
     fetchSidebarData()
   }, [fetchSidebarData])
 
-  const handleCreate = () => {
-    setEditAgent(null)
-    setModalOpen(true)
-  }
-
-  const handleEdit = (agent: Agent) => {
-    setEditAgent(agent)
-    setModalOpen(true)
-  }
-
-  const handleQuickView = (type: 'inbox' | 'active') => {
-    resetFilters()
-    if (type === 'inbox') {
-      setFilter('status', 'inbox')
-    } else if (type === 'active') {
-      setFilter('status', 'in_progress')
-    }
-    if (pathname !== '/') {
-      router.push('/')
-    }
-  }
-
-  const handleAgentClick = (agentId: string) => {
-    // If already filtering by this agent, clear the filter
-    const currentAssignee = useFiltersStore.getState().filters.assigneeId
-    if (currentAssignee === agentId) {
+  const handleMyTasks = () => {
+    if (!profile) return
+    const current = useFiltersStore.getState().filters.assigneeId
+    if (current === profile.id) {
       setFilter('assigneeId', null)
     } else {
-      setFilter('assigneeId', agentId)
+      resetFilters()
+      setFilter('assigneeId', profile.id)
     }
-    onSelectAgent?.(currentAssignee === agentId ? undefined : agentId)
+    if (pathname !== '/') router.push('/')
+  }
+
+  const handleMemberClick = (profileId: string) => {
+    router.push(`/team/${profileId}`)
   }
 
   const handleLoadView = (view: SavedView) => {
@@ -135,13 +99,32 @@ export function SidebarNav({ agents, loading, selectedAgentId, onSelectAgent, on
     setSavedViews((prev) => prev.filter((v) => v.id !== viewId))
   }
 
+  const myTasksActive = !!(profile && assigneeFilter === profile.id)
+
   return (
     <div className="flex flex-col h-full">
       {/* Scrollable content */}
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
 
+      {/* My Tasks */}
+      <div className="px-3 pt-3 pb-1">
+        <button
+          onClick={handleMyTasks}
+          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all duration-200
+            ${myTasksActive
+              ? 'bg-blue-500/15 text-blue-400 border border-blue-500/20'
+              : 'text-white/50 hover:text-white/80 hover:bg-white/[0.06] border border-transparent'
+            }`}
+        >
+          <CircleUserRound size={15} />
+          <span className="flex-1 text-left">My Tasks</span>
+        </button>
+      </div>
+
+      <div className="mx-3 border-t border-white/[0.06]" />
+
       {/* Navigation Links */}
-      <div className="px-3 pt-3 pb-2 space-y-0.5">
+      <div className="px-3 pt-2 pb-2 space-y-0.5">
         {NAV_LINKS.filter(({ href }) => canAccessRoute(href, role)).map(({ href, label, icon: Icon }) => {
           const isActive = href === '/'
             ? pathname === '/'
@@ -165,95 +148,50 @@ export function SidebarNav({ agents, loading, selectedAgentId, onSelectAgent, on
 
       {isOwner && (
       <>
-      <div className="mx-3 border-t border-white/[0.06]" />
-
-      {/* Quick Views */}
-      <div className="px-3 py-2 space-y-0.5">
-        <p className="text-[9px] uppercase tracking-widest text-white/25 font-semibold px-2.5 mb-1">Quick Views</p>
-        <button
-          onClick={() => handleQuickView('inbox')}
-          className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-white/40 hover:text-white/70 hover:bg-white/[0.05] transition-colors"
-        >
-          <Inbox size={15} />
-          <span className="flex-1 text-left">Inbox</span>
-          {taskCounts.inbox > 0 && (
-            <span className="text-[10px] bg-white/[0.08] px-1.5 py-0.5 rounded-full text-white/50">
-              {taskCounts.inbox}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => handleQuickView('active')}
-          className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-white/40 hover:text-white/70 hover:bg-white/[0.05] transition-colors"
-        >
-          <Zap size={15} />
-          <span className="flex-1 text-left">Active Tasks</span>
-          {taskCounts.active > 0 && (
-            <span className="text-[10px] bg-emerald-400/10 px-1.5 py-0.5 rounded-full text-emerald-400/80">
-              {taskCounts.active}
-            </span>
-          )}
-        </button>
-      </div>
-
-      <div className="mx-3 border-t border-white/[0.06]" />
-      </>
-      )}
-
-      {isOwner && (
-      <>
-      {/* Agents Section */}
+      {/* Team Members */}
       <div className="flex flex-col min-h-0">
         <div
-          onClick={() => setAgentsExpanded(!agentsExpanded)}
+          onClick={() => setTeamExpanded(!teamExpanded)}
           role="button"
           className="flex items-center justify-between px-5 py-2 cursor-pointer"
         >
           <div className="flex items-center gap-2">
-            {agentsExpanded ? <ChevronDown size={12} className="text-white/25" /> : <ChevronRight size={12} className="text-white/25" />}
+            {teamExpanded ? <ChevronDown size={12} className="text-white/25" /> : <ChevronRight size={12} className="text-white/25" />}
             <Users size={14} className="text-white/40" />
-            <span className="text-[10px] uppercase tracking-widest text-white/40 font-semibold">Agents</span>
+            <span className="text-[10px] uppercase tracking-widest text-white/40 font-semibold">Team</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            {activeCount > 0 && (
-              <span className="text-[10px] font-medium text-emerald-400/80 bg-emerald-400/10 px-1.5 py-0.5 rounded-full">
-                {activeCount}
-              </span>
-            )}
-            <button
-              onClick={(e) => { e.stopPropagation(); handleCreate() }}
-              className="p-1 rounded-lg hover:bg-white/[0.08] text-white/30 hover:text-white/60 transition-colors"
-              title="Add agent"
-            >
-              <Plus size={12} />
-            </button>
-          </div>
+          <span className="text-[9px] bg-white/[0.06] px-1.5 py-0.5 rounded-full text-white/30">
+            {members.length}
+          </span>
         </div>
 
-        {agentsExpanded && (
+        {teamExpanded && (
           <div className="overflow-y-auto max-h-64 px-2 pb-2 space-y-0.5">
-            {loading ? (
+            {membersLoading ? (
               <div className="space-y-2 px-1">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-14 rounded-xl bg-white/[0.04] animate-pulse" />
+                {[1, 2].map(i => (
+                  <div key={i} className="h-10 rounded-xl bg-white/[0.04] animate-pulse" />
                 ))}
               </div>
             ) : (
-              agents.map(agent => (
-                <div key={agent.id} className="group relative">
-                  <AgentCard
-                    agent={agent}
-                    selected={selectedAgentId === agent.id || useFiltersStore.getState().filters.assigneeId === agent.id}
-                    onClick={() => handleAgentClick(agent.id)}
-                  />
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleEdit(agent) }}
-                    className="absolute top-3 right-3 p-1 rounded-lg bg-white/[0.06] text-white/30 hover:text-white/60 hover:bg-white/[0.1] transition-all opacity-0 group-hover:opacity-100"
-                    title="Edit agent"
-                  >
-                    <Settings size={10} />
-                  </button>
-                </div>
+              members.map(member => (
+                <button
+                  key={member.id}
+                  onClick={() => handleMemberClick(member.id)}
+                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all duration-200
+                    hover:bg-white/[0.04] border border-transparent"
+                >
+                  {member.avatar_url ? (
+                    <img src={member.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-white/[0.1] flex items-center justify-center text-xs text-white/60 flex-shrink-0">
+                      {(member.full_name ?? '?')[0]}
+                    </div>
+                  )}
+                  <div className="min-w-0 text-left">
+                    <span className="text-xs text-white/80 truncate block">{member.full_name ?? 'User'}</span>
+                  </div>
+                </button>
               ))
             )}
           </div>
@@ -302,35 +240,23 @@ export function SidebarNav({ agents, loading, selectedAgentId, onSelectAgent, on
       </>
       )}
 
-
-      {/* Logout — inside scroll area, at bottom */}
-      <div
-        className="px-3 pt-1"
-        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
-      >
-        <div className="border-t border-white/[0.06] pt-2">
-          <form action={signout}>
-            <button
-              type="submit"
-              className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-white/30 hover:text-red-400/70 hover:bg-red-400/[0.05] transition-colors"
-            >
-              <LogOut size={14} />
-              Sign out
-            </button>
-          </form>
-        </div>
-      </div>
-
       </div>{/* end scrollable content */}
 
-      {isOwner && (
-        <AgentManageModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          agent={editAgent}
-          onSave={onAgentChange}
-        />
-      )}
+      {/* Sign out — fixed at bottom */}
+      <div
+        className="flex-shrink-0 px-3 border-t border-white/[0.06]"
+        style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+      >
+        <form action={signout} className="pt-2">
+          <button
+            type="submit"
+            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-white/30 hover:text-red-400/70 hover:bg-red-400/[0.05] transition-colors"
+          >
+            <LogOut size={14} />
+            Sign out
+          </button>
+        </form>
+      </div>
     </div>
   )
 }

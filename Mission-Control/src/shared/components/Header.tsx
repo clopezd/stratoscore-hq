@@ -36,20 +36,20 @@ export function Header() {
           <button
             onClick={toggleChatSessionsPanel}
             className="md:hidden p-2 rounded-lg hover:bg-white/[0.08] transition-colors text-white/50 hover:text-white/80"
-            title="Conversaciones"
+            title="Conversations"
           >
             <MessageSquare size={18} />
           </button>
         )}
       </div>
 
-      {/* Center: Assistant info on mobile chat, ONLINE status elsewhere */}
+      {/* Center: Assistant info on mobile chat, MISSION CONTROL badge elsewhere */}
       <div className="flex items-center gap-2">
         {isChatPage ? (
           <>
             {/* Mobile: Assistant avatar + name */}
             <div className="md:hidden flex items-center gap-2">
-              <button onClick={() => setAvatarOpen(true)} className="relative rounded-full focus:outline-none" title="Ver perfil">
+              <button onClick={() => setAvatarOpen(true)} className="relative rounded-full focus:outline-none" title="View profile">
                 <img src="/avatar.png" alt="Assistant" className="w-7 h-7 rounded-full object-cover border border-violet-400/30 hover:border-violet-400/70 transition-colors" />
                 <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-[#0a0a0f]" />
               </button>
@@ -59,16 +59,18 @@ export function Header() {
               </div>
             </div>
             {avatarOpen && <AvatarLightbox src="/avatar.png" alt="Assistant" onClose={() => setAvatarOpen(false)} />}
-            {/* Desktop: ONLINE indicator */}
-            <div className="hidden md:flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] uppercase tracking-widest text-white/30 font-medium">Online</span>
+            {/* Desktop: MISSION CONTROL badge */}
+            <div className="hidden md:flex items-center gap-3">
+              <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] backdrop-blur-md">
+                <span className="text-[10px] font-bold tracking-tighter text-white/90">MISSION CONTROL</span>
+              </div>
             </div>
           </>
         ) : (
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] uppercase tracking-widest text-white/30 font-medium">Online</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] backdrop-blur-md">
+              <span className="text-[10px] font-bold tracking-tighter text-white/90">MISSION CONTROL</span>
+            </div>
           </div>
         )}
       </div>
@@ -78,7 +80,7 @@ export function Header() {
         {isChatPage && (
           <button
             onClick={handleNewChat}
-            title="Nueva conversación"
+            title="New conversation"
             className="md:hidden p-2 rounded-lg hover:bg-white/[0.08] transition-colors text-white/50 hover:text-white/80"
           >
             <Plus size={18} />

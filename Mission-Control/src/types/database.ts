@@ -56,6 +56,7 @@ export type Database = {
           system_prompt: string | null
           character: string | null
           lore: string | null
+          user_id: string | null
           tenant_id: string | null
           created_at: string | null
           updated_at: string | null
@@ -72,6 +73,7 @@ export type Database = {
           system_prompt?: string | null
           character?: string | null
           lore?: string | null
+          user_id?: string | null
           tenant_id?: string | null
           created_at?: string | null
           updated_at?: string | null
@@ -88,6 +90,7 @@ export type Database = {
           system_prompt?: string | null
           character?: string | null
           lore?: string | null
+          user_id?: string | null
           tenant_id?: string | null
           created_at?: string | null
           updated_at?: string | null
@@ -172,19 +175,22 @@ export type Database = {
         Row: {
           id: string
           task_id: string
-          agent_id: string
+          agent_id: string | null
+          profile_id: string | null
           assigned_at: string | null
         }
         Insert: {
           id?: string
           task_id: string
-          agent_id: string
+          agent_id?: string | null
+          profile_id?: string | null
           assigned_at?: string | null
         }
         Update: {
           id?: string
           task_id?: string
-          agent_id?: string
+          agent_id?: string | null
+          profile_id?: string | null
           assigned_at?: string | null
         }
         Relationships: [
@@ -425,7 +431,7 @@ export type Database = {
 // Domain Types (clean interfaces for app usage)
 // ============================================================
 
-export type UserRole = 'owner' | 'member'
+export type UserRole = 'owner' | 'admin' | 'member'
 
 export interface Profile {
   id: string
@@ -439,7 +445,7 @@ export interface Profile {
 
 export type AgentStatus = 'idle' | 'active' | 'blocked'
 export type AgentLevel = 'LEAD' | 'INT' | 'SPC'
-export type TaskStatus = 'inbox' | 'assigned' | 'in_progress' | 'review' | 'done' | 'archived'
+export type TaskStatus = 'backlog' | 'todo' | 'in_progress' | 'done' | 'archived'
 export type TaskPriority = 0 | 1 | 2 | 3 | 4 // 0=none, 1=urgent, 2=high, 3=medium, 4=low
 export type ActivityType = 'status_update' | 'assignees_update' | 'task_update' | 'message' | 'document_created'
 export type DocumentType = 'markdown' | 'code' | 'image' | 'note' | 'link' | 'spec'
@@ -457,6 +463,7 @@ export interface Agent {
   system_prompt: string | null
   character: string | null
   lore: string | null
+  user_id: string | null
   tenant_id: string | null
   created_at: string | null
   updated_at: string | null
@@ -512,7 +519,7 @@ export interface SavedView {
 }
 
 export interface TaskWithAssignees extends Task {
-  assignees: Agent[]
+  assignees: Profile[]
   labels?: Label[]
   subtasks?: Task[]
   messages_count?: number

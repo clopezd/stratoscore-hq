@@ -18,6 +18,8 @@ export interface UsageMeta {
   outputTokens: number
   durationMs: number
   numTurns: number
+  contextUsed?: number
+  contextTotal?: number
 }
 
 export interface ChatMessage {
@@ -27,6 +29,7 @@ export interface ChatMessage {
   timestamp: Date
   error?: boolean
   audioUrl?: string
+  imageUrl?: string
   compact?: CompactMeta
   metadata?: { source?: string; jobId?: string; jobLabel?: string } | null
   toolCalls?: ToolCall[]
@@ -41,7 +44,7 @@ type SSEEvent =
   | { type: 'tool_start'; toolName: string; toolId: string }
   | { type: 'tool_done'; toolId: string }
   | { type: 'compact'; tokensBefore?: number; tokensAfter?: number }
-  | { type: 'usage'; costUsd: number; inputTokens: number; outputTokens: number; durationMs: number; numTurns: number }
+  | { type: 'usage'; costUsd: number; inputTokens: number; outputTokens: number; durationMs: number; numTurns: number; contextUsed?: number; contextTotal?: number }
   | { type: 'result'; text: string }
   | { type: 'model_changed'; model: string }
   | { type: 'interrupt' }
@@ -49,7 +52,7 @@ type SSEEvent =
 
 interface UseChatOptions {
   sessionId?: string | null
-  onSave?: (userMsg: string, assistantMsg: string, audioUrl?: string) => Promise<void>
+  onSave?: (userMsg: string, assistantMsg: string, audioUrl?: string, imageUrl?: string) => Promise<void>
 }
 
 export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
@@ -57,6 +60,8 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
   const [loading, setLoading] = useState(false)
   const [currentModel, setCurrentModel] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+  const intentionalStopRef = useRef(false)
+  const streamSessionRef = useRef<string | null>(null)
 
   // Abort in-flight request on unmount
   useEffect(() => {
@@ -70,9 +75,19 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
     abortRef.current?.abort()
   }, [])
 
-  const sendMessage = useCallback(async (text: string, opts?: { audioUrl?: string; effort?: string }) => {
+  // Detach stream when user switches to a different session.
+  // Agent keeps processing in background.
+  const detachStream = useCallback(() => {
+    if (!loading) return
+    intentionalStopRef.current = false
+    setLoading(false)
+  }, [loading])
+
+  const sendMessage = useCallback(async (text: string, opts?: { audioUrl?: string; effort?: string; imageUrl?: string; chatSessionId?: string }) => {
     const trimmed = text.trim()
     if (!trimmed || loading) return
+
+    streamSessionRef.current = opts?.chatSessionId ?? null
 
     const userMsg: ChatMessage = {
       id: `u-${Date.now()}`,
@@ -80,6 +95,7 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
       content: trimmed,
       timestamp: new Date(),
       audioUrl: opts?.audioUrl,
+      imageUrl: opts?.imageUrl,
     }
     const assistantId = `a-${Date.now()}`
     const assistantMsg: ChatMessage = {
@@ -130,6 +146,19 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
       let usageMeta: UsageMeta | undefined
       let toolCalls: ToolCall[] = []
 
+      // RAF text batching – avoid setState on every tiny text_delta
+      let pendingFlush = false
+      let rafId = 0
+      const flushText = () => {
+        pendingFlush = false
+        const snapshot = accumulatedText
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId ? { ...m, content: snapshot } : m
+          )
+        )
+      }
+
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
@@ -153,11 +182,10 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
           switch (event.type) {
             case 'text_delta':
               accumulatedText += event.text
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId ? { ...m, content: accumulatedText } : m
-                )
-              )
+              if (!pendingFlush) {
+                pendingFlush = true
+                rafId = requestAnimationFrame(flushText)
+              }
               break
 
             case 'tool_start':
@@ -196,10 +224,14 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
                 outputTokens: event.outputTokens,
                 durationMs: event.durationMs,
                 numTurns: event.numTurns,
+                contextUsed: event.contextUsed,
+                contextTotal: event.contextTotal,
               }
               break
 
             case 'result':
+              cancelAnimationFrame(rafId)
+              pendingFlush = false
               accumulatedText = event.text
               setMessages((prev) =>
                 prev.map((m) =>
@@ -222,6 +254,8 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
               break
 
             case 'error':
+              cancelAnimationFrame(rafId)
+              pendingFlush = false
               setMessages((prev) =>
                 prev.map((m) =>
                   m.id === assistantId
@@ -234,6 +268,10 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
         }
       }
 
+      // Cancel any pending RAF flush
+      cancelAnimationFrame(rafId)
+      if (pendingFlush) flushText()
+
       // Mark streaming done (in case we didn't get a result event)
       setMessages((prev) =>
         prev.map((m) =>
@@ -245,7 +283,7 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
 
       // Persist to Supabase
       if (accumulatedText.trim() && onSave) {
-        onSave(trimmed, accumulatedText.trim(), opts?.audioUrl).catch(() => {})
+        onSave(trimmed, accumulatedText.trim(), opts?.audioUrl, opts?.imageUrl).catch(() => {})
       }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -261,7 +299,7 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
         setMessages((prev) => {
           const msg = prev.find((m) => m.id === assistantId)
           if (msg?.content.trim() && onSave) {
-            onSave(trimmed, msg.content.trim(), opts?.audioUrl).catch(() => {})
+            onSave(trimmed, msg.content.trim(), opts?.audioUrl, opts?.imageUrl).catch(() => {})
           }
           return prev
         })
@@ -307,5 +345,5 @@ export function useChat({ sessionId, onSave }: UseChatOptions = {}) {
     })
   }, [])
 
-  return { messages, loading, sendMessage, loadMessages, clearMessages, appendMessage, stopStreaming, currentModel }
+  return { messages, loading, sendMessage, loadMessages, clearMessages, appendMessage, stopStreaming, detachStream, currentModel }
 }

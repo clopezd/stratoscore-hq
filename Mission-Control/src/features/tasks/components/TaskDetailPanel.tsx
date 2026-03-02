@@ -39,10 +39,9 @@ import type {
 } from '@/types/database'
 
 const STATUS_OPTIONS: { value: TaskStatus; label: string; color: string }[] = [
-  { value: 'inbox', label: 'Inbox', color: 'bg-white/[0.08]' },
-  { value: 'assigned', label: 'Assigned', color: 'bg-blue-500/20' },
+  { value: 'backlog', label: 'Backlog', color: 'bg-white/[0.08]' },
+  { value: 'todo', label: 'To-do', color: 'bg-blue-500/20' },
   { value: 'in_progress', label: 'In Progress', color: 'bg-yellow-500/20' },
-  { value: 'review', label: 'Review', color: 'bg-purple-500/20' },
   { value: 'done', label: 'Done', color: 'bg-emerald-500/20' },
   { value: 'archived', label: 'Archived', color: 'bg-white/[0.04]' },
 ]
@@ -289,7 +288,7 @@ export function TaskDetailPanel() {
     const { data } = await supabase.from('tasks').insert({
       title: newSubtaskTitle.trim(),
       parent_task_id: task.id,
-      status: 'inbox' as TaskStatus,
+      status: 'backlog' as TaskStatus,
       position: subtasks.length,
     }).select('*').single()
     if (data) {
@@ -300,65 +299,15 @@ export function TaskDetailPanel() {
   }
 
   const handleToggleSubtask = async (subtask: Task) => {
-    const newStatus: TaskStatus = subtask.status === 'done' ? 'inbox' : 'done'
+    const newStatus: TaskStatus = subtask.status === 'done' ? 'backlog' : 'done'
     setSubtasks((prev) => prev.map((s) => s.id === subtask.id ? { ...s, status: newStatus } : s))
     const supabase = createClient()
     await supabase.from('tasks').update({ status: newStatus }).eq('id', subtask.id)
   }
 
   const handleResumeAgent = async () => {
-    if (!task || task.assignees.length === 0) return
-    setResumingAgent(true)
-    setResumeResult(null)
-
-    const agent = task.assignees[0]
-
-    // Build agent preamble from personality fields
-    const preamble = [
-      agent.system_prompt ? `System: ${agent.system_prompt}` : '',
-      agent.character ? `Character: ${agent.character}` : '',
-      agent.lore ? `Lore: ${agent.lore}` : '',
-    ].filter(Boolean).join('\n')
-
-    // Build task context with messages
-    const taskContext = [
-      `Task: ${task.title}`,
-      task.description ? `Description: ${task.description}` : '',
-      `Status: ${task.status}`,
-      messages.length > 0 ? `\nRecent messages:\n${messages.slice(-5).map(m => `- ${m.agents?.name ?? 'System'}: ${m.content}`).join('\n')}` : '',
-    ].filter(Boolean).join('\n')
-
-    const prompt = preamble
-      ? `${preamble}\n\n---\n\n${taskContext}\n\nPlease resume work on this task.`
-      : `${taskContext}\n\nPlease resume work on this task.`
-
-    // Move task to in_progress
-    handleStatusChange('in_progress')
-
-    // Update agent to active
-    const supabase = createClient()
-    await supabase.from('agents').update({ status: 'active' }).eq('id', agent.id)
-
-    // Log the resume activity
-    await supabase.from('activities').insert({
-      type: 'agent_resumed',
-      agent_id: agent.id,
-      message: `resumed work on "${task.title}"`,
-      target_id: task.id,
-    })
-
-    // Add a message to the task thread
-    await supabase.from('messages').insert({
-      task_id: task.id,
-      from_agent_id: agent.id,
-      content: `*Agent resumed on this task via Mission Control*`,
-    })
-
-    setResumeResult({ ok: true, message: `${agent.name} resumed on this task` })
-    setResumingAgent(false)
-
-    // Clear result after 3 seconds
-    setTimeout(() => setResumeResult(null), 3000)
+    // Agent resume disabled — agent system removed from UI
+    return
   }
 
   const handleMarkDone = () => handleStatusChange('done')
@@ -762,15 +711,20 @@ export function TaskDetailPanel() {
               </label>
               {task.assignees.length > 0 ? (
                 <div className="space-y-1.5">
-                  {task.assignees.map((agent) => (
+                  {task.assignees.map((assignee) => (
                     <div
-                      key={agent.id}
+                      key={assignee.id}
                       className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.04]"
                     >
-                      <span className="text-lg">{agent.avatar}</span>
+                      {assignee.avatar_url
+                        ? <img src={assignee.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover" />
+                        : <span className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center text-xs text-white/50">
+                            {(assignee.full_name ?? '?')[0]}
+                          </span>
+                      }
                       <div className="min-w-0">
-                        <span className="text-sm text-white truncate block">{agent.name}</span>
-                        <span className="text-[11px] text-white/40">{agent.role}</span>
+                        <span className="text-sm text-white truncate block">{assignee.full_name ?? 'Unknown'}</span>
+                        <span className="text-[11px] text-white/40">{assignee.role}</span>
                       </div>
                     </div>
                   ))}
@@ -799,8 +753,8 @@ export function TaskDetailPanel() {
               </div>
             )}
 
-            {/* Resume Agent — for tasks with assignees in review/assigned/inbox */}
-            {task.assignees.length > 0 && ['review', 'assigned', 'inbox'].includes(task.status) && (
+            {/* Resume Agent — for tasks with assignees in backlog/todo */}
+            {task.assignees.length > 0 && ['backlog', 'todo'].includes(task.status) && (
               <div className="space-y-2">
                 <button
                   onClick={handleResumeAgent}
@@ -816,7 +770,7 @@ export function TaskDetailPanel() {
                   ) : (
                     <Play size={14} />
                   )}
-                  {resumingAgent ? 'Resuming...' : `Resume ${task.assignees[0].name}`}
+                  {resumingAgent ? 'Resuming...' : `Resume ${task.assignees[0].full_name ?? 'Agent'}`}
                 </button>
                 {resumeResult && (
                   <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs ${

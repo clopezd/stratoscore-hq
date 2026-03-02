@@ -9,10 +9,9 @@ import { TemplatesPicker } from './TemplatesPicker'
 import type { TaskStatus, TaskPriority, Label, Agent } from '@/types/database'
 
 const STATUS_OPTIONS: { value: TaskStatus; label: string }[] = [
-  { value: 'inbox', label: 'Inbox' },
-  { value: 'assigned', label: 'Assigned' },
+  { value: 'backlog', label: 'Backlog' },
+  { value: 'todo', label: 'To-do' },
   { value: 'in_progress', label: 'In Progress' },
-  { value: 'review', label: 'Review' },
 ]
 
 interface CreateTaskModalProps {
@@ -21,7 +20,7 @@ interface CreateTaskModalProps {
   defaultStatus?: TaskStatus
 }
 
-export function CreateTaskModal({ isOpen, onClose, defaultStatus = 'inbox' }: CreateTaskModalProps) {
+export function CreateTaskModal({ isOpen, onClose, defaultStatus = 'backlog' }: CreateTaskModalProps) {
   const addTask = useTasksStore((s) => s.addTask)
   const addTemplate = useTemplatesStore((s) => s.addTemplate)
 

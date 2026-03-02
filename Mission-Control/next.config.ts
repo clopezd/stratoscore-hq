@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   },
   // ssh2 uses native crypto — keep it out of the Turbopack bundle
   serverExternalPackages: ['ssh2'],
+  // Allow images from Supabase Storage (generated images, avatars, etc.)
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+    ],
+  },
   async headers() {
     return [
       {

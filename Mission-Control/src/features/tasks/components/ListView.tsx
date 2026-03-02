@@ -12,15 +12,14 @@ import { Plus, ChevronDown, ChevronRight } from 'lucide-react'
 import type { TaskStatus, TaskWithAssignees } from '@/types/database'
 
 const STATUS_CONFIG: Record<TaskStatus, { label: string; color: string }> = {
-  inbox: { label: 'Inbox', color: 'bg-white/[0.08]' },
-  assigned: { label: 'Assigned', color: 'bg-blue-500/20' },
+  backlog: { label: 'Backlog', color: 'bg-white/[0.08]' },
+  todo: { label: 'To-do', color: 'bg-blue-500/20' },
   in_progress: { label: 'In Progress', color: 'bg-yellow-500/20' },
-  review: { label: 'Review', color: 'bg-purple-500/20' },
   done: { label: 'Done', color: 'bg-emerald-500/20' },
   archived: { label: 'Archived', color: 'bg-white/[0.04]' },
 }
 
-const VISIBLE_STATUSES: TaskStatus[] = ['inbox', 'assigned', 'in_progress', 'review', 'done']
+const VISIBLE_STATUSES: TaskStatus[] = ['backlog', 'todo', 'in_progress', 'done']
 
 export function ListView() {
   const tasks = useTasksStore((s) => s.tasks)
@@ -36,7 +35,7 @@ export function ListView() {
 
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [createModalOpen, setCreateModalOpen] = useState(false)
-  const [createDefaultStatus, setCreateDefaultStatus] = useState<TaskStatus>('inbox')
+  const [createDefaultStatus, setCreateDefaultStatus] = useState<TaskStatus>('backlog')
 
   const statuses = showArchived ? [...VISIBLE_STATUSES, 'archived' as TaskStatus] : VISIBLE_STATUSES
 
@@ -53,7 +52,7 @@ export function ListView() {
 
   const tasksByStatus = useMemo(() => {
     const grouped: Record<TaskStatus, TaskWithAssignees[]> = {
-      inbox: [], assigned: [], in_progress: [], review: [], done: [], archived: [],
+      backlog: [], todo: [], in_progress: [], done: [], archived: [],
     }
     for (const task of filteredTasks) {
       if (grouped[task.status]) grouped[task.status].push(task)
@@ -84,7 +83,7 @@ export function ListView() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <button
-          onClick={() => { setCreateDefaultStatus('inbox'); setCreateModalOpen(true) }}
+          onClick={() => { setCreateDefaultStatus('backlog'); setCreateModalOpen(true) }}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/[0.08] text-white/70 border border-white/[0.1] hover:bg-white/[0.12] hover:text-white transition-colors"
         >
           <Plus size={14} />
@@ -166,7 +165,11 @@ export function ListView() {
                       {/* Title + assignee */}
                       <div className="flex items-center gap-2 min-w-0">
                         {task.assignees[0] && (
-                          <span className="text-sm flex-shrink-0">{task.assignees[0].avatar}</span>
+                          task.assignees[0].avatar_url
+                            ? <img src={task.assignees[0].avatar_url} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0" />
+                            : <span className="w-5 h-5 rounded-full bg-white/[0.08] flex items-center justify-center text-[10px] text-white/50 flex-shrink-0">
+                                {(task.assignees[0].full_name ?? '?')[0]}
+                              </span>
                         )}
                         <span className="text-sm text-white truncate">{task.title}</span>
                         {(task.labels ?? []).length > 0 && (

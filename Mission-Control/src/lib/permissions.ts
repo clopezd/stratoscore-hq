@@ -1,14 +1,15 @@
 import type { UserRole } from '@/types/database'
 
 const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
-  '/': ['owner', 'member'],
-  '/profile': ['owner', 'member'],
+  '/': ['owner', 'admin', 'member'],
+  '/profile': ['owner', 'admin', 'member'],
   '/chat': ['owner'],
   '/activity': ['owner'],
   '/cron': ['owner'],
-  '/calendar': ['owner'],
-  '/draw': ['owner'],
-  '/settings': ['owner', 'member'],
+  '/calendar': ['owner', 'admin'],
+  '/draw': ['owner', 'admin'],
+  '/settings': ['owner', 'admin', 'member'],
+  '/team': ['owner', 'admin', 'member'],
 }
 
 export function canAccessRoute(pathname: string, role: UserRole): boolean {

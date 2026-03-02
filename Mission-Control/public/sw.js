@@ -1,7 +1,7 @@
-// Mission Control Service Worker — Push Notifications
-// Handles: push events, subscription change, notification click
+// Mission Control Service Worker — Push + PWA Install
+// Handles: fetch (Android installability), push, notification click
 
-const CACHE_NAME = 'mc-sw-v1'
+const CACHE_NAME = 'mc-sw-v2'
 
 // ── Install/Activate ──────────────────────────────────────────
 self.addEventListener('install', () => {
@@ -9,7 +9,27 @@ self.addEventListener('install', () => {
 })
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim())
+  event.waitUntil(
+    caches.keys().then((names) =>
+      Promise.all(names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n)))
+    ).then(() => self.clients.claim())
+  )
+})
+
+// ── Fetch (network-first, required for Android PWA installability) ──
+self.addEventListener('fetch', (event) => {
+  // Only handle same-origin navigation requests (HTML pages)
+  if (event.request.mode !== 'navigate') return
+
+  event.respondWith(
+    fetch(event.request).catch(() =>
+      // Offline fallback: if network fails, try cache, then basic offline page
+      caches.match(event.request).then((cached) => cached || new Response(
+        '<html><body style="background:#0a0a0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui"><div style="text-align:center"><h2>Offline</h2><p>Check your connection and try again.</p></div></body></html>',
+        { headers: { 'Content-Type': 'text/html' } }
+      ))
+    )
+  )
 })
 
 // ── Push Events ───────────────────────────────────────────────

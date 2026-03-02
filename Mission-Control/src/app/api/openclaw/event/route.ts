@@ -290,7 +290,7 @@ async function handleEnd(
     isCodingTask = (codeDocs?.length ?? 0) > 0
   }
 
-  const endStatus = needsFeedback || isCodingTask ? 'review' : 'done'
+  const endStatus = 'done'
 
   // Calculate duration
   const startTime = task.started_at || task.created_at || new Date().toISOString()
@@ -349,7 +349,7 @@ async function handleError(
   // Update task to review
   await supabase
     .from('tasks')
-    .update({ status: 'review' })
+    .update({ status: 'done' })
     .eq('id', task.id)
 
   // Update agent to blocked

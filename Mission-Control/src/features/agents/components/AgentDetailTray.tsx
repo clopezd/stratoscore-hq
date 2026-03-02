@@ -66,7 +66,6 @@ export function AgentDetailTray({ agent, onClose }: AgentDetailTrayProps) {
 
   const statusConfig = STATUS_COLORS[agent.status]
   const activeTasks = tasks.filter((t) => t.status === 'in_progress')
-  const reviewTasks = tasks.filter((t) => t.status === 'review')
   const completedTasks = tasks.filter((t) => t.status === 'done')
   const totalTasks = tasks.length
   const completionRate = totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0
@@ -115,14 +114,10 @@ export function AgentDetailTray({ agent, onClose }: AgentDetailTrayProps) {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <div className="bg-white/[0.04] rounded-lg p-2.5 border border-white/[0.06] text-center">
                 <p className="text-xl font-bold text-white">{activeTasks.length}</p>
                 <p className="text-[9px] text-white/30 uppercase tracking-wider">Active</p>
-              </div>
-              <div className="bg-white/[0.04] rounded-lg p-2.5 border border-white/[0.06] text-center">
-                <p className="text-xl font-bold text-yellow-400">{reviewTasks.length}</p>
-                <p className="text-[9px] text-white/30 uppercase tracking-wider">Review</p>
               </div>
               <div className="bg-white/[0.04] rounded-lg p-2.5 border border-white/[0.06] text-center">
                 <p className="text-xl font-bold text-emerald-400">{completedTasks.length}</p>
@@ -223,22 +218,6 @@ export function AgentDetailTray({ agent, onClose }: AgentDetailTrayProps) {
                 <p className="text-xs text-white/20 italic px-1">No active tasks</p>
               )}
 
-              {/* Review tasks */}
-              {reviewTasks.length > 0 && (
-                <>
-                  <div className="flex items-center gap-2 mt-3 mb-2">
-                    <span className="text-[11px] uppercase tracking-widest text-white/30">Awaiting Review</span>
-                  </div>
-                  <div className="space-y-1.5">
-                    {reviewTasks.map((t) => (
-                      <div key={t.id} className="bg-purple-500/[0.04] rounded-lg px-3 py-2 border border-purple-500/[0.1]">
-                        <p className="text-xs text-white truncate">{t.title}</p>
-                        <span className="text-[10px] text-purple-300/50">Review</span>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
 
             {/* Recent Activity */}

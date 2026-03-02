@@ -14,7 +14,7 @@ const createTaskSchema = baseSchema.extend({
   action: z.literal('create_task'),
   title: z.string().min(1),
   description: z.string().optional().default(''),
-  status: z.enum(['inbox', 'assigned', 'in_progress', 'review', 'done', 'archived']).optional().default('inbox'),
+  status: z.enum(['backlog', 'todo', 'in_progress', 'done', 'archived']).optional().default('backlog'),
   tags: z.array(z.string()).optional().default([]),
   assignTo: z.string().optional(),
 })
@@ -24,13 +24,13 @@ const updateTaskSchema = baseSchema.extend({
   taskId: z.string().uuid(),
   title: z.string().optional(),
   description: z.string().optional(),
-  status: z.enum(['inbox', 'assigned', 'in_progress', 'review', 'done', 'archived']).optional(),
+  status: z.enum(['backlog', 'todo', 'in_progress', 'done', 'archived']).optional(),
   tags: z.array(z.string()).optional(),
 })
 
 const queryTasksSchema = baseSchema.extend({
   action: z.literal('query_tasks'),
-  status: z.enum(['inbox', 'assigned', 'in_progress', 'review', 'done', 'archived']).optional(),
+  status: z.enum(['backlog', 'todo', 'in_progress', 'done', 'archived']).optional(),
   limit: z.number().int().min(1).max(50).optional().default(20),
 })
 

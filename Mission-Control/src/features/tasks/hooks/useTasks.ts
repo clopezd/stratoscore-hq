@@ -2,14 +2,14 @@
 import { useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useTasksStore } from '@/shared/stores/tasks-store'
-import type { Agent, Label, Task, TaskStatus, TaskPriority, TaskWithAssignees } from '@/types/database'
+import type { Profile, Label, Task, TaskStatus, TaskPriority, TaskWithAssignees } from '@/types/database'
 
 interface TaskAssigneeRow {
   id: string
   task_id: string
-  agent_id: string
+  profile_id: string | null
   assigned_at: string | null
-  agents: Agent | null
+  profiles: Profile | null
 }
 
 interface TaskLabelRow {
@@ -47,9 +47,9 @@ interface TaskRow {
 }
 
 function transformTask(row: TaskRow): TaskWithAssignees {
-  const assignees: Agent[] = row.task_assignees
-    .map((ta) => ta.agents)
-    .filter((agent): agent is Agent => agent !== null)
+  const assignees: Profile[] = row.task_assignees
+    .map((ta) => ta.profiles)
+    .filter((profile): profile is Profile => profile !== null)
 
   const labels: Label[] = (row.task_labels ?? [])
     .map((tl) => tl.labels)
@@ -110,7 +110,7 @@ export function useTasks() {
     const supabase = createClient()
     const { data } = await supabase
       .from('tasks')
-      .select('*, task_assignees(*, agents(*)), task_labels(labels(*)), subtasks:tasks!parent_task_id(id, status)')
+      .select('*, task_assignees(*, profiles(*)), task_labels(labels(*)), subtasks:tasks!parent_task_id(id, status)')
       .eq('id', taskId)
       .single()
 
@@ -126,7 +126,7 @@ export function useTasks() {
     // Initial fetch
     supabase
       .from('tasks')
-      .select('*, task_assignees(*, agents(*)), task_labels(labels(*)), subtasks:tasks!parent_task_id(id, status)')
+      .select('*, task_assignees(*, profiles(*)), task_labels(labels(*)), subtasks:tasks!parent_task_id(id, status)')
       .order('created_at', { ascending: false })
       .then(({ data }) => {
         if (data) {

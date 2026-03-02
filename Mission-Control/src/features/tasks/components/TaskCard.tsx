@@ -9,10 +9,9 @@ import { PRIORITY_CONFIG, STATUS_CONFIG, formatDueDate, getDueDateColor } from '
 import type { TaskWithAssignees, TaskStatus, TaskPriority } from '@/types/database'
 
 const QUICK_STATUSES: { value: TaskStatus; label: string }[] = [
-  { value: 'inbox', label: 'Inbox' },
-  { value: 'assigned', label: 'Assigned' },
+  { value: 'backlog', label: 'Backlog' },
+  { value: 'todo', label: 'To-do' },
   { value: 'in_progress', label: 'In Progress' },
-  { value: 'review', label: 'Review' },
   { value: 'done', label: 'Done' },
   { value: 'archived', label: 'Archived' },
 ]
@@ -219,9 +218,14 @@ export function TaskCard({ task, isDragOverlay }: TaskCardProps) {
         <div className="flex items-center gap-2">
           {firstAssignee ? (
             <div className="flex items-center gap-1.5">
-              <span className="text-sm">{firstAssignee.avatar}</span>
+              {firstAssignee.avatar_url
+                ? <img src={firstAssignee.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
+                : <span className="w-5 h-5 rounded-full bg-white/[0.08] flex items-center justify-center text-[10px] text-white/50">
+                    {(firstAssignee.full_name ?? '?')[0]}
+                  </span>
+              }
               <span className="text-[11px] text-white/50 truncate max-w-[80px]">
-                {firstAssignee.name}
+                {firstAssignee.full_name ?? 'Unknown'}
               </span>
             </div>
           ) : (

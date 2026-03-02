@@ -18,19 +18,30 @@ function formatDuration(ms: number): string {
 
 export function UsageBadge({ usage }: { usage: UsageMeta }) {
   const [expanded, setExpanded] = useState(false)
+
+  const hasContext = usage.contextUsed != null && usage.contextTotal != null && usage.contextTotal > 0
   const totalTokens = usage.inputTokens + usage.outputTokens
 
-  if (totalTokens === 0) return null
+  if (!hasContext && totalTokens === 0) return null
+
+  const pct = hasContext ? Math.round((usage.contextUsed! / usage.contextTotal!) * 100) : 0
+  const colorClass = pct >= 90 ? 'text-red-400/60' : pct >= 70 ? 'text-amber-400/40' : 'text-white/20'
 
   return (
     <button
       onClick={() => setExpanded((v) => !v)}
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] text-white/20 hover:text-white/40 hover:bg-white/[0.04] transition-colors"
-      title="Token usage"
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] ${colorClass} hover:text-white/40 hover:bg-white/[0.04] transition-colors`}
+      title={hasContext ? `Context: ${pct}% used` : 'Token usage'}
     >
       <Zap size={9} />
       {expanded ? (
         <span className="flex items-center gap-1.5">
+          {hasContext && (
+            <>
+              <span>{formatTokens(usage.contextUsed!)} / {formatTokens(usage.contextTotal!)}</span>
+              <span className="text-white/10">·</span>
+            </>
+          )}
           <span>{formatTokens(usage.inputTokens)} in</span>
           <span className="text-white/10">·</span>
           <span>{formatTokens(usage.outputTokens)} out</span>
@@ -44,7 +55,12 @@ export function UsageBadge({ usage }: { usage: UsageMeta }) {
           )}
         </span>
       ) : (
-        <span>{formatTokens(totalTokens)} tokens</span>
+        <span>
+          {hasContext
+            ? `${formatTokens(usage.contextUsed!)} / ${formatTokens(usage.contextTotal!)}`
+            : `${formatTokens(totalTokens)} tokens`
+          }
+        </span>
       )}
     </button>
   )

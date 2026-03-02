@@ -137,7 +137,7 @@ export function FilterBar() {
             <div className="absolute top-full left-0 mt-1 bg-[#15151f] border border-white/[0.1] rounded-xl overflow-hidden z-20 shadow-xl shadow-black/40 min-w-[180px]">
               {/* Status */}
               <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-white/25 font-semibold">Status</div>
-              {(['inbox', 'assigned', 'in_progress', 'review', 'done'] as TaskStatus[]).map((s) => {
+              {(['backlog', 'todo', 'in_progress', 'done'] as TaskStatus[]).map((s) => {
                 const cfg = STATUS_CONFIG[s]
                 return (
                   <button

@@ -6,7 +6,7 @@ import { useTasksStore } from '@/shared/stores/tasks-store'
 import { useLayoutStore } from '@/shared/stores/layout-store'
 import type { TaskStatus, TaskPriority, TaskWithAssignees } from '@/types/database'
 
-const STATUS_CYCLE: TaskStatus[] = ['inbox', 'assigned', 'in_progress', 'review', 'done']
+const STATUS_CYCLE: TaskStatus[] = ['backlog', 'todo', 'in_progress', 'done']
 
 function isInputFocused(): boolean {
   const el = document.activeElement
@@ -127,7 +127,7 @@ export function useGlobalShortcuts({ onCreateTask, onShowHelp }: UseGlobalShortc
   const markDone = useCallback(() => {
     const task = getFocusedTask()
     if (!task) return
-    const newStatus = task.status === 'done' ? 'inbox' : 'done'
+    const newStatus = task.status === 'done' ? 'backlog' : 'done'
     updateTask(task.id, { status: newStatus as TaskStatus })
     updateTaskInDb(task.id, { status: newStatus })
   }, [getFocusedTask, updateTask, updateTaskInDb])
