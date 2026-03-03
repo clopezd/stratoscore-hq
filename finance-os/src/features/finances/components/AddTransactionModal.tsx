@@ -45,7 +45,7 @@ export function AddTransactionModal({
   const [monto, setMonto] = useState('')
   const [categoria, setCategoria] = useState('')
   const [cuenta, setCuenta] = useState<Cuenta>('Primary Checking')
-  const [cuentaDestino, setCuentaDestino] = useState<Cuenta>('Efectivo')
+  const [cuentaDestino, setCuentaDestino] = useState<Cuenta>('Cash')
   const [descripcion, setDescripcion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -58,7 +58,7 @@ export function AddTransactionModal({
       setMonto(String(editTransaction.monto))
       setCategoria(editTransaction.categoria)
       setCuenta(editTransaction.cuenta)
-      setCuentaDestino(editTransaction.cuenta_destino || 'Efectivo')
+      setCuentaDestino(editTransaction.cuenta_destino || 'Cash')
       setDescripcion(editTransaction.descripcion || '')
     } else if (initialTipo && isOpen) {
       setTipo(initialTipo)
@@ -129,7 +129,7 @@ export function AddTransactionModal({
     setMonto('')
     setCategoria('')
     setCuenta('Primary Checking')
-    setCuentaDestino('Efectivo')
+    setCuentaDestino('Cash')
     setDescripcion('')
     setError(null)
   }

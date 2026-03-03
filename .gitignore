@@ -30,8 +30,8 @@ dist/
 .mcp.json
 
 # Agent server runtime
-store/
-workspace/
+agent-server/store/
+agent-server/workspace/
 *.log
 *.pid
 
