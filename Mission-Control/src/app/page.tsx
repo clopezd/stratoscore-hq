@@ -440,11 +440,11 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════
           1. HERO
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="relative z-10 px-4 pt-8 pb-4 md:px-10 md:pt-16 lg:px-16 fade-up">
+      <section className="relative z-10 px-4 pt-4 pb-3 md:px-10 md:pt-8 lg:px-16 fade-up">
         <TiltCard className="max-w-5xl mx-auto">
           <Window title="stratoscore.app — Centro de Mando" accentTop glowColor="rgba(0,242,254,0.15)">
 
-            <div className="px-4 md:px-6 pt-4 md:pt-5 pb-2 flex items-center justify-between">
+            <div className="px-4 md:px-6 pt-3 pb-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full pulse-dot flex-shrink-0" style={{ background: '#27C93F', boxShadow: '0 0 8px #27C93F' }} />
                 <p className="font-mono text-xs" style={{ color: 'rgba(0,242,254,0.6)' }}>
@@ -454,9 +454,9 @@ export default function LandingPage() {
               <span className="hidden sm:inline font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.4)' }}>[CORE_v2.0 :: ONLINE]</span>
             </div>
 
-            <div className="px-4 md:px-6 pb-10 md:pb-14 pt-6 md:pt-8 text-center">
+            <div className="px-4 md:px-6 pb-6 md:pb-8 pt-4 md:pt-5 text-center">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 mb-6 md:mb-8 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm"
+              <div className="inline-flex items-center gap-2 mb-3 md:mb-4 px-3 md:px-4 py-1.5 rounded-full text-xs md:text-sm"
                 style={{ border: '1px solid rgba(0,242,254,0.22)', background: 'rgba(0,242,254,0.05)', color: '#8B949E' }}>
                 <span>🇨🇴</span>
                 <span style={{ color: 'rgba(0,242,254,0.6)' }}>+</span>
@@ -466,7 +466,7 @@ export default function LandingPage() {
               </div>
 
               {/* Headline */}
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight max-w-4xl mx-auto mb-4 md:mb-5">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight tracking-tight max-w-4xl mx-auto mb-2 md:mb-3">
                 Tu negocio trabajando{' '}
                 <span style={{
                   background: 'linear-gradient(135deg, #00F2FE 0%, #7cf5ff 55%, #ffffff 100%)',
@@ -480,30 +480,30 @@ export default function LandingPage() {
               </h1>
 
               {/* Cyber labels — hidden on mobile */}
-              <div className="hidden sm:flex items-center justify-center gap-3 mb-6">
+              <div className="hidden sm:flex items-center justify-center gap-3 mb-3 md:mb-4">
                 <span className="font-mono text-[10px]" style={{ color: 'rgba(0,242,254,0.45)' }}>[AI_ENGINE :: ACTIVE]</span>
                 <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: '#27C93F', boxShadow: '0 0 6px #27C93F' }} />
                 <span className="font-mono text-[10px]" style={{ color: 'rgba(0,242,254,0.45)' }}>[GROWTH_MODE :: ON]</span>
               </div>
 
               {/* Subheadline */}
-              <p className="text-base md:text-xl lg:text-2xl max-w-2xl mx-auto leading-relaxed mb-8 md:mb-10" style={{ color: '#8B949E' }}>
+              <p className="text-sm md:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed mb-5 md:mb-6" style={{ color: '#8B949E' }}>
                 Marketing que no para mientras atiendes pacientes.{' '}
                 <span style={{ color: '#E0EDE0' }}>Automatizamos tu crecimiento con IA.</span>
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 md:gap-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
                 <Link
                   href="mailto:hello@stratoscore.app"
-                  className="w-full sm:w-auto text-center px-6 md:px-10 py-4 md:py-5 rounded-xl font-bold text-base md:text-lg tracking-wide transition-all duration-200 hover:scale-[1.02] hover:brightness-110 bg-brandCyan text-brandBg"
+                  className="w-full sm:w-auto text-center px-6 md:px-8 py-3.5 rounded-xl font-bold text-sm md:text-base tracking-wide transition-all duration-200 hover:scale-[1.02] hover:brightness-110 bg-brandCyan text-brandBg"
                   style={{ boxShadow: '0 0 36px rgba(0,242,254,0.7), 0 0 90px rgba(0,242,254,0.2)' }}
                 >
                   📅 Agendar diagnóstico gratis
                 </Link>
                 <Link
                   href="#servicios"
-                  className="w-full sm:w-auto text-center px-6 md:px-10 py-4 md:py-5 rounded-xl text-base font-medium transition-all duration-300"
+                  className="w-full sm:w-auto text-center px-6 md:px-8 py-3.5 rounded-xl text-sm md:text-base font-medium transition-all duration-300"
                   style={{ border: '1px solid rgba(255,255,255,0.12)', color: '#8B949E' }}
                   onMouseEnter={e => { e.currentTarget.style.color = '#E0EDE0'; e.currentTarget.style.borderColor = 'rgba(0,242,254,0.35)' }}
                   onMouseLeave={e => { e.currentTarget.style.color = '#8B949E'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}
@@ -513,8 +513,8 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Status bar — hidden on mobile */}
-            <div className="hidden sm:flex items-center justify-between px-6 py-2.5"
+            {/* Status bar — hidden on mobile and md, only visible on lg+ */}
+            <div className="hidden lg:flex items-center justify-between px-6 py-2"
               style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.25)' }}>
               <span className="font-mono text-[10px]" style={{ color: 'rgba(0,242,254,0.35)' }}>stratoscore@v2.0</span>
               <span className="font-mono text-[10px]" style={{ color: 'rgba(39,201,63,0.6)' }}>● sistema nominal</span>
@@ -527,10 +527,10 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════
           2. DIAGNÓSTICO DE PÉRDIDAS
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="relative z-10 px-4 py-10 md:px-10 md:py-14 lg:px-16">
+      <section className="relative z-10 px-4 py-8 md:px-10 md:py-10 lg:px-16">
         <div className="max-w-5xl mx-auto">
 
-          <div className="text-center mb-8 md:mb-10 fade-d1">
+          <div className="text-center mb-6 md:mb-8 fade-d1">
             <div className="inline-flex items-center gap-2 md:gap-3 mb-4">
               <div className="h-px w-8 md:w-16" style={{ background: 'rgba(255,189,46,0.35)' }} />
               <span className="font-mono text-[10px] md:text-xs uppercase tracking-widest" style={{ color: 'rgba(255,189,46,0.75)' }}>
