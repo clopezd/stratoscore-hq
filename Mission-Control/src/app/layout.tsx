@@ -11,11 +11,12 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: 'StratosCore — Automatización 24/7 para PYMEs y Clínicas',
-  description: 'Automatizamos tu crecimiento con IA: agenda, CRM y marketing que no paran mientras tú atiendes. Colombia y Costa Rica.',
+  description: 'Optimizamos tu operación con IA y automatización estratégica: agenda inteligente, CRM y marketing que no paran mientras tú atiendes. Colombia y Costa Rica.',
   manifest: '/manifest.json',
   icons: {
-    icon: '/icon.svg',
-    apple: '/icon.svg',
+    icon: [{ url: '/logo.png', type: 'image/png' }],
+    apple: '/logo.png',
+    shortcut: '/logo.png',
   },
   appleWebApp: {
     capable: true,

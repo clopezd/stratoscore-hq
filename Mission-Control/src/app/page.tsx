@@ -348,7 +348,8 @@ export default function LandingPage() {
         <div className="flex items-center justify-between px-4 py-3 md:px-10">
           {/* Logo */}
           <div className="flex items-center gap-2.5">
-            <CubeIcon className="w-8 h-8" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="StratosCore" className="w-8 h-8 object-contain" />
             <span className="text-sm font-semibold uppercase" style={{ color: '#E0EDE0', letterSpacing: '0.26em' }}>
               STRATOS<span style={{ color: '#8B949E', margin: '0 7px' }}>|</span>CORE
             </span>
@@ -800,7 +801,8 @@ export default function LandingPage() {
           style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(20px)' }}
         >
           <div className="flex items-center gap-2.5">
-            <CubeIcon className="w-6 h-6" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="StratosCore" className="w-6 h-6 object-contain opacity-70" />
             <span className="text-sm font-semibold uppercase" style={{ color: '#8B949E', letterSpacing: '0.2em' }}>
               STRATOS<span style={{ margin: '0 5px', opacity: 0.35 }}>|</span>CORE
             </span>
