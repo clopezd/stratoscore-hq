@@ -440,7 +440,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════
           1. HERO
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="relative z-10 px-4 pt-6 pb-4 md:px-10 md:pt-10 lg:px-16 fade-up">
+      <section className="relative z-10 px-4 pt-10 pb-10 md:px-10 md:pt-10 md:pb-4 lg:px-16 fade-up">
         <TiltCard className="max-w-5xl mx-auto">
           <Window title="stratoscore.app — Centro de Mando" accentTop glowColor="rgba(0,242,254,0.15)">
 
@@ -454,9 +454,9 @@ export default function LandingPage() {
               <span className="hidden sm:inline font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.4)' }}>[CORE_v2.0 :: ONLINE]</span>
             </div>
 
-            <div className="px-4 md:px-8 pb-8 md:pb-10 pt-6 md:pt-8 text-center">
+            <div className="px-5 md:px-8 pb-10 md:pb-10 pt-8 md:pt-8 text-center">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 mb-5 md:mb-6 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm"
+              <div className="inline-flex items-center gap-2 mb-6 md:mb-6 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm"
                 style={{ border: '1px solid rgba(0,242,254,0.22)', background: 'rgba(0,242,254,0.05)', color: '#8B949E' }}>
                 <span>🇨🇴</span>
                 <span style={{ color: 'rgba(0,242,254,0.6)' }}>+</span>
@@ -466,7 +466,7 @@ export default function LandingPage() {
               </div>
 
               {/* Headline */}
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight tracking-tight max-w-4xl mx-auto mb-4 md:mb-5">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight tracking-tight max-w-4xl mx-auto mb-5 md:mb-5">
                 Tu negocio trabajando{' '}
                 <span style={{
                   background: 'linear-gradient(135deg, #00F2FE 0%, #7cf5ff 55%, #ffffff 100%)',
@@ -487,7 +487,7 @@ export default function LandingPage() {
               </div>
 
               {/* Subheadline */}
-              <p className="text-sm md:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed mb-7 md:mb-8" style={{ color: '#8B949E' }}>
+              <p className="text-base md:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed mb-8 md:mb-8" style={{ color: '#8B949E' }}>
                 Marketing que no para mientras atiendes pacientes.{' '}
                 <span style={{ color: '#E0EDE0' }}>Automatizamos tu crecimiento con IA.</span>
               </p>

@@ -10,8 +10,8 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: 'Mission Control',
-  description: 'Real-time dashboard for AI agents',
+  title: 'StratosCore — Automatización 24/7 para PYMEs y Clínicas',
+  description: 'Automatizamos tu crecimiento con IA: agenda, CRM y marketing que no paran mientras tú atiendes. Colombia y Costa Rica.',
   manifest: '/manifest.json',
   icons: {
     icon: '/icon.svg',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Mission Control',
+    title: 'StratosCore',
   },
 }
 
