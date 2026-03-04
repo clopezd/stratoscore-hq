@@ -61,14 +61,18 @@ export function Header() {
             {avatarOpen && <AvatarLightbox src="/avatar.png" alt="Assistant" onClose={() => setAvatarOpen(false)} />}
             {/* Desktop: MISSION CONTROL badge */}
             <div className="hidden md:flex items-center gap-3">
-              <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] backdrop-blur-md">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] backdrop-blur-md">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.png" alt="StratosCore" className="w-5 h-5 object-contain rounded-sm" />
                 <span className="text-[10px] font-bold tracking-tighter text-white/90">MISSION CONTROL</span>
               </div>
             </div>
           </>
         ) : (
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] backdrop-blur-md">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] backdrop-blur-md">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="StratosCore" className="w-5 h-5 object-contain rounded-sm" />
               <span className="text-[10px] font-bold tracking-tighter text-white/90">MISSION CONTROL</span>
             </div>
           </div>

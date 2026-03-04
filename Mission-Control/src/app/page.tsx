@@ -349,7 +349,7 @@ export default function LandingPage() {
           {/* Logo */}
           <div className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="StratosCore" className="w-8 h-8 object-contain" />
+            <img src="/logo.png" alt="StratosCore" className="w-10 h-10 object-contain rounded-md" style={{ filter: 'drop-shadow(0 0 8px rgba(0,242,254,0.35))' }} />
             <span className="text-sm font-semibold uppercase" style={{ color: '#E0EDE0', letterSpacing: '0.26em' }}>
               STRATOS<span style={{ color: '#8B949E', margin: '0 7px' }}>|</span>CORE
             </span>
@@ -802,7 +802,7 @@ export default function LandingPage() {
         >
           <div className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="StratosCore" className="w-6 h-6 object-contain opacity-70" />
+            <img src="/logo.png" alt="StratosCore" className="w-8 h-8 object-contain rounded-sm" style={{ filter: 'drop-shadow(0 0 6px rgba(0,242,254,0.25))' }} />
             <span className="text-sm font-semibold uppercase" style={{ color: '#8B949E', letterSpacing: '0.2em' }}>
               STRATOS<span style={{ margin: '0 5px', opacity: 0.35 }}>|</span>CORE
             </span>
