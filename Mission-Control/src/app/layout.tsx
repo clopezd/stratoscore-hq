@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#0A0A0F',
+  themeColor: '#001117',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -39,7 +39,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={spaceGrotesk.variable}>
-      <body style={{ fontFamily: 'var(--font-grotesk), system-ui, sans-serif' }}>
+      <body style={{ fontFamily: 'var(--font-grotesk), system-ui, sans-serif', backgroundColor: '#001117' }}>
         {children}
         <PWARegister />
       </body>

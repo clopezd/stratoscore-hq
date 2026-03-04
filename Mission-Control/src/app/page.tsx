@@ -1,44 +1,101 @@
+'use client'
+
 import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
+
+// ── Brand palette — stratoscore-brand.jpg ─────────────────────────────────────
+// #001117 Deep Carbon · #E0EDE0 Platinum · #00F2FE Electric Cyan · #8B949E Stellar Gray
+
+const GLOBAL_STYLES = `
+  @keyframes scanner {
+    0%   { top: -2px; opacity: 0; }
+    3%   { opacity: 1; }
+    97%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+  @keyframes orbFloat {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50%       { transform: translateY(-18px) scale(1.03); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+  .fade-up    { animation: fadeUp 0.7s ease both; }
+  .fade-d1    { animation: fadeUp 0.7s 0.12s ease both; }
+  .fade-d2    { animation: fadeUp 0.7s 0.24s ease both; }
+  .fade-d3    { animation: fadeUp 0.7s 0.36s ease both; }
+  .fade-d4    { animation: fadeUp 0.7s 0.48s ease both; }
+  .pulse-dot  { animation: pulse-dot 1.8s ease-in-out infinite; }
+`
+
+// ── TiltCard ──────────────────────────────────────────────────────────────────
+function TiltCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current
+    if (!el) return
+    const { left, top, width, height } = el.getBoundingClientRect()
+    const x = (e.clientX - left) / width - 0.5
+    const y = (e.clientY - top) / height - 0.5
+    el.style.transform = `perspective(900px) rotateY(${x * 12}deg) rotateX(${-y * 8}deg) translateZ(8px)`
+  }
+
+  const onLeave = () => {
+    if (ref.current)
+      ref.current.style.transform = 'perspective(900px) rotateX(0) rotateY(0) translateZ(0)'
+  }
+
+  return (
+    <div
+      ref={ref}
+      className={className}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{ transition: 'transform 0.2s ease-out', willChange: 'transform' }}
+    >
+      {children}
+    </div>
+  )
+}
 
 // ── Mac Window Chrome ─────────────────────────────────────────────────────────
-
 function Window({
   title,
   children,
   className = '',
-  glowColor = 'rgba(0,242,254,0.12)',
+  glowColor = 'rgba(0,242,254,0.10)',
   accentTop = false,
+  accentColor = 'rgba(0,242,254,0.4)',
 }: {
   title: string
   children: React.ReactNode
   className?: string
   glowColor?: string
   accentTop?: boolean
+  accentColor?: string
 }) {
   return (
     <div
       className={`relative rounded-2xl overflow-hidden ${className}`}
       style={{
-        background: 'rgba(8, 14, 22, 0.88)',
+        background: 'rgba(0,17,23,0.92)',
         border: '1px solid rgba(255,255,255,0.08)',
         backdropFilter: 'blur(32px)',
         WebkitBackdropFilter: 'blur(32px)',
         boxShadow: `0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03) inset, 0 0 60px ${glowColor}`,
       }}
     >
-      {/* Specular rim */}
       <div className="absolute inset-x-0 top-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)' }} />
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.16), transparent)' }} />
 
       {/* Title bar */}
-      <div
-        className="flex items-center gap-3 px-4 py-[11px]"
-        style={{
-          background: 'rgba(255,255,255,0.025)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-        }}
-      >
-        {/* Traffic lights */}
+      <div className="flex items-center gap-3 px-4 py-[11px]"
+        style={{ background: 'rgba(255,255,255,0.022)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex items-center gap-[6px]">
           <span className="w-[11px] h-[11px] rounded-full block"
             style={{ background: '#FF5F56', boxShadow: '0 0 8px rgba(255,95,86,0.7)' }} />
@@ -47,23 +104,15 @@ function Window({
           <span className="w-[11px] h-[11px] rounded-full block"
             style={{ background: '#27C93F', boxShadow: '0 0 8px rgba(39,201,63,0.7)' }} />
         </div>
-
-        {/* Title */}
-        <span
-          className="flex-1 text-center text-[11px] font-mono"
-          style={{ color: '#8B949E', letterSpacing: '0.04em' }}
-        >
+        <span className="flex-1 text-center text-[11px] font-mono" style={{ color: '#8B949E', letterSpacing: '0.04em' }}>
           {title}
         </span>
-
-        {/* Right spacer to center title visually */}
         <div className="w-[38px]" />
       </div>
 
-      {/* Accent line below title bar */}
       {accentTop && (
         <div className="h-px w-full"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(0,242,254,0.4), transparent)' }} />
+          style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }} />
       )}
 
       {children}
@@ -71,498 +120,644 @@ function Window({
   )
 }
 
-// ── Cube logo icon ────────────────────────────────────────────────────────────
-
+// ── Icons (escalados a w-10 h-10) ─────────────────────────────────────────────
 function CubeIcon({ className = '' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <polygon points="24,4 44,14 44,34 24,44 4,34 4,14" stroke="#E0E0E0" strokeWidth="1" fill="none" />
-      <polygon points="24,4 44,14 24,24 4,14" stroke="#E0E0E0" strokeWidth="1" fill="none" />
+    <svg viewBox="0 0 48 48" fill="none" className={className}>
+      <polygon points="24,4 44,14 44,34 24,44 4,34 4,14" stroke="#E0EDE0" strokeWidth="1" fill="none" />
+      <polygon points="24,4 44,14 24,24 4,14" stroke="#E0EDE0" strokeWidth="1" fill="none" />
       <polygon points="24,24 44,14 44,34 24,44" fill="#00F2FE" opacity="0.92" />
-      <line x1="24" y1="24" x2="24" y2="44" stroke="#E0E0E0" strokeWidth="1" />
+      <line x1="24" y1="24" x2="24" y2="44" stroke="#E0EDE0" strokeWidth="1" />
     </svg>
   )
 }
 
-// ── Service icons ─────────────────────────────────────────────────────────────
-
-function ArchIcon() {
+function VitrineIcon() {
   return (
-    <svg viewBox="0 0 40 40" fill="none" className="w-6 h-6">
-      <rect x="4" y="4" width="13" height="13" rx="2" stroke="#00F2FE" strokeWidth="1.5" />
-      <rect x="23" y="4" width="13" height="13" rx="2" stroke="#00F2FE" strokeWidth="1.5" />
-      <rect x="4" y="23" width="13" height="13" rx="2" stroke="#00F2FE" strokeWidth="1.5" />
-      <rect x="23" y="23" width="13" height="13" rx="2" stroke="#00F2FE" strokeWidth="1.5" />
-      <line x1="17" y1="10.5" x2="23" y2="10.5" stroke="#00F2FE" strokeWidth="1.5" />
-      <line x1="10.5" y1="17" x2="10.5" y2="23" stroke="#00F2FE" strokeWidth="1.5" />
-      <line x1="29.5" y1="17" x2="29.5" y2="23" stroke="#00F2FE" strokeWidth="1.5" />
-      <line x1="17" y1="29.5" x2="23" y2="29.5" stroke="#00F2FE" strokeWidth="1.5" />
+    <svg viewBox="0 0 40 40" fill="none" className="w-10 h-10">
+      <rect x="4" y="8" width="32" height="22" rx="2" stroke="#00F2FE" strokeWidth="1.5" />
+      <line x1="4" y1="14" x2="36" y2="14" stroke="#00F2FE" strokeWidth="1.5" />
+      <line x1="14" y1="30" x2="14" y2="36" stroke="#00F2FE" strokeWidth="1.5" />
+      <line x1="26" y1="30" x2="26" y2="36" stroke="#00F2FE" strokeWidth="1.5" />
+      <line x1="10" y1="36" x2="30" y2="36" stroke="#00F2FE" strokeWidth="1.5" />
+      <circle cx="9" cy="11" r="1.5" fill="#FF5F56" />
+      <circle cx="14" cy="11" r="1.5" fill="#FFBD2E" />
+      <circle cx="19" cy="11" r="1.5" fill="#27C93F" />
     </svg>
   )
 }
 
-function ShieldIcon() {
+function AgentIcon() {
   return (
-    <svg viewBox="0 0 40 40" fill="none" className="w-6 h-6">
-      <path d="M20 4L36 10V22C36 30 20 38 20 38C20 38 4 30 4 22V10L20 4Z" stroke="#00F2FE" strokeWidth="1.5" />
-      <path d="M13 20L18 25L28 15" stroke="#00F2FE" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 40 40" fill="none" className="w-10 h-10">
+      <circle cx="20" cy="14" r="7" stroke="#00F2FE" strokeWidth="1.5" />
+      <path d="M6 36c0-7.732 6.268-14 14-14s14 6.268 14 14" stroke="#00F2FE" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="20" cy="14" r="2.5" fill="#00F2FE" opacity="0.5" />
+      <path d="M29 8l3-3M11 8l-3-3M20 5V2" stroke="#00F2FE" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }
 
-function MobilityIcon() {
+function CRMIcon() {
   return (
-    <svg viewBox="0 0 40 40" fill="none" className="w-6 h-6">
-      <circle cx="12" cy="30" r="4.5" stroke="#00F2FE" strokeWidth="1.5" />
-      <circle cx="30" cy="30" r="4.5" stroke="#00F2FE" strokeWidth="1.5" />
-      <path d="M4 22L8 10H24L36 22H4Z" stroke="#00F2FE" strokeWidth="1.5" strokeLinejoin="round" />
-      <line x1="17" y1="10" x2="17" y2="22" stroke="#00F2FE" strokeWidth="1.5" />
+    <svg viewBox="0 0 40 40" fill="none" className="w-10 h-10">
+      <rect x="4" y="4" width="14" height="14" rx="2" stroke="#00F2FE" strokeWidth="1.5" />
+      <rect x="22" y="4" width="14" height="14" rx="2" stroke="#00F2FE" strokeWidth="1.5" />
+      <rect x="4" y="22" width="14" height="14" rx="2" stroke="#00F2FE" strokeWidth="1.5" />
+      <rect x="22" y="22" width="14" height="14" rx="2" stroke="#00F2FE" strokeWidth="1.5" />
+      <line x1="11" y1="18" x2="11" y2="22" stroke="#00F2FE" strokeWidth="1.5" />
+      <line x1="29" y1="18" x2="29" y2="22" stroke="#00F2FE" strokeWidth="1.5" />
+      <line x1="11" y1="20" x2="29" y2="20" stroke="#00F2FE" strokeWidth="1.5" />
     </svg>
   )
 }
 
 // ── Data ──────────────────────────────────────────────────────────────────────
-
-const benefits = [
+const painPoints = [
   {
-    metric: '10x',
-    file: '10x_agility.sh',
-    label: 'Agilidad Operativa',
-    cmd: '$ run --workflows --replace-manual',
-    desc: 'Workflows automatizados que reemplazan procesos manuales en días, no meses.',
-    color: '#00F2FE',
+    icon: '💬',
+    text: '¿WhatsApp saturado y sin responder?',
+    tag: '[MSG_OVERFLOW :: DETECTED]',
+    sub: 'Cada mensaje sin respuesta es un cliente que se va con la competencia.',
   },
   {
-    metric: '0ms',
-    file: 'latency.monitor',
-    label: 'Latencia en Datos',
-    cmd: '$ stream --realtime --pipeline active',
-    desc: 'Pipelines en tiempo real. Tus datos en el momento exacto que los necesitas.',
+    icon: '📊',
+    text: '¿Clientes perdidos en hojas de Excel?',
+    tag: '[DATA_LOSS :: WARNING]',
+    sub: 'Sin un CRM, el seguimiento depende de tu memoria — y eso tiene un costo real.',
+  },
+  {
+    icon: '📅',
+    text: '¿Citas que se olvidan por falta de recordatorios?',
+    tag: '[NO_SHOW_RATE :: HIGH]',
+    sub: 'El 30% de las inasistencias se evita con un recordatorio automático a tiempo.',
+  },
+  {
+    icon: '📣',
+    text: '¿Publicidad que no trae pacientes reales?',
+    tag: '[ROI :: UNMEASURED]',
+    sub: 'Invertir sin medir es tirar dinero. Necesitas datos, no suposiciones.',
+  },
+]
+
+const metrics = [
+  {
+    metric: '+40%',
+    label: 'más citas agendadas',
+    tag: '[BOOKING_RATE :: OPTIMIZED]',
+    desc: 'Automatización de agenda + recordatorios = agenda llena sin esfuerzo manual.',
     color: '#00F2FE',
+    file: 'citas-agendadas.metric',
+  },
+  {
+    metric: '0',
+    label: 'clientes perdidos',
+    tag: '[LEAD_LOSS :: ELIMINATED]',
+    desc: 'Nuestro CRM captura, clasifica y hace seguimiento de cada contacto automáticamente.',
+    color: '#00F2FE',
+    file: 'clientes-perdidos.metric',
   },
   {
     metric: '24/7',
-    file: 'agents.service',
-    label: 'Control por IA',
-    cmd: '$ systemctl status agents ● active',
-    desc: 'Agentes autónomos que monitorean, alertan y ejecutan mientras duermes.',
+    label: 'operación automática',
+    tag: '[AGENTS :: SYSTEM_ACTIVE]',
+    desc: 'Tu negocio responde, agenda y vende incluso mientras duermes.',
     color: '#27C93F',
+    file: 'operacion-continua.metric',
   },
 ]
 
 const services = [
   {
-    icon: <ArchIcon />,
-    file: 'business-arch.app',
-    title: 'Business Architecture',
-    subtitle: 'El sistema nervioso de tu empresa',
+    icon: <VitrineIcon />,
+    file: 'vitrina-digital.app',
+    title: 'Tu Vitrina Digital',
+    subtitle: 'Tu mejor vendedor — disponible las 24 horas',
+    sysTag: '[WEB :: ONLINE]',
     bullets: [
-      'Ecosistemas digitales integrales',
-      'Automatización de workflows operativos',
-      'Integración de sistemas y APIs',
-      'Arquitectura cloud-native escalable',
-      'Mission Control: dashboard IA en tiempo real',
+      'Sitio web profesional que convierte visitas en citas',
+      'Landing pages específicas por campaña',
+      'Integración con WhatsApp y formularios',
+      'SEO local para que te encuentren en Google',
+      'Diseño optimizado para móvil y velocidad',
     ],
   },
   {
-    icon: <ShieldIcon />,
-    file: 'insurtech.app',
-    title: 'InsurTech Ecosystems',
-    subtitle: 'Tecnología para agencias de seguros',
+    icon: <AgentIcon />,
+    file: 'asistente-ia.app',
+    title: 'Asistente IA de Agendamiento',
+    subtitle: 'El recepcionista que nunca descansa',
+    sysTag: '[AI_AGENT :: ACTIVE]',
     bullets: [
-      'CRM especializado para gestión de cartera',
-      'Automatización de pólizas y renovaciones',
-      'Analytics de riesgo y rentabilidad',
-      'Onboarding digital de clientes',
-      'Reportes regulatorios automatizados',
+      'Responde WhatsApp e Instagram automáticamente',
+      'Agenda citas sin intervención humana',
+      'Envía recordatorios 24h y 1h antes',
+      'Califica leads y filtra consultas frecuentes',
+      'Escalada inteligente cuando tú tomas control',
     ],
   },
   {
-    icon: <MobilityIcon />,
-    file: 'mobility.app',
-    title: 'Smart Mobility Frameworks',
-    subtitle: 'Plataformas de movilidad inteligente',
+    icon: <CRMIcon />,
+    file: 'crm-pymes.app',
+    title: 'CRM Inteligente para PYMEs',
+    subtitle: 'Todos tus clientes, en un solo lugar',
+    sysTag: '[CRM :: SYNCED]',
     bullets: [
-      'Apps de ride-hailing con IA embebida',
-      'Gestión de flotas en tiempo real',
-      'Optimización de rutas con ML adaptativo',
-      'Dashboard operacional 24/7',
-      'Integraciones con pasarelas de pago',
+      'Historial completo de cada cliente o paciente',
+      'Seguimiento automatizado de oportunidades',
+      'Reportes de ventas y ocupación en tiempo real',
+      'Alertas de clientes inactivos para reactivar',
+      'Integración con facturación y pagos',
     ],
   },
 ]
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+const audiences = [
+  { label: 'CLÍNICAS', icon: '🏥' },
+  { label: 'ODONTÓLOGOS', icon: '🦷' },
+  { label: 'ESTÉTICA', icon: '✨' },
+  { label: 'RESTAURANTES', icon: '🍽️' },
+  { label: 'EMPRESAS DE SERVICIOS', icon: '⚙️' },
+]
 
+// ── Page ──────────────────────────────────────────────────────────────────────
 export default function LandingPage() {
+  const [mouse, setMouse] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    // Habilita scroll en la landing (el app shell lo tiene desactivado)
+    document.body.classList.add('landing')
+    return () => document.body.classList.remove('landing')
+  }, [])
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => setMouse({ x: e.clientX, y: e.clientY })
+    window.addEventListener('mousemove', onMove)
+    return () => window.removeEventListener('mousemove', onMove)
+  }, [])
+
   return (
     <div
-      className="min-h-screen text-[#E0E0E0] overflow-x-hidden"
-      style={{ background: '#020b12', fontFamily: 'var(--font-grotesk), system-ui, sans-serif' }}
+      className="min-h-screen overflow-x-hidden bg-brandBg text-brandText"
+      style={{ fontFamily: 'var(--font-grotesk), system-ui, sans-serif' }}
     >
+      <style dangerouslySetInnerHTML={{ __html: GLOBAL_STYLES }} />
 
-      {/* ── Desktop background ─────────────────────────────────────────── */}
+      {/* ── Background ─────────────────────────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none" aria-hidden>
-        {/* Petrol base gradient */}
-        <div className="absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse at 20% 0%, #001a28 0%, #020b12 55%)' }} />
+        {/* Deep Carbon #001117 — solid brand background */}
+        <div className="absolute inset-0" style={{ background: '#001117' }} />
 
-        {/* Cyan glow top-right */}
-        <div className="orb-animate absolute -top-32 right-0 w-[800px] h-[600px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(0,242,254,0.09) 0%, transparent 65%)' }} />
+        {/* Mouse-reactive glow */}
+        <div className="absolute inset-0" style={{
+          background: `radial-gradient(circle 520px at ${mouse.x}px ${mouse.y}px, rgba(0,242,254,0.055) 0%, transparent 70%)`,
+          transition: 'background 0.08s linear',
+        }} />
 
-        {/* Secondary glow bottom-left */}
-        <div className="orb-animate absolute bottom-0 -left-40 w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(0,242,254,0.05) 0%, transparent 65%)', animationDelay: '4s' }} />
+        {/* Orbs */}
+        <div className="absolute -top-32 right-0 w-[800px] h-[600px] rounded-full"
+          style={{ background: 'radial-gradient(ellipse, rgba(0,242,254,0.07) 0%, transparent 65%)', animation: 'orbFloat 9s ease-in-out infinite' }} />
+        <div className="absolute bottom-0 -left-40 w-[500px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(0,242,254,0.04) 0%, transparent 65%)', animation: 'orbFloat 13s 4s ease-in-out infinite' }} />
 
         {/* Dot grid */}
-        <div className="absolute inset-0 opacity-[0.18]"
-          style={{
-            backgroundImage: 'radial-gradient(rgba(0,242,254,0.5) 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
-          }} />
+        <div className="absolute inset-0 opacity-[0.15]"
+          style={{ backgroundImage: 'radial-gradient(rgba(0,242,254,0.55) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-        {/* Horizontal scanlines */}
-        <div className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,242,254,1) 2px, rgba(0,242,254,1) 3px)',
-            backgroundSize: '100% 8px',
-          }} />
+        {/* Scanlines */}
+        <div className="absolute inset-0 opacity-[0.02]"
+          style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,242,254,1) 2px, rgba(0,242,254,1) 3px)', backgroundSize: '100% 8px' }} />
+
+        {/* Scanner beam */}
+        <div className="absolute left-0 right-0 pointer-events-none" style={{
+          height: '2px',
+          background: 'linear-gradient(90deg, transparent 0%, rgba(0,242,254,0.0) 10%, rgba(0,242,254,0.6) 50%, rgba(0,242,254,0.0) 90%, transparent 100%)',
+          boxShadow: '0 0 16px 4px rgba(0,242,254,0.18)',
+          animation: 'scanner 7s linear infinite',
+          top: 0,
+        }} />
       </div>
 
-      {/* ── macOS menubar ─────────────────────────────────────────────── */}
-      <nav
-        className="relative z-50 flex items-center justify-between px-6 py-3 md:px-10"
+      {/* ── Nav ───────────────────────────────────────────────────── */}
+      <nav className="relative z-50 flex items-center justify-between px-6 py-3 md:px-10"
         style={{
-          background: 'rgba(2,11,18,0.80)',
+          background: 'rgba(0,17,23,0.90)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(0,242,254,0.08)',
-        }}
-      >
-        {/* Logo */}
+          borderBottom: '1px solid rgba(0,242,254,0.10)',
+        }}>
         <div className="flex items-center gap-2.5">
           <CubeIcon className="w-8 h-8" />
-          <span className="text-sm font-semibold text-[#E0E0E0] uppercase" style={{ letterSpacing: '0.26em' }}>
+          <span className="text-sm font-semibold uppercase" style={{ color: '#E0EDE0', letterSpacing: '0.26em' }}>
             STRATOS<span style={{ color: '#8B949E', margin: '0 7px' }}>|</span>CORE
           </span>
         </div>
 
-        {/* Menubar items (desktop only) */}
-        <div className="hidden md:flex items-center gap-6 text-xs text-[#8B949E]" style={{ letterSpacing: '0.04em' }}>
-          {['Servicios', 'Proyectos', 'Contacto'].map(item => (
-            <button key={item} className="hover:text-[#E0E0E0] transition-colors">{item}</button>
+        <div className="hidden md:flex items-center gap-6 text-sm" style={{ color: '#8B949E' }}>
+          {['Servicios', '¿Para quién?', 'Contacto'].map(item => (
+            <button key={item} className="hover:text-[#E0EDE0] transition-colors">{item}</button>
           ))}
         </div>
 
-        {/* CTA nav */}
         <div className="flex items-center gap-2">
-          <Link href="/login" className="px-3 py-1.5 text-xs text-[#8B949E] hover:text-[#E0E0E0] transition-colors">
-            Entrar
+          <Link href="/login" className="px-3 py-1.5 text-sm text-[#8B949E] hover:text-[#E0EDE0] transition-colors">
+            Acceder
           </Link>
           <Link
-            href="/login"
-            className="px-4 py-1.5 text-xs font-bold text-[#020b12] rounded-lg transition-all duration-200 hover:scale-[1.04] hover:brightness-110"
-            style={{
-              background: '#00F2FE',
-              boxShadow: '0 0 16px rgba(0,242,254,0.5)',
-            }}
+            href="mailto:hello@stratoscore.app"
+            className="px-5 py-2 text-sm font-bold rounded-lg transition-all duration-200 hover:scale-[1.04] hover:brightness-110 bg-brandCyan text-brandBg"
+            style={{ boxShadow: '0 0 18px rgba(0,242,254,0.55)' }}
           >
-            Mission Control →
+            Diagnóstico Gratis →
           </Link>
         </div>
       </nav>
 
-      {/* ── HERO WINDOW ───────────────────────────────────────────────── */}
-      <section className="relative z-10 px-4 pt-16 pb-8 md:px-10 lg:px-16 fade-up">
-        <Window
-          title="stratoscore.app — System v2.0"
-          accentTop
-          glowColor="rgba(0,242,254,0.15)"
-          className="max-w-5xl mx-auto"
-        >
-          {/* Terminal pre-boot line */}
-          <div className="px-6 pt-5 pb-2">
-            <p className="font-mono text-xs" style={{ color: 'rgba(0,242,254,0.45)', letterSpacing: '0.04em' }}>
-              {'>'} Initializing StratosCore engine... <span style={{ color: '#27C93F' }}>OK</span>
-            </p>
-          </div>
+      {/* ═══════════════════════════════════════════════════════════════
+          1. HERO — La Promesa
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="relative z-10 px-6 pt-12 pb-6 md:px-10 md:pt-16 lg:px-16 fade-up">
+        <TiltCard className="max-w-5xl mx-auto">
+          <Window title="stratoscore.app — Centro de Mando" accentTop glowColor="rgba(0,242,254,0.15)">
 
-          <div className="px-6 pb-12 pt-6 text-center">
-            {/* Badge */}
-            <div
-              className="inline-flex items-center gap-2 mb-8 px-3.5 py-1.5 rounded-full text-xs"
-              style={{
-                border: '1px solid rgba(0,242,254,0.2)',
-                background: 'rgba(0,242,254,0.04)',
-                color: '#8B949E',
-              }}
-            >
-              <span>🇨🇴</span>
-              <span style={{ color: 'rgba(0,242,254,0.5)' }}>+</span>
-              <span>🇨🇷</span>
-              <span className="mx-1 opacity-40">·</span>
-              <span>Ingeniería de Élite · Latinoamérica</span>
+            <div className="px-6 pt-5 pb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full pulse-dot" style={{ background: '#27C93F', boxShadow: '0 0 8px #27C93F' }} />
+                <p className="font-mono text-xs" style={{ color: 'rgba(0,242,254,0.6)' }}>
+                  Sistema activo — automatización en curso
+                </p>
+              </div>
+              <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.4)' }}>[CORE_v2.0 :: ONLINE]</span>
             </div>
 
-            {/* Headline */}
-            <h1
-              className="text-4xl md:text-6xl lg:text-7xl font-semibold leading-tight tracking-tight max-w-4xl mx-auto mb-6"
-            >
-              Convertimos tu Visión en{' '}
-              <span
-                style={{
+            <div className="px-6 pb-14 pt-8 text-center">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full text-sm"
+                style={{ border: '1px solid rgba(0,242,254,0.22)', background: 'rgba(0,242,254,0.05)', color: '#8B949E' }}>
+                <span>🇨🇴</span>
+                <span style={{ color: 'rgba(0,242,254,0.6)' }}>+</span>
+                <span>🇨🇷</span>
+                <span className="mx-1 opacity-40">·</span>
+                <span>Automatización para PYMEs y Clínicas</span>
+              </div>
+
+              {/* Headline */}
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight max-w-4xl mx-auto mb-5">
+                Tu negocio trabajando{' '}
+                <span style={{
                   background: 'linear-gradient(135deg, #00F2FE 0%, #7cf5ff 55%, #ffffff 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
-                  textShadow: 'none',
-                  filter: 'drop-shadow(0 0 24px rgba(0,242,254,0.35))',
-                }}
-              >
-                Infraestructura Digital
-              </span>
-            </h1>
+                  filter: 'drop-shadow(0 0 28px rgba(0,242,254,0.4))',
+                }}>
+                  24/7 sin que lo notes
+                </span>
+              </h1>
 
-            {/* Subheadline */}
-            <p className="text-base md:text-lg max-w-xl mx-auto leading-relaxed mb-10" style={{ color: '#8B949E' }}>
-              Fábrica de software élite — <span className="text-[#E0E0E0]">SaaS</span>,{' '}
-              <span className="text-[#E0E0E0]">Apps</span> y{' '}
-              <span className="text-[#E0E0E0]">Agentes de IA</span>{' '}
-              para negocios en Latinoamérica.
-            </p>
+              {/* Cyber labels */}
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <span className="font-mono text-[10px]" style={{ color: 'rgba(0,242,254,0.45)' }}>[AI_ENGINE :: ACTIVE]</span>
+                <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: '#27C93F', boxShadow: '0 0 6px #27C93F' }} />
+                <span className="font-mono text-[10px]" style={{ color: 'rgba(0,242,254,0.45)' }}>[GROWTH_MODE :: ON]</span>
+              </div>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="mailto:hello@stratoscore.app"
-                className="px-8 py-3.5 rounded-xl text-[#020b12] font-bold text-sm tracking-wide transition-all duration-200 hover:scale-[1.04] hover:brightness-110"
-                style={{
-                  background: '#00F2FE',
-                  boxShadow: '0 0 30px rgba(0,242,254,0.65), 0 0 80px rgba(0,242,254,0.2)',
-                }}
-              >
-                Solicita tu Demo
-              </Link>
-              <Link
-                href="#services"
-                className="px-8 py-3.5 rounded-xl text-sm font-medium border border-[rgba(255,255,255,0.1)] text-[#8B949E] hover:text-[#E0E0E0] hover:border-[rgba(0,242,254,0.3)] transition-all duration-300"
-              >
-                Ver Servicios ↓
-              </Link>
+              {/* Subheadline — text-xl / text-2xl */}
+              <p className="text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto leading-relaxed mb-10" style={{ color: '#8B949E' }}>
+                Marketing que no para mientras atiendes pacientes.{' '}
+                <span style={{ color: '#E0EDE0' }}>Automatizamos tu crecimiento con IA.</span>
+              </p>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4">
+                <Link
+                  href="mailto:hello@stratoscore.app"
+                  className="w-full sm:w-auto text-center px-8 md:px-10 py-5 rounded-xl font-bold text-base md:text-lg tracking-wide transition-all duration-200 hover:scale-[1.02] hover:brightness-110 bg-brandCyan text-brandBg"
+                  style={{ boxShadow: '0 0 36px rgba(0,242,254,0.7), 0 0 90px rgba(0,242,254,0.2)' }}
+                >
+                  📅 Agendar diagnóstico (30 min sin compromiso)
+                </Link>
+                <Link
+                  href="#servicios"
+                  className="w-full sm:w-auto text-center px-8 md:px-10 py-5 rounded-xl text-base font-medium transition-all duration-300"
+                  style={{ border: '1px solid rgba(255,255,255,0.12)', color: '#8B949E' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#E0EDE0'; e.currentTarget.style.borderColor = 'rgba(0,242,254,0.35)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = '#8B949E'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}
+                >
+                  Ver cómo funciona ↓
+                </Link>
+              </div>
             </div>
-          </div>
 
-          {/* Window bottom status bar */}
-          <div
-            className="flex items-center justify-between px-6 py-2"
-            style={{
-              borderTop: '1px solid rgba(255,255,255,0.05)',
-              background: 'rgba(0,0,0,0.25)',
-            }}
-          >
-            <span className="font-mono text-[10px]" style={{ color: 'rgba(0,242,254,0.3)' }}>
-              stratoscore@v2.0
-            </span>
-            <span className="font-mono text-[10px]" style={{ color: 'rgba(39,201,63,0.5)' }}>
-              ● system nominal
-            </span>
-            <span className="font-mono text-[10px]" style={{ color: 'rgba(0,242,254,0.3)' }}>
-              latency: 0ms
-            </span>
-          </div>
-        </Window>
+            {/* Status bar */}
+            <div className="flex items-center justify-between px-6 py-2.5"
+              style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.25)' }}>
+              <span className="font-mono text-[10px]" style={{ color: 'rgba(0,242,254,0.35)' }}>stratoscore@v2.0</span>
+              <span className="font-mono text-[10px]" style={{ color: 'rgba(39,201,63,0.6)' }}>● sistema nominal</span>
+              <span className="font-mono text-[10px]" style={{ color: 'rgba(0,242,254,0.35)' }}>[UPTIME: 99.98%]</span>
+            </div>
+          </Window>
+        </TiltCard>
       </section>
 
-      {/* ── BENEFIT WINDOWS ───────────────────────────────────────────── */}
-      <section className="relative z-10 px-4 py-8 md:px-10 lg:px-16">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 fade-up-delay">
-          {benefits.map((b) => (
-            <Window
-              key={b.metric}
-              title={b.file}
-              glowColor={b.color === '#27C93F' ? 'rgba(39,201,63,0.08)' : 'rgba(0,242,254,0.08)'}
-            >
-              <div className="px-5 py-6">
-                {/* Terminal command */}
-                <p
-                  className="font-mono text-[10px] mb-5 truncate"
-                  style={{ color: 'rgba(0,242,254,0.4)' }}
-                >
-                  {b.cmd}
-                </p>
+      {/* ═══════════════════════════════════════════════════════════════
+          2. DIAGNÓSTICO DE PÉRDIDAS
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="relative z-10 px-6 py-14 md:px-10 lg:px-16">
+        <div className="max-w-5xl mx-auto">
 
-                {/* Metric */}
+          <div className="text-center mb-10 fade-d1">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <div className="h-px w-16" style={{ background: 'rgba(255,189,46,0.35)' }} />
+              <span className="font-mono text-xs uppercase tracking-widest" style={{ color: 'rgba(255,189,46,0.75)' }}>
+                [ DIAGNÓSTICO_DE_PÉRDIDAS ]
+              </span>
+              <div className="h-px w-16" style={{ background: 'rgba(255,189,46,0.35)' }} />
+            </div>
+            <p className="text-lg" style={{ color: '#8B949E' }}>¿Te identificas con alguno de estos escenarios?</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 fade-d2">
+            {painPoints.map((p) => (
+              <TiltCard key={p.tag}>
                 <div
-                  className="text-5xl font-bold mb-3 tabular-nums leading-none"
+                  className="relative rounded-2xl overflow-hidden p-7"
                   style={{
-                    color: b.color,
-                    textShadow: `0 0 30px ${b.color}80`,
-                    filter: `drop-shadow(0 0 16px ${b.color}60)`,
+                    background: 'rgba(0,17,23,0.90)',
+                    border: '1px solid rgba(255,189,46,0.18)',
+                    backdropFilter: 'blur(20px)',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,189,46,0.05)',
                   }}
                 >
-                  {b.metric}
-                </div>
+                  <div className="absolute inset-x-0 top-0 h-px"
+                    style={{ background: 'linear-gradient(90deg, transparent, rgba(255,189,46,0.4), transparent)' }} />
 
-                {/* Separator */}
-                <div
-                  className="mb-3"
-                  style={{
-                    width: '28px',
-                    height: '1px',
-                    background: b.color,
-                    opacity: 0.4,
-                  }}
-                />
-
-                <div
-                  className="text-[11px] font-semibold uppercase tracking-widest mb-2"
-                  style={{ color: '#E0E0E0' }}
-                >
-                  {b.label}
+                  <div className="flex items-start gap-5">
+                    <span className="text-3xl mt-0.5 flex-shrink-0">{p.icon}</span>
+                    <div>
+                      {/* Título de tarjeta — text-xl */}
+                      <p className="text-xl font-semibold mb-2 leading-snug" style={{ color: '#E0EDE0' }}>
+                        {p.text}
+                      </p>
+                      <p className="font-mono text-[9px] mb-3" style={{ color: 'rgba(255,189,46,0.55)' }}>
+                        {p.tag}
+                      </p>
+                      {/* Descripción — text-base */}
+                      <p className="text-base leading-relaxed" style={{ color: '#8B949E' }}>
+                        {p.sub}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs leading-relaxed" style={{ color: '#8B949E' }}>
-                  {b.desc}
-                </p>
-              </div>
-            </Window>
-          ))}
+              </TiltCard>
+            ))}
+          </div>
+
+          <div className="text-center mt-12 fade-d3">
+            <p className="text-xl md:text-2xl" style={{ color: '#8B949E' }}>
+              Nosotros resolvemos todo esto.{' '}
+              <span style={{ color: '#00F2FE' }}>Sin que tengas que volverte técnico.</span>
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* ── SERVICE WINDOWS ───────────────────────────────────────────── */}
-      <section id="services" className="relative z-10 px-4 py-8 md:px-10 lg:px-16">
-        {/* Section label */}
-        <div className="max-w-5xl mx-auto mb-8">
+      {/* ═══════════════════════════════════════════════════════════════
+          3. MÉTRICAS DE IMPACTO
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="relative z-10 px-6 py-8 md:px-10 lg:px-16">
+
+        <div className="max-w-5xl mx-auto mb-8 fade-d1">
           <div className="flex items-center gap-3">
             <div className="h-px flex-1" style={{ background: 'rgba(0,242,254,0.12)' }} />
-            <span
-              className="text-[10px] font-mono uppercase"
-              style={{ color: 'rgba(0,242,254,0.5)', letterSpacing: '0.3em' }}
-            >
-              Servicios — 3 módulos activos
+            <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'rgba(0,242,254,0.55)' }}>
+              [ MÉTRICAS_DE_IMPACTO :: 3 resultados medibles ]
             </span>
             <div className="h-px flex-1" style={{ background: 'rgba(0,242,254,0.12)' }} />
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 fade-up-late">
-          {services.map((svc, i) => (
-            <Window key={svc.title} title={svc.file}>
-              <div className="px-6 py-6">
-                {/* Index */}
-                <span
-                  className="font-mono text-[10px]"
-                  style={{ color: 'rgba(0,242,254,0.3)', letterSpacing: '0.08em' }}
-                >
-                  0{i + 1} /
-                </span>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 fade-d2">
+          {metrics.map((m) => (
+            <TiltCard key={m.metric}>
+              <Window
+                title={m.file}
+                glowColor={m.color === '#27C93F' ? 'rgba(39,201,63,0.10)' : 'rgba(0,242,254,0.10)'}
+              >
+                <div className="px-6 py-8">
+                  <p className="text-sm mb-4 font-medium" style={{ color: m.color === '#27C93F' ? 'rgba(39,201,63,0.75)' : 'rgba(0,242,254,0.65)' }}>
+                    ✓ Resultado verificado
+                  </p>
 
-                {/* Icon + title */}
-                <div className="flex items-start gap-3 mt-3 mb-4">
-                  <div
-                    className="p-2 rounded-lg mt-0.5"
-                    style={{
-                      border: '1px solid rgba(0,242,254,0.15)',
-                      background: 'rgba(0,242,254,0.06)',
-                    }}
-                  >
-                    {svc.icon}
+                  {/* Metric number */}
+                  <div className="text-6xl font-bold mb-2 tabular-nums leading-none"
+                    style={{ color: m.color, textShadow: `0 0 40px ${m.color}80`, filter: `drop-shadow(0 0 20px ${m.color}60)` }}>
+                    {m.metric}
                   </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-[#E0E0E0]">{svc.title}</h3>
-                    <p className="text-xs mt-0.5" style={{ color: '#8B949E' }}>{svc.subtitle}</p>
-                  </div>
+
+                  {/* Metric label — text-lg */}
+                  <p className="text-lg font-semibold mb-2" style={{ color: '#E0EDE0' }}>{m.label}</p>
+
+                  <p className="font-mono text-[9px] mb-4" style={{ color: 'rgba(0,242,254,0.38)' }}>{m.tag}</p>
+
+                  <div className="mb-4" style={{ width: '32px', height: '1px', background: m.color, opacity: 0.45 }} />
+
+                  {/* Descripción — text-base */}
+                  <p className="text-base leading-relaxed" style={{ color: '#8B949E' }}>{m.desc}</p>
                 </div>
-
-                {/* Bullets as terminal lines */}
-                <ul className="space-y-1.5">
-                  {svc.bullets.map((b) => (
-                    <li key={b} className="flex items-start gap-2 text-xs" style={{ color: '#8B949E' }}>
-                      <span className="font-mono mt-0.5" style={{ color: 'rgba(0,242,254,0.4)', flexShrink: 0 }}>›</span>
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Window>
+              </Window>
+            </TiltCard>
           ))}
         </div>
       </section>
 
-      {/* ── CTA WINDOW ────────────────────────────────────────────────── */}
-      <section className="relative z-10 px-4 py-8 md:px-10 lg:px-16">
-        <Window
-          title="contact.stratoscore.app"
-          accentTop
-          glowColor="rgba(0,242,254,0.18)"
-          className="max-w-3xl mx-auto"
-        >
-          <div className="px-8 py-14 text-center">
-            <p
-              className="text-[10px] font-mono uppercase mb-6"
-              style={{ color: '#00F2FE', letterSpacing: '0.3em' }}
-            >
-              {'>'} Iniciar proyecto_
+      {/* ═══════════════════════════════════════════════════════════════
+          4. SERVICIOS
+      ═══════════════════════════════════════════════════════════════ */}
+      <section id="servicios" className="relative z-10 px-6 py-14 md:px-10 lg:px-16">
+
+        <div className="max-w-5xl mx-auto mb-8 fade-d1">
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1" style={{ background: 'rgba(0,242,254,0.12)' }} />
+            <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'rgba(0,242,254,0.55)' }}>
+              [ MÓDULOS_ACTIVOS :: 3 soluciones ]
+            </span>
+            <div className="h-px flex-1" style={{ background: 'rgba(0,242,254,0.12)' }} />
+          </div>
+        </div>
+
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-5 fade-d2">
+          {services.map((svc, i) => (
+            <TiltCard key={svc.title}>
+              <Window title={svc.file}>
+                <div className="px-7 py-7">
+                  {/* Header row */}
+                  <div className="flex items-center justify-between mb-5">
+                    <span className="font-mono text-[10px]" style={{ color: 'rgba(0,242,254,0.35)' }}>0{i + 1} /</span>
+                    <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.38)' }}>{svc.sysTag}</span>
+                  </div>
+
+                  {/* Icon */}
+                  <div className="mb-5">
+                    <div className="inline-flex p-3 rounded-xl"
+                      style={{ border: '1px solid rgba(0,242,254,0.18)', background: 'rgba(0,242,254,0.07)' }}>
+                      {svc.icon}
+                    </div>
+                  </div>
+
+                  {/* Título — text-2xl */}
+                  <h3 className="text-2xl font-semibold mb-1" style={{ color: '#E0EDE0' }}>{svc.title}</h3>
+                  {/* Subtítulo — text-base */}
+                  <p className="text-base mb-5" style={{ color: '#8B949E' }}>{svc.subtitle}</p>
+
+                  {/* Bullets — text-base */}
+                  <ul className="space-y-2.5">
+                    {svc.bullets.map((b) => (
+                      <li key={b} className="flex items-start gap-3 text-base" style={{ color: '#8B949E' }}>
+                        <span className="font-mono mt-0.5 text-lg" style={{ color: 'rgba(0,242,254,0.5)', flexShrink: 0 }}>›</span>
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Window>
+            </TiltCard>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          5. PARA QUIÉN
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="relative z-10 px-6 py-14 md:px-10 lg:px-16">
+        <div className="max-w-5xl mx-auto text-center">
+
+          <div className="mb-10 fade-d1">
+            <p className="font-mono text-[10px] uppercase tracking-widest mb-4" style={{ color: 'rgba(0,242,254,0.55)' }}>
+              [ SECTORES_ATENDIDOS ]
             </p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-[#E0E0E0] mb-4 leading-tight">
-              ¿Listo para construir algo{' '}
-              <span
+            <h2 className="text-3xl md:text-4xl font-semibold mb-3" style={{ color: '#E0EDE0' }}>
+              Diseñado para negocios como el tuyo
+            </h2>
+            <p className="text-lg" style={{ color: '#8B949E' }}>
+              Soluciones adaptadas a cada sector — sin tecnicismos.
+            </p>
+          </div>
+
+          {/* Audience badges — text-base, padding generoso */}
+          <div className="flex flex-wrap items-center justify-center gap-4 fade-d2">
+            {audiences.map((a) => (
+              <div
+                key={a.label}
+                className="flex items-center gap-3 px-7 py-4 rounded-full text-base font-semibold tracking-wide cursor-default"
                 style={{
+                  border: '1px solid rgba(0,242,254,0.22)',
+                  background: 'rgba(0,242,254,0.05)',
+                  color: '#E0EDE0',
+                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.25s ease',
+                }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget
+                  el.style.borderColor = 'rgba(0,242,254,0.55)'
+                  el.style.background = 'rgba(0,242,254,0.12)'
+                  el.style.boxShadow = '0 0 24px rgba(0,242,254,0.18)'
+                  el.style.transform = 'translateY(-3px)'
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget
+                  el.style.borderColor = 'rgba(0,242,254,0.22)'
+                  el.style.background = 'rgba(0,242,254,0.05)'
+                  el.style.boxShadow = 'none'
+                  el.style.transform = 'translateY(0)'
+                }}
+              >
+                <span className="text-xl">{a.icon}</span>
+                <span>[ {a.label} ]</span>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-10 text-base fade-d3" style={{ color: '#8B949E' }}>
+            ¿Tu sector no está en la lista?{' '}
+            <Link href="mailto:hello@stratoscore.app" style={{ color: '#00F2FE' }}
+              className="transition-colors hover:brightness-125">
+              Cuéntanos tu caso →
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          6. CTA FINAL
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="relative z-10 px-6 py-8 pb-20 md:px-10 lg:px-16">
+        <TiltCard className="max-w-3xl mx-auto fade-d1">
+          <Window title="contact.stratoscore.app" accentTop glowColor="rgba(0,242,254,0.20)">
+            <div className="px-6 md:px-8 py-12 md:py-16 text-center">
+              <p className="font-mono text-[10px] uppercase mb-2" style={{ color: '#00F2FE', letterSpacing: '0.3em' }}>
+                {'>'} Iniciar diagnóstico_
+              </p>
+              <p className="font-mono text-[9px] mb-8" style={{ color: 'rgba(0,242,254,0.45)' }}>
+                [SESSION_READY :: SIN_COMPROMISO]
+              </p>
+
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold mb-5 leading-tight" style={{ color: '#E0EDE0' }}>
+                ¿Listo para{' '}
+                <span style={{
                   background: 'linear-gradient(135deg, #00F2FE 0%, #7cf5ff 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
-                }}
+                }}>
+                  llenar tu agenda
+                </span>?
+              </h2>
+
+              <p className="text-lg mb-10 max-w-md mx-auto leading-relaxed" style={{ color: '#8B949E' }}>
+                30 minutos. Sin tecnicismos. Te mostramos exactamente cómo automatizamos tu negocio y cuánto puede crecer.
+              </p>
+
+              <Link
+                href="mailto:hello@stratoscore.app"
+                className="block sm:inline-block w-full sm:w-auto px-10 md:px-12 py-5 rounded-xl font-bold text-base md:text-lg tracking-wide transition-all duration-200 hover:scale-[1.02] hover:brightness-110 text-center bg-brandCyan text-brandBg"
+                style={{ boxShadow: '0 0 36px rgba(0,242,254,0.65), 0 0 90px rgba(0,242,254,0.2)' }}
               >
-                extraordinario
-              </span>?
-            </h2>
-            <p className="text-sm mb-8 max-w-md mx-auto leading-relaxed" style={{ color: '#8B949E' }}>
-              Cuéntanos tu reto. En 48 horas tienes una propuesta técnica y un plan de ejecución.
-            </p>
-            <Link
-              href="mailto:hello@stratoscore.app"
-              className="inline-block px-10 py-3.5 rounded-xl text-[#020b12] font-bold text-sm tracking-wide transition-all duration-200 hover:scale-[1.04] hover:brightness-110"
-              style={{
-                background: '#00F2FE',
-                boxShadow: '0 0 30px rgba(0,242,254,0.6), 0 0 80px rgba(0,242,254,0.2)',
-              }}
-            >
-              Agendar Llamada →
-            </Link>
-          </div>
-        </Window>
+                Agendar Llamada — Sin tecnicismos →
+              </Link>
+            </div>
+          </Window>
+        </TiltCard>
       </section>
 
-      {/* ── Dock / Footer ─────────────────────────────────────────────── */}
+      {/* ── Footer ────────────────────────────────────────────────── */}
       <footer className="relative z-10 px-4 py-10 md:px-10">
-        {/* Dock bar */}
         <div
-          className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 px-6 py-4 rounded-2xl"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            backdropFilter: 'blur(20px)',
-          }}
+          className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 px-8 py-5 rounded-2xl"
+          style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(20px)' }}
         >
           <div className="flex items-center gap-2.5">
             <CubeIcon className="w-6 h-6" />
-            <span className="text-xs font-semibold uppercase" style={{ color: '#8B949E', letterSpacing: '0.2em' }}>
+            <span className="text-sm font-semibold uppercase" style={{ color: '#8B949E', letterSpacing: '0.2em' }}>
               STRATOS<span style={{ margin: '0 5px', opacity: 0.35 }}>|</span>CORE
             </span>
           </div>
 
-          <p className="text-[10px] uppercase tracking-widest opacity-40 font-mono" style={{ color: '#8B949E' }}>
-            © 2026 StratosCore · Ingeniería Regional de Élite
-          </p>
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-xs uppercase tracking-widest opacity-40 font-mono" style={{ color: '#8B949E' }}>
+              © 2026 StratosCore · Automatización para PYMEs y Clínicas
+            </p>
+            <p className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.32)' }}>
+              [SYS_STATUS :: NOMINAL] [UPTIME: 99.98%]
+            </p>
+          </div>
 
-          <div className="flex items-center gap-5 text-xs" style={{ color: '#8B949E' }}>
+          <div className="flex items-center gap-5 text-sm" style={{ color: '#8B949E' }}>
             <Link href="mailto:hello@stratoscore.app" className="hover:text-[#00F2FE] transition-colors">
               hello@stratoscore.app
             </Link>
             <Link href="/login" className="hover:text-[#00F2FE] transition-colors">
-              Mission Control
+              Acceder
             </Link>
           </div>
         </div>

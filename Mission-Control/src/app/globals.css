@@ -3,14 +3,20 @@
 
 /* ── StratosCore Design System ──────────────────────────────────────────────── */
 @theme {
-  /* Brand palette */
+  /* ── StratosCore Brand — HEX extraídos de public/stratoscore-brand.jpg ────── */
+  /* Swatch 1 */ --color-brandBg:    #001117;   /* Deep Carbon   · fondo */
+  /* Swatch 2 */ --color-brandText:  #E0EDE0;   /* Platinum      · texto primario */
+  /* Swatch 3 */ --color-brandCyan:  #00F2FE;   /* Electric Cyan · acento, botones, glows */
+  /* Swatch 4 */ --color-brandMuted: #8B949E;   /* Stellar Gray  · texto secundario */
+
+  /* Aliases operativos */
   --color-carbon:   #001117;
-  --color-platinum: #E0E0E0;
+  --color-platinum: #E0EDE0;
   --color-cyan:     #00F2FE;
-  --color-cyan-dim: #00F2FE40;
   --color-stellar:  #8B949E;
-  --color-surface:  #0a1520;
+  --color-surface:  #001e30;
   --color-border:   rgba(0, 242, 254, 0.12);
+  --color-cyan-dim: #00F2FE40;
 }
 
 /* Glow utilities */
@@ -91,7 +97,7 @@ body:has([data-lavanderia]) {
 }
 
 html, body {
-  background-color: #0a0a0f;
+  background-color: #001117;
   margin: 0;
   overflow: hidden;
   overscroll-behavior: none;
