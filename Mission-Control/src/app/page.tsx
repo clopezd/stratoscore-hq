@@ -175,7 +175,7 @@ export default function LandingPage() {
           <span className="text-[rgba(0,242,254,0.6)]">+</span>
           <span>🇨🇷</span>
           <span className="mx-1 text-[rgba(0,242,254,0.3)]">·</span>
-          <span>Ingeniería Regional de Élite</span>
+          <span>Ingeniería de Élite · Latinoamérica</span>
         </div>
 
         {/* Headline */}
