@@ -368,7 +368,7 @@ export default function LandingPage() {
               Acceder
             </Link>
             <Link
-              href="mailto:hello@stratoscore.app"
+              href="mailto:contacto@stratoscore.app"
               className="px-5 py-2 text-sm font-bold rounded-lg transition-all duration-200 hover:scale-[1.04] hover:brightness-110 bg-brandCyan text-brandBg"
               style={{ boxShadow: '0 0 18px rgba(0,242,254,0.55)' }}
             >
@@ -379,7 +379,7 @@ export default function LandingPage() {
           {/* Mobile: CTA + Hamburger */}
           <div className="flex md:hidden items-center gap-2">
             <Link
-              href="mailto:hello@stratoscore.app"
+              href="mailto:contacto@stratoscore.app"
               className="px-4 py-2 text-xs font-bold rounded-lg bg-brandCyan text-brandBg"
               style={{ boxShadow: '0 0 14px rgba(0,242,254,0.5)' }}
             >
@@ -496,7 +496,7 @@ export default function LandingPage() {
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 md:gap-5">
                 <Link
-                  href="mailto:hello@stratoscore.app"
+                  href="mailto:contacto@stratoscore.app"
                   className="w-full sm:w-auto text-center px-7 md:px-9 py-4 rounded-xl font-bold text-sm md:text-base tracking-wide transition-all duration-200 hover:scale-[1.02] hover:brightness-110 bg-brandCyan text-brandBg"
                   style={{ boxShadow: '0 0 36px rgba(0,242,254,0.7), 0 0 90px rgba(0,242,254,0.2)' }}
                 >
@@ -744,7 +744,7 @@ export default function LandingPage() {
 
           <p className="mt-8 md:mt-10 text-sm md:text-base fade-d3" style={{ color: '#8B949E' }}>
             ¿Tu sector no está en la lista?{' '}
-            <Link href="mailto:hello@stratoscore.app" style={{ color: '#00F2FE' }}
+            <Link href="mailto:contacto@stratoscore.app" style={{ color: '#00F2FE' }}
               className="transition-colors hover:brightness-125">
               Cuéntanos tu caso →
             </Link>
@@ -783,7 +783,7 @@ export default function LandingPage() {
               </p>
 
               <Link
-                href="mailto:hello@stratoscore.app"
+                href="mailto:contacto@stratoscore.app"
                 className="block w-full sm:w-auto sm:inline-block px-8 md:px-12 py-5 rounded-xl font-bold text-base md:text-lg tracking-wide transition-all duration-200 hover:scale-[1.02] hover:brightness-110 text-center bg-brandCyan text-brandBg"
                 style={{ boxShadow: '0 0 36px rgba(0,242,254,0.65), 0 0 90px rgba(0,242,254,0.2)' }}
               >
@@ -813,8 +813,8 @@ export default function LandingPage() {
           </p>
 
           <div className="flex items-center gap-4 md:gap-5 text-sm" style={{ color: '#8B949E' }}>
-            <Link href="mailto:hello@stratoscore.app" className="hover:text-[#00F2FE] transition-colors">
-              hello@stratoscore.app
+            <Link href="mailto:contacto@stratoscore.app" className="hover:text-[#00F2FE] transition-colors">
+              contacto@stratoscore.app
             </Link>
             <Link href="/login" className="hover:text-[#00F2FE] transition-colors">
               Acceder
