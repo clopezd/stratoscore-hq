@@ -29,6 +29,13 @@ export async function middleware(request: NextRequest) {
   const hostname = host.split(':')[0]
   const pathname = request.nextUrl.pathname
 
+  // ── 0. Landing pública — accesible sin auth desde cualquier host ────────
+  // Esto permite que la landing funcione en stratoscore.app, preview URLs de
+  // Vercel y cualquier dominio sin necesitar sesión activa.
+  if (pathname === '/') {
+    return NextResponse.next()
+  }
+
   // ── 1. Dominios raíz → flujo normal (landing en /, dashboard con auth) ─
   if (MAIN_HOSTNAMES.has(hostname)) {
     return await updateSession(request)
