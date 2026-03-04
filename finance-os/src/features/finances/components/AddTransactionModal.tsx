@@ -41,12 +41,20 @@ export function AddTransactionModal({
   editTransaction,
 }: AddTransactionModalProps) {
   const isEditMode = !!editTransaction
+
+  function nowLocalISO() {
+    const d = new Date()
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+    return d.toISOString().slice(0, 16)
+  }
+
   const [tipo, setTipo] = useState<TipoTransaccion>(initialTipo || 'gasto')
   const [monto, setMonto] = useState('')
   const [categoria, setCategoria] = useState('')
-  const [cuenta, setCuenta] = useState<Cuenta>('Primary Checking')
-  const [cuentaDestino, setCuentaDestino] = useState<Cuenta>('Cash')
+  const [cuenta, setCuenta] = useState<Cuenta>('Lavandería')
+  const [cuentaDestino, setCuentaDestino] = useState<Cuenta>('Personal')
   const [descripcion, setDescripcion] = useState('')
+  const [fechaHora, setFechaHora] = useState(nowLocalISO())
   const [isLoading, setIsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -58,7 +66,7 @@ export function AddTransactionModal({
       setMonto(String(editTransaction.monto))
       setCategoria(editTransaction.categoria)
       setCuenta(editTransaction.cuenta)
-      setCuentaDestino(editTransaction.cuenta_destino || 'Cash')
+      setCuentaDestino(editTransaction.cuenta_destino || 'Personal')
       setDescripcion(editTransaction.descripcion || '')
     } else if (initialTipo && isOpen) {
       setTipo(initialTipo)
@@ -103,6 +111,7 @@ export function AddTransactionModal({
         cuenta,
         cuenta_destino: tipo === 'transferencia' ? cuentaDestino : undefined,
         descripcion: descripcion || undefined,
+        fecha_hora: fechaHora ? new Date(fechaHora).toISOString() : new Date().toISOString(),
       }
 
       if (isEditMode && onUpdate && editTransaction) {
@@ -128,9 +137,10 @@ export function AddTransactionModal({
     setTipo('gasto')
     setMonto('')
     setCategoria('')
-    setCuenta('Primary Checking')
-    setCuentaDestino('Cash')
+    setCuenta('Lavandería')
+    setCuentaDestino('Personal')
     setDescripcion('')
+    setFechaHora(nowLocalISO())
     setError(null)
   }
 
@@ -196,7 +206,7 @@ export function AddTransactionModal({
                               ? 'text-red-500'
                               : t === 'ingreso'
                               ? 'text-emerald-500'
-                              : 'text-sky-500'
+                              : 'text-violet-500'
                           }`
                         : 'bg-neu-bg shadow-neu text-gray-500 hover:shadow-neu-sm'
                     }
@@ -279,6 +289,14 @@ export function AddTransactionModal({
               }
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
+            />
+
+            {/* Fecha y hora */}
+            <NeuInput
+              label="Fecha y hora"
+              type="datetime-local"
+              value={fechaHora}
+              onChange={(e) => setFechaHora(e.target.value)}
             />
 
             {/* Error */}

@@ -1,6 +1,84 @@
 @import 'tailwindcss';
 @import 'highlight.js/styles/github-dark-dimmed.css';
 
+/* ── StratosCore Design System ──────────────────────────────────────────────── */
+@theme {
+  /* Brand palette */
+  --color-carbon:   #001117;
+  --color-platinum: #E0E0E0;
+  --color-cyan:     #00F2FE;
+  --color-cyan-dim: #00F2FE40;
+  --color-stellar:  #8B949E;
+  --color-surface:  #0a1520;
+  --color-border:   rgba(0, 242, 254, 0.12);
+}
+
+/* Glow utilities */
+.glow-cyan {
+  box-shadow: 0 0 16px #00F2FE80, 0 0 40px #00F2FE30;
+}
+.glow-cyan-sm {
+  box-shadow: 0 0 8px #00F2FE60;
+}
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #00F2FE 0%, #a8f0ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Landing page: allow scroll (different from app shell) */
+body.landing {
+  overflow: auto !important;
+  background-color: #001117 !important;
+}
+
+/* Subtle grid background */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(0, 242, 254, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 242, 254, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Animated glow orb */
+@keyframes pulse-orb {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50%       { opacity: 0.25; transform: scale(1.08); }
+}
+.orb-animate { animation: pulse-orb 6s ease-in-out infinite; }
+
+/* Fade up on load */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up       { animation: fade-up 0.7s ease forwards; }
+.fade-up-delay { animation: fade-up 0.7s 0.15s ease both; }
+.fade-up-late  { animation: fade-up 0.7s 0.3s ease both; }
+
+/* ── Lavandería App: warm amber operational theme ────────────────────────── */
+/* Allow scroll and override dark dashboard defaults */
+html:has([data-lavanderia]),
+body:has([data-lavanderia]) {
+  overflow: auto !important;
+  background-color: #100800 !important;
+}
+
+/* Amber glow utilities for lavandería */
+.glow-amber {
+  box-shadow: 0 0 16px #F59E0B80, 0 0 40px #F59E0B30;
+}
+.glow-amber-sm {
+  box-shadow: 0 0 8px #F59E0B60;
+}
+.text-gradient-amber {
+  background: linear-gradient(135deg, #F59E0B 0%, #FDE68A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Override hljs background so code bubbles control their own bg */
 .hljs { background: transparent !important; }
 

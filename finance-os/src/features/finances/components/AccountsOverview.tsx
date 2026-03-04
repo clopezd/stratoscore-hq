@@ -14,11 +14,11 @@ interface AccountsOverviewProps {
 }
 
 const SHORT_NAMES: Record<Cuenta, string> = {
-  'Primary Checking': 'Primary',
-  'Secondary Checking': 'Secondary',
-  Cash: 'Cash',
-  'Credit Card 1': 'CC 1',
-  'Credit Card 2': 'CC 2',
+  'Lavandería': 'Lav.',
+  'Mobility': 'Mob.',
+  'Seguros': 'Seg.',
+  'Personal': 'Pers.',
+  'Efectivo': 'Efec.',
 }
 
 const colorClasses: Record<string, { bg: string; icon: string; border: string }> = {

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { Client } from 'ssh2'
 
 interface GogCalendarEvent {
   id: string
@@ -15,7 +14,7 @@ interface GogResponse {
   events?: GogCalendarEvent[]
 }
 
-function sshExec(command: string): Promise<string> {
+async function sshExec(command: string): Promise<string> {
   const host = process.env.VPS_SSH_HOST
   const username = process.env.VPS_SSH_USER
   const password = process.env.VPS_SSH_PASSWORD
@@ -23,6 +22,10 @@ function sshExec(command: string): Promise<string> {
   if (!host || !username || !password) {
     return Promise.reject(new Error('VPS SSH credentials not configured'))
   }
+
+  // Dynamic import keeps ssh2 (and its 'fs' dependency) out of the static bundle.
+  // Vercel/Turbopack won't try to resolve 'fs' at build time this way.
+  const { Client } = await import('ssh2')
 
   return new Promise((resolve, reject) => {
     const conn = new Client()

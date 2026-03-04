@@ -5,9 +5,12 @@ import { readEnvFile } from './env.js'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-export const PROJECT_ROOT = join(__dirname, '..')
-export const STORE_DIR = join(PROJECT_ROOT, 'store')
-export const UPLOADS_DIR = join(PROJECT_ROOT, 'workspace', 'uploads')
+// Agent's own directory (agent-server/) — used for DB, uploads, PID
+export const AGENT_DIR = join(__dirname, '..')
+// Repo root — CWD for the Claude Agent SDK so it can reach all sub-projects
+export const PROJECT_ROOT = join(__dirname, '..', '..')
+export const STORE_DIR = join(AGENT_DIR, 'store')
+export const UPLOADS_DIR = join(AGENT_DIR, 'workspace', 'uploads')
 
 const env = readEnvFile()
 

@@ -1,11 +1,18 @@
 import type { NextConfig } from 'next'
+import path from 'path'
 
 const nextConfig: NextConfig = {
   // Activa el MCP server en /_next/mcp (Next.js 16+)
   experimental: {
     mcpServer: true,
   },
-  // ssh2 uses native crypto — keep it out of the Turbopack bundle
+  // Fix Turbopack workspace root: prevent Turbopack from picking up the
+  // monorepo-level lockfile and dragging in unrelated packages.
+  turbopack: {
+    root: path.resolve('.'),
+  },
+  // ssh2 uses native 'fs' — keep it out of the static bundle.
+  // The import in calendar/route.ts is now dynamic, so this is a belt-and-suspenders guard.
   serverExternalPackages: ['ssh2'],
   // Allow images from Supabase Storage (generated images, avatars, etc.)
   images: {

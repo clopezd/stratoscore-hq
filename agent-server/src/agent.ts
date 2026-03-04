@@ -1,8 +1,8 @@
-import { query, type Query, type ModelInfo } from '@anthropic-ai/claude-agent-sdk'
+import { query, type Query, type ModelInfo, type CanUseTool } from '@anthropic-ai/claude-agent-sdk'
 import { PROJECT_ROOT, AGENT_TIMEOUT_MS } from './config.js'
 import { logger } from './logger.js'
 
-export type { Query, ModelInfo }
+export type { Query, ModelInfo, CanUseTool }
 
 export interface AgentResult {
   text: string | null
@@ -39,6 +39,7 @@ export async function* runAgentStream(
   signal?: AbortSignal,
   effort?: EffortLevel,
   onQuery?: (q: Query) => void,
+  canUseTool?: CanUseTool,
 ): AsyncGenerator<SSEEvent> {
   const ac = new AbortController()
   const timeout = setTimeout(() => ac.abort(), AGENT_TIMEOUT_MS)
@@ -59,10 +60,12 @@ export async function* runAgentStream(
         cwd: PROJECT_ROOT,
         resume: sessionId,
         settingSources: ['project', 'user'],
-        permissionMode: 'bypassPermissions',
+        permissionMode: canUseTool ? 'default' : 'bypassPermissions',
+        allowDangerouslySkipPermissions: !canUseTool,
         abortController: ac,
         includePartialMessages: true,
         ...(effort && { effort }),
+        ...(canUseTool && { canUseTool }),
       },
     })
 
@@ -175,7 +178,8 @@ export async function* runAgentStream(
 export async function runAgent(
   message: string,
   sessionId?: string,
-  onTyping?: () => void
+  onTyping?: () => void,
+  canUseTool?: CanUseTool,
 ): Promise<AgentResult> {
   let resultText: string | null = null
   let newSessionId: string | undefined
@@ -196,7 +200,9 @@ export async function runAgent(
         resume: sessionId,
         settingSources: ['project', 'user'],
         permissionMode: 'bypassPermissions',
+        allowDangerouslySkipPermissions: true,
         abortController: ac,
+        stderr: (data: string) => logger.warn({ stderr: data.trim() }, 'claude subprocess stderr'),
       },
     })
 
@@ -261,6 +267,7 @@ export async function getAvailableModels(sessionId?: string): Promise<ModelInfo[
         ...(sessionId && { resume: sessionId }),
         settingSources: ['project', 'user'],
         permissionMode: 'bypassPermissions',
+        allowDangerouslySkipPermissions: true,
         abortController: ac,
       },
     })

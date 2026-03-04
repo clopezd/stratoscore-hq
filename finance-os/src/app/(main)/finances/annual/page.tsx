@@ -78,7 +78,7 @@ const columns: ColumnConfig<GastoAnual>[] = [
 const defaultValues: Omit<GastoAnual, 'id' | 'created_at'> = {
   nombre_servicio: '',
   categoria: EXPENSE_CATEGORIES[0],
-  cuenta: 'Primary Checking',
+  cuenta: 'Lavandería',
   mes_de_cobro: 1,
   dia_de_cobro: 1,
   monto: 0,

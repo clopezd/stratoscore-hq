@@ -1,10 +1,10 @@
 // Cuentas bancarias disponibles
 export const CUENTAS = [
-  'Primary Checking',
-  'Secondary Checking',
-  'Cash',
-  'Credit Card 1',
-  'Credit Card 2',
+  'Lavandería',
+  'Mobility',
+  'Seguros',
+  'Personal',
+  'Efectivo',
 ] as const
 
 export type Cuenta = (typeof CUENTAS)[number]

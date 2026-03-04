@@ -101,7 +101,7 @@ export async function POST(): Promise<NextResponse<ResultadoProcesamiento | { er
       tipo: 'gasto',
       monto: gasto.monto,
       categoria: gasto.categoria,
-      cuenta: gasto.cuenta || 'Primary Checking',
+      cuenta: gasto.cuenta || 'Lavandería',
       descripcion: descripcionRecurrente,
       fecha_hora: `${fechaCobroStr}T12:00:00`,
     })

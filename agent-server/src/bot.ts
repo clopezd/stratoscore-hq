@@ -3,6 +3,7 @@ import { TELEGRAM_BOT_TOKEN, ALLOWED_CHAT_ID, TYPING_REFRESH_MS, MAX_MESSAGE_LEN
 import { getSession, setSession, clearSession, getMemoriesByChatId, clearMemories } from './db.js'
 // Note: clearMemories added to db.ts
 import { runAgent } from './agent.js'
+import { createApprovalHandler, resolveApproval } from './approvals.js'
 import { buildMemoryContext, saveConversationTurn } from './memory.js'
 import { voiceCapabilities, transcribeAudio, synthesizeSpeech } from './voice.js'
 import { downloadMedia, buildPhotoMessage, buildDocumentMessage } from './media.js'
@@ -107,7 +108,8 @@ function isAuthorised(chatId: number | string): boolean {
 export async function handleMessage(
   ctx: Context,
   rawText: string,
-  forceVoiceReply = false
+  forceVoiceReply = false,
+  bot?: Bot,
 ): Promise<void> {
   const chatId = String(ctx.chat?.id)
   if (!isAuthorised(chatId)) {
@@ -140,10 +142,13 @@ export async function handleMessage(
     // Sesión Claude Code (getSession returns string | undefined directly)
     const sessionId = getSession(chatId)
 
+    const approvalHandler = bot ? createApprovalHandler(bot, chatId) : undefined
+
     const result = await runAgent(
       fullMessage,
       sessionId,
-      sendTyping
+      sendTyping,
+      approvalHandler,
     )
 
     typingActive = false
@@ -163,22 +168,7 @@ export async function handleMessage(
     // Notificar Mission Control — conversación completada
     mcEnd(runId, responseText)
 
-    // TTS si el mensaje fue por voz
-    const caps = voiceCapabilities()
-    logger.info({ forceVoiceReply, tts: caps.tts, responseLen: responseText.length }, 'TTS check')
-    if (forceVoiceReply && caps.tts && responseText) {
-      try {
-        logger.info('synthesizing speech via ElevenLabs...')
-        const audioBuffer = await synthesizeSpeech(responseText)
-        logger.info({ bytes: audioBuffer.length }, 'TTS ok, sending voice')
-        await ctx.replyWithVoice(new InputFile(audioBuffer, 'response.mp3'))
-        return
-      } catch (err) {
-        logger.error({ err }, 'TTS failed, falling back to text')
-      }
-    }
-
-    // Respuesta de texto (chunks si es largo)
+    // Respuesta de texto (siempre se envía, chunks si es largo)
     if (!responseText) {
       await ctx.reply('(sin respuesta)')
       return
@@ -186,16 +176,40 @@ export async function handleMessage(
 
     const formatted = formatForTelegram(responseText)
     const chunks = splitMessage(formatted)
-
     for (const chunk of chunks) {
       await ctx.reply(chunk, { parse_mode: 'HTML' })
+    }
+
+    // TTS — convierte TODA respuesta a audio si ElevenLabs está configurado
+    // ElevenLabs flash acepta hasta ~5000 caracteres; respuestas más largas se omiten
+    const caps = voiceCapabilities()
+    logger.info({ tts: caps.tts, responseLen: responseText.length }, 'TTS check')
+    if (caps.tts && responseText.length <= 5000) {
+      try {
+        logger.info('synthesizing speech via ElevenLabs...')
+        const audioBuffer = await synthesizeSpeech(responseText)
+        logger.info({ bytes: audioBuffer.length }, 'TTS ok, sending voice')
+        await ctx.replyWithVoice(new InputFile(audioBuffer, 'response.mp3'))
+      } catch (err) {
+        const detail = String(err).replace(/^Error:\s*/, '')
+        console.error('[TTS] ElevenLabs falló:', detail)
+        logger.error({ err }, 'TTS failed')
+        await ctx.reply(`⚠️ Error de audio: ${detail}`)
+      }
+    } else if (caps.tts) {
+      logger.info({ responseLen: responseText.length }, 'TTS skipped: response too long')
     }
   } catch (err) {
     clearInterval(typingInterval)
     typingActive = false
     logger.error({ err, chatId }, 'handleMessage error')
     mcError(runId, String(err))
-    await ctx.reply(`Error: ${String(err)}`)
+    const msg = String(err)
+    if (msg.includes('exit code 1') || msg.includes('exited with code 1')) {
+      await ctx.reply('⚠️ El agente encontró un error al ejecutar. Intenta de nuevo o usa /newchat si persiste.')
+    } else {
+      await ctx.reply(`Error: ${msg}`)
+    }
   }
 }
 
@@ -300,7 +314,7 @@ export function createBot(): Bot {
   // Mensajes de texto normales
   bot.on('message:text', async (ctx) => {
     if (!isAuthorised(String(ctx.chat.id))) return
-    await handleMessage(ctx, ctx.message.text)
+    await handleMessage(ctx, ctx.message.text, false, bot)
   })
 
   // Voice notes (STT → Claude → opcional TTS)
@@ -321,7 +335,7 @@ export function createBot(): Bot {
       logger.info({ length: transcript.length }, 'voice transcribed')
 
       // Indicar que fue transcrito (útil para debugging)
-      await handleMessage(ctx, `[Nota de voz]: ${transcript}`, true)
+      await handleMessage(ctx, `[Nota de voz]: ${transcript}`, true, bot)
     } catch (err) {
       logger.error({ err }, 'voice handler error')
       await ctx.reply(`Error procesando nota de voz: ${String(err)}`)
@@ -340,7 +354,7 @@ export function createBot(): Bot {
       const localPath = await downloadMedia(best.file_id, 'photo.jpg')
       const caption = ctx.message.caption
       const message = buildPhotoMessage(localPath, caption)
-      await handleMessage(ctx, message)
+      await handleMessage(ctx, message, false, bot)
     } catch (err) {
       logger.error({ err }, 'photo handler error')
       await ctx.reply(`Error procesando foto: ${String(err)}`)
@@ -357,10 +371,41 @@ export function createBot(): Bot {
       const localPath = await downloadMedia(doc.file_id, doc.file_name ?? 'document')
       const caption = ctx.message.caption
       const message = buildDocumentMessage(localPath, doc.file_name ?? 'document', caption)
-      await handleMessage(ctx, message)
+      await handleMessage(ctx, message, false, bot)
     } catch (err) {
       logger.error({ err }, 'document handler error')
       await ctx.reply(`Error procesando documento: ${String(err)}`)
+    }
+  })
+
+  // Callback queries — approval buttons
+  bot.on('callback_query:data', async (ctx) => {
+    const data = ctx.callbackQuery.data
+    const match = data.match(/^(approve|deny):(.+)$/)
+    if (!match) {
+      await ctx.answerCallbackQuery()
+      return
+    }
+
+    const [, action, toolUseId] = match
+    const approved = action === 'approve'
+    const resolved = resolveApproval(toolUseId, approved)
+
+    if (resolved) {
+      const statusText = approved ? '✅ Aprobado' : '❌ Denegado'
+      try {
+        // Strip inline keyboard and append status
+        const orig = ctx.callbackQuery.message
+        const origText = orig && 'text' in orig ? orig.text : ''
+        await ctx.editMessageText(
+          origText + `\n\n${statusText}`,
+          { parse_mode: 'HTML' },
+        )
+      } catch { /* ignore edit errors */ }
+      await ctx.answerCallbackQuery(statusText)
+    } else {
+      // Already resolved (timeout or abort)
+      await ctx.answerCallbackQuery('Ya fue resuelto.')
     }
   })
 

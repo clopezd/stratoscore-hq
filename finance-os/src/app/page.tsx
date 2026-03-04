@@ -21,6 +21,7 @@ import { fetchCuentas } from '@/features/finances/services/cuentas'
 import { summarizeByCategory } from '@/features/finances/services/analytics'
 import { Transaction, TransactionInput, TipoTransaccion, CuentaDB } from '@/features/finances/types'
 import { QuickActionButtons } from '@/features/finances/components/QuickActionButtons'
+import { CsvImportModal } from '@/features/finances/components/CsvImportModal'
 
 export default function HomePage() {
   const {
@@ -42,6 +43,7 @@ export default function HomePage() {
   const { inputs } = useCalculatorStore()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCsvModalOpen, setIsCsvModalOpen] = useState(false)
   const [initialTipo, setInitialTipo] = useState<TipoTransaccion | undefined>()
   const [editTransaction, setEditTransaction] = useState<Transaction | null>(null)
   const [gastosData, setGastosData] = useState<ReturnType<typeof summarizeByCategory>>([])
@@ -136,6 +138,13 @@ export default function HomePage() {
     setIngresosData(summarizeByCategory(updated, 'ingreso'))
   }
 
+  const handleCsvImported = (imported: Transaction[]) => {
+    const updated = [...imported, ...transactions]
+    setTransactions(updated)
+    setGastosData(summarizeByCategory(updated, 'gasto'))
+    setIngresosData(summarizeByCategory(updated, 'ingreso'))
+  }
+
   return (
     <div className="min-h-screen bg-neu-bg">
       <NavBar />
@@ -151,6 +160,15 @@ export default function HomePage() {
                 {inputs?.businessName && ` - ${inputs.businessName}`}
               </p>
             </div>
+            <button
+              onClick={() => setIsCsvModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neu-bg shadow-neu hover:shadow-neu-sm text-violet-600 font-medium text-sm transition-all self-start sm:self-auto"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Importar CSV
+            </button>
           </div>
 
           {/* Date Range Selector */}
@@ -234,6 +252,13 @@ export default function HomePage() {
 
       {/* Quick Action FABs */}
       <QuickActionButtons onQuickAction={handleQuickAction} />
+
+      {/* CSV Import Modal */}
+      <CsvImportModal
+        isOpen={isCsvModalOpen}
+        onClose={() => setIsCsvModalOpen(false)}
+        onImported={handleCsvImported}
+      />
     </div>
   )
 }

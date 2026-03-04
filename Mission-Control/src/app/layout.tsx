@@ -1,6 +1,13 @@
 import type { Metadata, Viewport } from 'next'
+import { Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { PWARegister } from '@/components/PWARegister'
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-grotesk',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'Mission Control',
@@ -31,8 +38,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="es" className={spaceGrotesk.variable}>
+      <body style={{ fontFamily: 'var(--font-grotesk), system-ui, sans-serif' }}>
         {children}
         <PWARegister />
       </body>

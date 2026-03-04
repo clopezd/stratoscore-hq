@@ -65,7 +65,7 @@ const columns: ColumnConfig<GastoMensual>[] = [
 const defaultValues: Omit<GastoMensual, 'id' | 'created_at'> = {
   nombre_app: '',
   categoria: EXPENSE_CATEGORIES[0],
-  cuenta: 'Primary Checking',
+  cuenta: 'Lavandería',
   dia_de_cobro: 1,
   monto: 0,
   activo: true,

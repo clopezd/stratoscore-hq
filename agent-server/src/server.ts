@@ -26,6 +26,7 @@ import { getSession, setSession, clearSession, listTasks, getTask, updateTaskSta
 import { computeNextRun, runDueTasks } from './scheduler.js'
 import { buildMemoryContext, saveConversationTurn } from './memory.js'
 import { logger } from './logger.js'
+import { getFinanceSummary } from './finance-client.js'
 
 const env = readEnvFile(['OPENCLAW_GATEWAY_TOKEN', 'MC_SERVER_PORT', 'MISSION_CONTROL_ORIGIN'])
 const MC_TOKEN = env['OPENCLAW_GATEWAY_TOKEN'] ?? ''
@@ -182,6 +183,7 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
             ...(sessionId && { resume: sessionId }),
             settingSources: ['project', 'user'],
             permissionMode: 'bypassPermissions',
+            allowDangerouslySkipPermissions: true,
           },
         })
         await stream.setModel(modelName)
@@ -365,6 +367,41 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
         updateTaskAfterRun(taskId, `Error: ${String(err)}`, nextRun)
         logger.error({ err, taskId }, 'manual run error')
       })
+    return
+  }
+
+  // GET /mc/report — proxy al endpoint de Mission Control
+  if (req.method === 'GET' && req.url === '/mc/report') {
+    try {
+      const mcRes = await fetch('http://localhost:3000/api/openclaw/report', {
+        headers: { Authorization: `Bearer ${MC_TOKEN}` },
+        signal: AbortSignal.timeout(10_000),
+      })
+      if (!mcRes.ok) {
+        sendJSON(res, mcRes.status, { error: `Mission Control respondió ${mcRes.status}` })
+        return
+      }
+      const data = await mcRes.json()
+      sendJSON(res, 200, data)
+    } catch {
+      sendJSON(res, 503, { error: 'Mission Control no disponible' })
+    }
+    return
+  }
+
+  // GET /finance/summary — resumen financiero vía Supabase
+  if (req.method === 'GET' && req.url === '/finance/summary') {
+    try {
+      const summary = await getFinanceSummary()
+      if (!summary) {
+        sendJSON(res, 503, { error: 'ANALYTICS_SUPABASE vars no configuradas' })
+        return
+      }
+      sendJSON(res, 200, summary)
+    } catch (err) {
+      logger.error({ err }, 'finance/summary error')
+      sendJSON(res, 500, { error: String(err) })
+    }
     return
   }
 
