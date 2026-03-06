@@ -497,7 +497,9 @@ export default function LandingPage() {
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 md:gap-5">
                 <Link
-                  href="mailto:contacto@stratoscore.app"
+                  href="https://calendly.com/contacto-stratoscore/30min"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full sm:w-auto text-center px-7 md:px-9 py-4 rounded-xl font-bold text-sm md:text-base tracking-wide transition-all duration-200 hover:scale-[1.02] hover:brightness-110 bg-brandCyan text-brandBg uppercase"
                   style={{ boxShadow: '0 0 36px rgba(0,242,254,0.7), 0 0 90px rgba(0,242,254,0.2)' }}
                 >
@@ -789,7 +791,9 @@ export default function LandingPage() {
               </p>
 
               <Link
-                href="mailto:contacto@stratoscore.app"
+                href="https://calendly.com/contacto-stratoscore/30min"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="block w-full sm:w-auto sm:inline-block px-8 md:px-12 py-5 rounded-xl font-bold text-base md:text-lg tracking-wide transition-all duration-200 hover:scale-[1.02] hover:brightness-110 text-center bg-brandCyan text-brandBg"
                 style={{ boxShadow: '0 0 36px rgba(0,242,254,0.65), 0 0 90px rgba(0,242,254,0.2)' }}
               >
