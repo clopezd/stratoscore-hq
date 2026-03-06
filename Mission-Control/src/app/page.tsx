@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { MessageSquare, BarChart3, Calendar, Megaphone } from 'lucide-react'
+import { MessageSquare, BarChart3, Calendar, Megaphone, Network, Cpu, TrendingUp } from 'lucide-react'
 
 // ── Brand palette — stratoscore-brand.jpg ─────────────────────────────────────
 // #001117 Deep Carbon · #E0EDE0 Platinum · #00F2FE Electric Cyan · #8B949E Stellar Gray
@@ -667,7 +667,7 @@ export default function LandingPage() {
             {/* Paso 01 */}
             <TiltCard>
               <div
-                className="relative rounded-2xl overflow-hidden p-5 md:p-7 h-full flex flex-col"
+                className="relative rounded-2xl overflow-hidden p-5 md:p-6 h-full flex flex-col"
                 style={{
                   background: 'rgba(0,17,23,0.90)',
                   border: '1px solid rgba(0,242,254,0.18)',
@@ -683,15 +683,30 @@ export default function LandingPage() {
                   <span className="text-4xl font-bold tabular-nums" style={{ color: 'rgba(0,242,254,0.25)' }}>01</span>
                 </div>
 
-                <h3 className="text-xl md:text-2xl font-semibold mb-3" style={{ color: '#E0EDE0' }}>
+                {/* Icon container */}
+                <div className="mb-4">
+                  <div
+                    className="inline-flex p-3 rounded-xl"
+                    style={{
+                      background: 'rgba(0,242,254,0.08)',
+                      border: '1px solid rgba(0,242,254,0.20)',
+                      backdropFilter: 'blur(10px)',
+                      boxShadow: '0 8px 32px rgba(0,242,254,0.1)',
+                    }}
+                  >
+                    <Network size={28} style={{ color: '#00F2FE' }} strokeWidth={1.5} />
+                  </div>
+                </div>
+
+                <h3 className="text-xl md:text-2xl font-semibold mb-2.5" style={{ color: '#E0EDE0' }}>
                   Mapeo de Flujo Lógico
                 </h3>
 
-                <p className="text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
+                <p className="text-sm md:text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
                   No instalamos un chat genérico. Analizamos cómo vendes y cómo compran tus clientes. Diseñamos un protocolo de respuesta que imita tu mejor discurso de ventas, asegurando que cada interacción tenga una intención clara y una resolución rápida.
                 </p>
 
-                <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
+                <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
                   <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.35)' }}>
                     [ANÁLISIS_FLOW :: COMPLETE]
                   </span>
@@ -702,7 +717,7 @@ export default function LandingPage() {
             {/* Paso 02 */}
             <TiltCard>
               <div
-                className="relative rounded-2xl overflow-hidden p-5 md:p-7 h-full flex flex-col"
+                className="relative rounded-2xl overflow-hidden p-5 md:p-6 h-full flex flex-col"
                 style={{
                   background: 'rgba(0,17,23,0.90)',
                   border: '1px solid rgba(0,242,254,0.18)',
@@ -718,15 +733,30 @@ export default function LandingPage() {
                   <span className="text-4xl font-bold tabular-nums" style={{ color: 'rgba(0,242,254,0.25)' }}>02</span>
                 </div>
 
-                <h3 className="text-xl md:text-2xl font-semibold mb-3" style={{ color: '#E0EDE0' }}>
+                {/* Icon container */}
+                <div className="mb-4">
+                  <div
+                    className="inline-flex p-3 rounded-xl"
+                    style={{
+                      background: 'rgba(0,242,254,0.08)',
+                      border: '1px solid rgba(0,242,254,0.20)',
+                      backdropFilter: 'blur(10px)',
+                      boxShadow: '0 8px 32px rgba(0,242,254,0.1)',
+                    }}
+                  >
+                    <Cpu size={28} style={{ color: '#00F2FE' }} strokeWidth={1.5} />
+                  </div>
+                </div>
+
+                <h3 className="text-xl md:text-2xl font-semibold mb-2.5" style={{ color: '#E0EDE0' }}>
                   Implementación de Infraestructura
                 </h3>
 
-                <p className="text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
+                <p className="text-sm md:text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
                   Conectamos tu negocio con el mundo. Integramos nuestra tecnología CORE en tus canales de comunicación existentes. El sistema comienza a filtrar, calificar y gestionar prospectos de forma autónoma, eliminando el ruido y entregándote solo oportunidades reales.
                 </p>
 
-                <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
+                <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
                   <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.35)' }}>
                     [INTEGRATION :: DEPLOYED]
                   </span>
@@ -737,7 +767,7 @@ export default function LandingPage() {
             {/* Paso 03 */}
             <TiltCard>
               <div
-                className="relative rounded-2xl overflow-hidden p-5 md:p-7 h-full flex flex-col"
+                className="relative rounded-2xl overflow-hidden p-5 md:p-6 h-full flex flex-col"
                 style={{
                   background: 'rgba(0,17,23,0.90)',
                   border: '1px solid rgba(0,242,254,0.18)',
@@ -753,15 +783,30 @@ export default function LandingPage() {
                   <span className="text-4xl font-bold tabular-nums" style={{ color: 'rgba(0,242,254,0.25)' }}>03</span>
                 </div>
 
-                <h3 className="text-xl md:text-2xl font-semibold mb-3" style={{ color: '#E0EDE0' }}>
+                {/* Icon container */}
+                <div className="mb-4">
+                  <div
+                    className="inline-flex p-3 rounded-xl"
+                    style={{
+                      background: 'rgba(0,242,254,0.08)',
+                      border: '1px solid rgba(0,242,254,0.20)',
+                      backdropFilter: 'blur(10px)',
+                      boxShadow: '0 8px 32px rgba(0,242,254,0.1)',
+                    }}
+                  >
+                    <TrendingUp size={28} style={{ color: '#00F2FE' }} strokeWidth={1.5} />
+                  </div>
+                </div>
+
+                <h3 className="text-xl md:text-2xl font-semibold mb-2.5" style={{ color: '#E0EDE0' }}>
                   Optimización de Conversión
                 </h3>
 
-                <p className="text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
+                <p className="text-sm md:text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
                   Tu agenda se llena, tu tiempo se libera. El sistema no solo responde; cierra. Ya sea agendando una cita, enviando una cotización o resolviendo una duda crítica, el resultado final es siempre el mismo: un negocio que avanza sin que tú tengas que presionar cada botón.
                 </p>
 
-                <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
+                <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
                   <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.35)' }}>
                     [CONVERSION :: OPTIMIZED]
                   </span>
