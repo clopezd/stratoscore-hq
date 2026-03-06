@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { MessageSquare, BarChart3, Calendar, Megaphone, Network, Cpu, TrendingUp } from 'lucide-react'
+import { MessageSquare, BarChart3, Calendar, Megaphone, Sparkles, CalendarDays, CheckCircle } from 'lucide-react'
 
 // ── Brand palette — stratoscore-brand.jpg ─────────────────────────────────────
 // #001117 Deep Carbon · #E0EDE0 Platinum · #00F2FE Electric Cyan · #8B949E Stellar Gray
@@ -656,10 +656,10 @@ export default function LandingPage() {
               <div className="h-px w-8 md:w-16" style={{ background: 'rgba(0,242,254,0.35)' }} />
             </div>
             <h2 className="text-2xl md:text-4xl font-semibold mb-3" style={{ color: '#E0EDE0' }}>
-              Un sistema diseñado para resultados, no para experimentos.
+              Recupera tu tiempo. Automatiza la atención.
             </h2>
             <p className="text-base md:text-lg" style={{ color: '#8B949E' }}>
-              Tres etapas para llevar tu operación al siguiente nivel.
+              Tres etapas para transformar tu operación.
             </p>
           </div>
 
@@ -694,21 +694,21 @@ export default function LandingPage() {
                       boxShadow: '0 8px 32px rgba(0,242,254,0.1)',
                     }}
                   >
-                    <Network size={28} style={{ color: '#00F2FE' }} strokeWidth={1.5} />
+                    <Sparkles size={28} style={{ color: '#00F2FE' }} strokeWidth={1.5} />
                   </div>
                 </div>
 
                 <h3 className="text-xl md:text-2xl font-semibold mb-2.5" style={{ color: '#E0EDE0' }}>
-                  Mapeo de Flujo Lógico
+                  Captura de Prospectos
                 </h3>
 
                 <p className="text-sm md:text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
-                  No instalamos un chat genérico. Analizamos cómo vendes y cómo compran tus clientes. Diseñamos un protocolo de respuesta que imita tu mejor discurso de ventas, asegurando que cada interacción tenga una intención clara y una resolución rápida.
+                  Tu asistente virtual responde automáticamente por WhatsApp, web y redes sociales. Califica cada consulta, identifica oportunidades reales y descarta el ruido. Cada prospecto queda registrado y clasificado sin que muevas un dedo.
                 </p>
 
                 <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
                   <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.35)' }}>
-                    [ANÁLISIS_FLOW :: COMPLETE]
+                    [LEAD_CAPTURE :: ACTIVE]
                   </span>
                 </div>
               </div>
@@ -744,21 +744,21 @@ export default function LandingPage() {
                       boxShadow: '0 8px 32px rgba(0,242,254,0.1)',
                     }}
                   >
-                    <Cpu size={28} style={{ color: '#00F2FE' }} strokeWidth={1.5} />
+                    <CalendarDays size={28} style={{ color: '#00F2FE' }} strokeWidth={1.5} />
                   </div>
                 </div>
 
                 <h3 className="text-xl md:text-2xl font-semibold mb-2.5" style={{ color: '#E0EDE0' }}>
-                  Implementación de Infraestructura
+                  Gestión de Agenda y Operación
                 </h3>
 
                 <p className="text-sm md:text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
-                  Conectamos tu negocio con el mundo. Integramos nuestra tecnología CORE en tus canales de comunicación existentes. El sistema comienza a filtrar, calificar y gestionar prospectos de forma autónoma, eliminando el ruido y entregándote solo oportunidades reales.
+                  El sistema agenda citas, envía recordatorios automáticos y coordina tu calendario sin intervención manual. Reduce ausencias, optimiza tu tiempo y mantiene tu agenda llena con clientes que realmente van a presentarse.
                 </p>
 
                 <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
                   <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.35)' }}>
-                    [INTEGRATION :: DEPLOYED]
+                    [SCHEDULING :: AUTOMATED]
                   </span>
                 </div>
               </div>
@@ -794,21 +794,21 @@ export default function LandingPage() {
                       boxShadow: '0 8px 32px rgba(0,242,254,0.1)',
                     }}
                   >
-                    <TrendingUp size={28} style={{ color: '#00F2FE' }} strokeWidth={1.5} />
+                    <CheckCircle size={28} style={{ color: '#00F2FE' }} strokeWidth={1.5} />
                   </div>
                 </div>
 
                 <h3 className="text-xl md:text-2xl font-semibold mb-2.5" style={{ color: '#E0EDE0' }}>
-                  Optimización de Conversión
+                  Seguimiento y Cierre
                 </h3>
 
                 <p className="text-sm md:text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
-                  Tu agenda se llena, tu tiempo se libera. El sistema no solo responde; cierra. Ya sea agendando una cita, enviando una cotización o resolviendo una duda crítica, el resultado final es siempre el mismo: un negocio que avanza sin que tú tengas que presionar cada botón.
+                  Nunca más pierdas un cliente por falta de seguimiento. El sistema reactiva prospectos inactivos, envía cotizaciones automáticas y guía cada conversación hacia el cierre. Tu negocio crece mientras tú te enfocas en lo que realmente importa.
                 </p>
 
                 <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
                   <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.35)' }}>
-                    [CONVERSION :: OPTIMIZED]
+                    [FOLLOW_UP :: OPTIMIZED]
                   </span>
                 </div>
               </div>
