@@ -469,7 +469,7 @@ export default function LandingPage() {
 
               {/* Headline */}
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight tracking-tight max-w-4xl mx-auto mb-5 md:mb-5">
-                Tu negocio trabajando{' '}
+                Tu negocio no necesita más manos.{' '}
                 <span style={{
                   background: 'linear-gradient(135deg, #00F2FE 0%, #7cf5ff 55%, #ffffff 100%)',
                   WebkitBackgroundClip: 'text',
@@ -477,7 +477,7 @@ export default function LandingPage() {
                   backgroundClip: 'text',
                   filter: 'drop-shadow(0 0 28px rgba(0,242,254,0.4))',
                 }}>
-                  24/7 sin que lo notes
+                  Necesita mejores sistemas.
                 </span>
               </h1>
 
@@ -490,18 +490,18 @@ export default function LandingPage() {
 
               {/* Subheadline */}
               <p className="text-base md:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed mb-8 md:mb-8" style={{ color: '#8B949E' }}>
-                Marketing que no para mientras atiendes pacientes.{' '}
-                <span style={{ color: '#E0EDE0' }}>Automatizamos tu crecimiento con IA.</span>
+                Diseñamos la infraestructura digital que filtra, responde y agenda con precisión quirúrgica.{' '}
+                <span style={{ color: '#E0EDE0' }}>Mientras tú te enfocas en la visión, STRATOS asegura que cada oportunidad se convierta en resultado. Sin errores, sin pausas, sin fricción.</span>
               </p>
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 md:gap-5">
                 <Link
                   href="mailto:contacto@stratoscore.app"
-                  className="w-full sm:w-auto text-center px-7 md:px-9 py-4 rounded-xl font-bold text-sm md:text-base tracking-wide transition-all duration-200 hover:scale-[1.02] hover:brightness-110 bg-brandCyan text-brandBg"
+                  className="w-full sm:w-auto text-center px-7 md:px-9 py-4 rounded-xl font-bold text-sm md:text-base tracking-wide transition-all duration-200 hover:scale-[1.02] hover:brightness-110 bg-brandCyan text-brandBg uppercase"
                   style={{ boxShadow: '0 0 36px rgba(0,242,254,0.7), 0 0 90px rgba(0,242,254,0.2)' }}
                 >
-                  📅 Agendar diagnóstico gratis
+                  OPTIMIZAR MI OPERACIÓN
                 </Link>
                 <Link
                   href="#servicios"
