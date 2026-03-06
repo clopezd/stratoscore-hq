@@ -642,7 +642,138 @@ export default function LandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          4. SERVICIOS
+          4. CÓMO FUNCIONA — PROCESO
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="relative z-10 px-4 py-10 md:px-10 md:py-14 lg:px-16">
+        <div className="max-w-5xl mx-auto">
+
+          <div className="text-center mb-8 md:mb-12 fade-d1">
+            <div className="inline-flex items-center gap-2 md:gap-3 mb-4">
+              <div className="h-px w-8 md:w-16" style={{ background: 'rgba(0,242,254,0.35)' }} />
+              <span className="font-mono text-[10px] md:text-xs uppercase tracking-widest" style={{ color: 'rgba(0,242,254,0.65)' }}>
+                [ CÓMO_FUNCIONA ]
+              </span>
+              <div className="h-px w-8 md:w-16" style={{ background: 'rgba(0,242,254,0.35)' }} />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-semibold mb-3" style={{ color: '#E0EDE0' }}>
+              Un sistema diseñado para resultados, no para experimentos.
+            </h2>
+            <p className="text-base md:text-lg" style={{ color: '#8B949E' }}>
+              Tres etapas para llevar tu operación al siguiente nivel.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 fade-d2">
+            {/* Paso 01 */}
+            <TiltCard>
+              <div
+                className="relative rounded-2xl overflow-hidden p-5 md:p-7 h-full flex flex-col"
+                style={{
+                  background: 'rgba(0,17,23,0.90)',
+                  border: '1px solid rgba(0,242,254,0.18)',
+                  backdropFilter: 'blur(20px)',
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,242,254,0.05)',
+                }}
+              >
+                <div className="absolute inset-x-0 top-0 h-px"
+                  style={{ background: 'linear-gradient(90deg, transparent, rgba(0,242,254,0.4), transparent)' }} />
+
+                <div className="flex items-center justify-between mb-4">
+                  <span className="font-mono text-xs" style={{ color: 'rgba(0,242,254,0.45)' }}>PASO</span>
+                  <span className="text-4xl font-bold tabular-nums" style={{ color: 'rgba(0,242,254,0.25)' }}>01</span>
+                </div>
+
+                <h3 className="text-xl md:text-2xl font-semibold mb-3" style={{ color: '#E0EDE0' }}>
+                  Mapeo de Flujo Lógico
+                </h3>
+
+                <p className="text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
+                  No instalamos un chat genérico. Analizamos cómo vendes y cómo compran tus clientes. Diseñamos un protocolo de respuesta que imita tu mejor discurso de ventas, asegurando que cada interacción tenga una intención clara y una resolución rápida.
+                </p>
+
+                <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
+                  <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.35)' }}>
+                    [ANÁLISIS_FLOW :: COMPLETE]
+                  </span>
+                </div>
+              </div>
+            </TiltCard>
+
+            {/* Paso 02 */}
+            <TiltCard>
+              <div
+                className="relative rounded-2xl overflow-hidden p-5 md:p-7 h-full flex flex-col"
+                style={{
+                  background: 'rgba(0,17,23,0.90)',
+                  border: '1px solid rgba(0,242,254,0.18)',
+                  backdropFilter: 'blur(20px)',
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,242,254,0.05)',
+                }}
+              >
+                <div className="absolute inset-x-0 top-0 h-px"
+                  style={{ background: 'linear-gradient(90deg, transparent, rgba(0,242,254,0.4), transparent)' }} />
+
+                <div className="flex items-center justify-between mb-4">
+                  <span className="font-mono text-xs" style={{ color: 'rgba(0,242,254,0.45)' }}>PASO</span>
+                  <span className="text-4xl font-bold tabular-nums" style={{ color: 'rgba(0,242,254,0.25)' }}>02</span>
+                </div>
+
+                <h3 className="text-xl md:text-2xl font-semibold mb-3" style={{ color: '#E0EDE0' }}>
+                  Implementación de Infraestructura
+                </h3>
+
+                <p className="text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
+                  Conectamos tu negocio con el mundo. Integramos nuestra tecnología CORE en tus canales de comunicación existentes. El sistema comienza a filtrar, calificar y gestionar prospectos de forma autónoma, eliminando el ruido y entregándote solo oportunidades reales.
+                </p>
+
+                <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
+                  <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.35)' }}>
+                    [INTEGRATION :: DEPLOYED]
+                  </span>
+                </div>
+              </div>
+            </TiltCard>
+
+            {/* Paso 03 */}
+            <TiltCard>
+              <div
+                className="relative rounded-2xl overflow-hidden p-5 md:p-7 h-full flex flex-col"
+                style={{
+                  background: 'rgba(0,17,23,0.90)',
+                  border: '1px solid rgba(0,242,254,0.18)',
+                  backdropFilter: 'blur(20px)',
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,242,254,0.05)',
+                }}
+              >
+                <div className="absolute inset-x-0 top-0 h-px"
+                  style={{ background: 'linear-gradient(90deg, transparent, rgba(0,242,254,0.4), transparent)' }} />
+
+                <div className="flex items-center justify-between mb-4">
+                  <span className="font-mono text-xs" style={{ color: 'rgba(0,242,254,0.45)' }}>PASO</span>
+                  <span className="text-4xl font-bold tabular-nums" style={{ color: 'rgba(0,242,254,0.25)' }}>03</span>
+                </div>
+
+                <h3 className="text-xl md:text-2xl font-semibold mb-3" style={{ color: '#E0EDE0' }}>
+                  Optimización de Conversión
+                </h3>
+
+                <p className="text-base leading-relaxed flex-1" style={{ color: '#8B949E' }}>
+                  Tu agenda se llena, tu tiempo se libera. El sistema no solo responde; cierra. Ya sea agendando una cita, enviando una cotización o resolviendo una duda crítica, el resultado final es siempre el mismo: un negocio que avanza sin que tú tengas que presionar cada botón.
+                </p>
+
+                <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(0,242,254,0.10)' }}>
+                  <span className="font-mono text-[9px]" style={{ color: 'rgba(0,242,254,0.35)' }}>
+                    [CONVERSION :: OPTIMIZED]
+                  </span>
+                </div>
+              </div>
+            </TiltCard>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          5. SERVICIOS
       ═══════════════════════════════════════════════════════════════ */}
       <section id="servicios" className="relative z-10 px-4 py-10 md:px-10 md:py-14 lg:px-16">
 
@@ -700,7 +831,7 @@ export default function LandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          5. PARA QUIÉN
+          6. PARA QUIÉN
       ═══════════════════════════════════════════════════════════════ */}
       <section className="relative z-10 px-4 py-10 md:px-10 md:py-14 lg:px-16">
         <div className="max-w-5xl mx-auto text-center">
@@ -761,7 +892,7 @@ export default function LandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          6. CTA FINAL
+          7. CTA FINAL
       ═══════════════════════════════════════════════════════════════ */}
       <section className="relative z-10 px-4 py-6 pb-16 md:px-10 md:py-8 md:pb-20 lg:px-16">
         <TiltCard className="max-w-3xl mx-auto fade-d1">
