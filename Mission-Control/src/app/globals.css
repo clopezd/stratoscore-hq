@@ -96,11 +96,17 @@ body:has([data-lavanderia]) {
   }
 }
 
+/* Default: allow scroll for landing and public pages */
 html, body {
   background-color: #001117;
   margin: 0;
-  overflow: hidden;
+  overflow: auto;
   overscroll-behavior: none;
+}
+
+/* Dashboard shell: lock scroll (app shell handles it) */
+body:has([data-dashboard-shell]) {
+  overflow: hidden;
 }
 
 /* Safe-area bottom spacer (home indicator on notched iPhones) */

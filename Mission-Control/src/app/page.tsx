@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { MessageSquare, BarChart3, Calendar, Megaphone } from 'lucide-react'
 
 // ── Brand palette — stratoscore-brand.jpg ─────────────────────────────────────
 // #001117 Deep Carbon · #E0EDE0 Platinum · #00F2FE Electric Cyan · #8B949E Stellar Gray
@@ -175,25 +176,25 @@ function CRMIcon() {
 // ── Data ──────────────────────────────────────────────────────────────────────
 const painPoints = [
   {
-    icon: '💬',
+    Icon: MessageSquare,
     text: '¿WhatsApp saturado y sin responder?',
     tag: '[MSG_OVERFLOW :: DETECTED]',
     sub: 'Cada mensaje sin respuesta es un cliente que se va con la competencia.',
   },
   {
-    icon: '📊',
+    Icon: BarChart3,
     text: '¿Clientes perdidos en hojas de Excel?',
     tag: '[DATA_LOSS :: WARNING]',
     sub: 'Sin un CRM, el seguimiento depende de tu memoria — y eso tiene un costo real.',
   },
   {
-    icon: '📅',
+    Icon: Calendar,
     text: '¿Citas que se olvidan por falta de recordatorios?',
     tag: '[NO_SHOW_RATE :: HIGH]',
     sub: 'El 30% de las inasistencias se evita con un recordatorio automático a tiempo.',
   },
   {
-    icon: '📣',
+    Icon: Megaphone,
     text: '¿Publicidad que no trae pacientes reales?',
     tag: '[ROI :: UNMEASURED]',
     sub: 'Invertir sin medir es tirar dinero. Necesitas datos, no suposiciones.',
@@ -543,38 +544,43 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 fade-d2">
-            {painPoints.map((p) => (
-              <TiltCard key={p.tag}>
-                <div
-                  className="relative rounded-2xl overflow-hidden p-5 md:p-7"
-                  style={{
-                    background: 'rgba(0,17,23,0.90)',
-                    border: '1px solid rgba(255,189,46,0.18)',
-                    backdropFilter: 'blur(20px)',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,189,46,0.05)',
-                  }}
-                >
-                  <div className="absolute inset-x-0 top-0 h-px"
-                    style={{ background: 'linear-gradient(90deg, transparent, rgba(255,189,46,0.4), transparent)' }} />
+            {painPoints.map((p) => {
+              const IconComponent = p.Icon
+              return (
+                <TiltCard key={p.tag}>
+                  <div
+                    className="relative rounded-2xl overflow-hidden p-5 md:p-7 w-full"
+                    style={{
+                      background: 'rgba(0,17,23,0.90)',
+                      border: '1px solid rgba(255,189,46,0.18)',
+                      backdropFilter: 'blur(20px)',
+                      boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,189,46,0.05)',
+                    }}
+                  >
+                    <div className="absolute inset-x-0 top-0 h-px"
+                      style={{ background: 'linear-gradient(90deg, transparent, rgba(255,189,46,0.4), transparent)' }} />
 
-                  <div className="flex items-start gap-4 md:gap-5">
-                    <span className="text-2xl md:text-3xl mt-0.5 flex-shrink-0">{p.icon}</span>
-                    <div>
-                      <p className="text-base md:text-xl font-semibold mb-1 md:mb-2 leading-snug" style={{ color: '#E0EDE0' }}>
-                        {p.text}
-                      </p>
-                      <p className="font-mono text-[9px] mb-2 md:mb-3" style={{ color: 'rgba(255,189,46,0.55)' }}>
-                        {p.tag}
-                      </p>
-                      {/* Description — hidden on mobile */}
-                      <p className="hidden sm:block text-base leading-relaxed" style={{ color: '#8B949E' }}>
-                        {p.sub}
-                      </p>
+                    <div className="flex items-start gap-4 md:gap-5">
+                      <div className="flex-shrink-0 mt-0.5">
+                        <IconComponent size={24} style={{ color: '#FFBD2E' }} strokeWidth={1.5} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base md:text-xl font-semibold mb-1 md:mb-2 leading-snug" style={{ color: '#E0EDE0' }}>
+                          {p.text}
+                        </p>
+                        <p className="font-mono text-[9px] mb-2 md:mb-3" style={{ color: 'rgba(255,189,46,0.55)' }}>
+                          {p.tag}
+                        </p>
+                        {/* Description — hidden on mobile */}
+                        <p className="hidden sm:block text-base leading-relaxed" style={{ color: '#8B949E' }}>
+                          {p.sub}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </TiltCard>
-            ))}
+                </TiltCard>
+              )
+            })}
           </div>
 
           <div className="text-center mt-10 md:mt-12 fade-d3">

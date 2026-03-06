@@ -79,9 +79,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <div className="fixed inset-0 bg-[#0a0a0f]">
+    <div className="fixed inset-0 bg-[#0a0a0f]" data-dashboard-shell>
     <div
-      className="flex flex-col overflow-hidden"
+      className="flex flex-col md:overflow-hidden"
       style={{
         height: 'var(--app-h, 100dvh)',
         paddingTop: 'env(safe-area-inset-top)',
@@ -95,7 +95,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <Header />
 
       {/* Body */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex md:overflow-hidden relative min-h-0">
         {/* Mobile overlay */}
         {leftSidebarOpen && (
           <div
@@ -128,7 +128,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-hidden min-w-0">
+        <main className="flex-1 overflow-y-auto md:overflow-hidden min-w-0">
           <RouteGuard>{children}</RouteGuard>
         </main>
       </div>
