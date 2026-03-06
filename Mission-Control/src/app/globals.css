@@ -37,6 +37,11 @@
 body.landing {
   overflow: auto !important;
   background-color: #001117 !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+html:has(body.landing) {
+  overflow: auto !important;
 }
 
 /* Subtle grid background */

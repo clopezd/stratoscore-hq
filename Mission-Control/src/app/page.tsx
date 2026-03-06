@@ -309,7 +309,7 @@ export default function LandingPage() {
 
   return (
     <div
-      className="min-h-screen overflow-x-hidden bg-brandBg text-brandText"
+      className="min-h-screen overflow-x-hidden overflow-y-auto touch-auto bg-brandBg text-brandText"
       style={{ fontFamily: 'var(--font-grotesk), system-ui, sans-serif' }}
     >
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_STYLES }} />
