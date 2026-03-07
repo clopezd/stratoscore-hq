@@ -26,6 +26,8 @@ function isLavanderiaSubdomain(hostname: string): boolean {
 
 function isEmailAllowed(email: string): boolean {
   const allowed = process.env.ALLOWED_EMAILS?.split(',').map(e => e.trim().toLowerCase()).filter(Boolean) ?? []
+  // Sin lista configurada → todos permitidos
+  if (allowed.length === 0) return true
   return allowed.includes(email.toLowerCase())
 }
 
@@ -105,11 +107,11 @@ function isAuthPath(pathname: string): boolean {
 // ── Middleware principal ───────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
-  // En Vercel el custom domain llega en x-forwarded-host; nextUrl.hostname
-  // puede devolver el hostname interno del deployment (*.vercel.app).
-  // Usamos x-forwarded-host como fuente primaria de verdad.
-  const forwardedHost = request.headers.get('x-forwarded-host')?.split(':')[0]
-  const hostname = forwardedHost ?? request.nextUrl.hostname
+  // En Vercel el custom domain puede llegar en x-forwarded-host.
+  // Usamos x-forwarded-host → host header → nextUrl.hostname como cadena de fallbacks.
+  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.split(':')[0]?.trim()
+  const hostHeader = request.headers.get('host')?.split(':')[0]?.trim()
+  const hostname = forwardedHost ?? hostHeader ?? request.nextUrl.hostname
   const pathname = request.nextUrl.pathname
 
   // ── 1. Dominios raíz → flujo normal (landing en /, dashboard con auth) ──
