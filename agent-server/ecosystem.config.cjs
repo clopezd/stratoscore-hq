@@ -2,7 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'stratoscore-agent',
-      script: './dist/index.js',
+      script: './start.sh',
+      interpreter: '/bin/bash',
       cwd: '/home/cmarioia/proyectos/stratoscore-hq/agent-server',
       instances: 1,
       autorestart: true,

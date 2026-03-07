@@ -30,7 +30,7 @@ interface SavedView {
 }
 
 const NAV_LINKS = [
-  { href: '/', label: 'Board', icon: LayoutGrid },
+  { href: '/dashboard', label: 'Board', icon: LayoutGrid },
   { href: '/chat', label: 'Chat', icon: Bot },
   { href: '/activity', label: 'Activity', icon: Activity },
   { href: '/draw', label: 'Draw', icon: PenLine },
@@ -76,7 +76,7 @@ export function SidebarNav() {
       resetFilters()
       setFilter('assigneeId', profile.id)
     }
-    if (pathname !== '/') router.push('/')
+    if (pathname !== '/dashboard') router.push('/dashboard')
   }
 
   const handleMemberClick = (profileId: string) => {
@@ -126,8 +126,8 @@ export function SidebarNav() {
       {/* Navigation Links */}
       <div className="px-3 pt-2 pb-2 space-y-0.5">
         {NAV_LINKS.filter(({ href }) => canAccessRoute(href, role)).map(({ href, label, icon: Icon }) => {
-          const isActive = href === '/'
-            ? pathname === '/'
+          const isActive = href === '/dashboard'
+            ? pathname === '/dashboard'
             : pathname.startsWith(href)
           return (
             <Link

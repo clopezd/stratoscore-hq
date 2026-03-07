@@ -1,103 +1,48 @@
-// Panel operativo de Lavandería Carlos
-// Accesible en: lavanderia.stratoscore.app
-// Internamente sirve desde: /lavanderia
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { OrderDashboard } from '@/features/lavanderia/dashboard/components/OrderDashboard'
+import { OrderBlocked } from '@/features/lavanderia/dashboard/components/OrderBlocked'
+import { MisPedidos } from '@/features/lavanderia/dashboard/components/MisPedidos'
 
-const stats = [
-  { label: 'Cargas completadas hoy',  value: '—', unit: 'cargas',  icon: '🫧' },
-  { label: 'Ingresos del día',        value: '—', unit: 'COP',     icon: '💰' },
-  { label: 'Tiempo promedio de ciclo',value: '—', unit: 'min',     icon: '⏱️' },
-  { label: 'Máquinas activas',        value: '—', unit: '/ 4',     icon: '⚡' },
-]
+function getSixHoursAgo() {
+  return new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
+}
 
-const quickActions = [
-  { label: 'Registrar lavada',  href: '#', color: 'bg-amber-500 hover:bg-amber-400 text-black' },
-  { label: 'Ver historial',     href: '#', color: 'bg-amber-900/60 hover:bg-amber-800/60 text-amber-200 border border-amber-500/30' },
-  { label: 'Exportar reporte', href: '#', color: 'bg-amber-900/60 hover:bg-amber-800/60 text-amber-200 border border-amber-500/30' },
-]
+export default async function LavanderiaPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-export default function LavanderiaPage() {
+  if (!user) redirect('/login')
+
+  const { data: todayOrder } = await supabase
+    .from('cc_orders')
+    .select('client_name')
+    .eq('user_id', user.id)
+    .gte('created_at', getSixHoursAgo())
+    .limit(1)
+    .maybeSingle()
+
   return (
-    <div className="min-h-screen px-4 py-8 md:px-8 md:py-12" style={{ fontFamily: 'var(--font-grotesk), system-ui, sans-serif' }}>
+    <div className="min-h-screen px-4 pt-8 pb-16">
+      <div className="w-full max-w-md mx-auto mb-6 text-center">
+        <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#0077B6]/50 mb-1">
+          Portal Oficial · Servicio Exclusivo
+        </p>
+        <h1 className="text-xl font-black text-[#0077B6] tracking-tight leading-tight">
+          MEDCARE
+          <span className="block text-sm font-semibold text-[#00B4D8] mt-0.5 tracking-normal">
+            C&amp;C Clean Express
+          </span>
+        </h1>
+        <div className="mt-2 mx-auto w-16 h-px bg-gradient-to-r from-transparent via-[#00B4D8]/50 to-transparent" />
+      </div>
 
-      {/* ── Header ── */}
-      <header className="max-w-4xl mx-auto mb-10 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-xl glow-amber-sm"
-            style={{ background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.35)' }}
-          >
-            🫧
-          </div>
-          <div>
-            <h1 className="text-white font-bold text-lg leading-tight">Lavandería Carlos</h1>
-            <p className="text-amber-500/70 text-xs">Panel Operativo</p>
-          </div>
-        </div>
-
-        <span
-          className="text-xs px-3 py-1 rounded-full font-medium"
-          style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.25)', color: '#F59E0B' }}
-        >
-          ● En línea
-        </span>
-      </header>
-
-      {/* ── Stats grid ── */}
-      <section className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-        {stats.map((s) => (
-          <div
-            key={s.label}
-            className="rounded-2xl p-5 flex flex-col gap-2"
-            style={{
-              background: 'rgba(245, 158, 11, 0.06)',
-              border: '1px solid rgba(245, 158, 11, 0.12)',
-            }}
-          >
-            <span className="text-2xl">{s.icon}</span>
-            <div>
-              <div className="text-white font-bold text-2xl leading-none">
-                {s.value}
-                <span className="text-amber-500/50 text-sm font-normal ml-1">{s.unit}</span>
-              </div>
-              <div className="text-amber-500/60 text-xs mt-1 leading-tight">{s.label}</div>
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {/* ── Quick actions ── */}
-      <section className="max-w-4xl mx-auto mb-10">
-        <h2 className="text-amber-500/60 text-xs font-semibold uppercase tracking-widest mb-3">
-          Acciones rápidas
-        </h2>
-        <div className="flex flex-wrap gap-3">
-          {quickActions.map((a) => (
-            <a
-              key={a.label}
-              href={a.href}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${a.color}`}
-            >
-              {a.label}
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Placeholder notice ── */}
-      <section className="max-w-4xl mx-auto">
-        <div
-          className="rounded-2xl p-6 text-center"
-          style={{
-            background: 'rgba(245, 158, 11, 0.04)',
-            border: '1px dashed rgba(245, 158, 11, 0.2)',
-          }}
-        >
-          <p className="text-amber-500/50 text-sm">
-            Panel en construcción — conectar con la base de datos de la lavandería para ver datos en tiempo real.
-          </p>
-        </div>
-      </section>
-
+      {todayOrder ? (
+        <OrderBlocked clientName={todayOrder.client_name} />
+      ) : (
+        <OrderDashboard />
+      )}
+      <MisPedidos userId={user.id} />
     </div>
   )
 }

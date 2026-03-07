@@ -87,10 +87,19 @@ async function updateSession(request: NextRequest) {
   }
 
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL('/', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return supabaseResponse
+}
+
+// ── Rutas de auth que deben servirse tal cual en el subdominio lavanderia ──
+const AUTH_PATHS = [
+  '/login', '/signup', '/check-email', '/forgot-password', '/update-password',
+]
+
+function isAuthPath(pathname: string): boolean {
+  return AUTH_PATHS.some((p) => pathname.startsWith(p))
 }
 
 // ── Middleware principal ───────────────────────────────────────────────────
@@ -100,24 +109,38 @@ export async function middleware(request: NextRequest) {
   const hostname = host.split(':')[0]
   const pathname = request.nextUrl.pathname
 
-  // ── 0. Landing pública — sin auth desde cualquier host ──────────────────
-  if (pathname === '/') {
-    return NextResponse.next()
-  }
-
   // ── 1. Dominios raíz → flujo normal (landing en /, dashboard con auth) ──
   if (MAIN_HOSTNAMES.has(hostname)) {
+    // La landing pública no necesita sesión
+    if (pathname === '/') return NextResponse.next()
     return await updateSession(request)
   }
 
   // ── 2. Subdominio 'lavanderia.' → App operativa ──────────────────────────
   if (isLavanderiaSubdomain(hostname)) {
-    if (!pathname.startsWith('/lavanderia') && !pathname.startsWith('/api')) {
-      const url = request.nextUrl.clone()
-      url.pathname = pathname === '/' ? '/lavanderia' : `/lavanderia${pathname}`
-      return NextResponse.rewrite(url)
+    // API routes: sin rewrite ni auth extra
+    if (pathname.startsWith('/api')) return NextResponse.next()
+
+    // Rutas de auth: se sirven normales; si login redirige a /dashboard,
+    // lo capturamos y lo mandamos a /lavanderia
+    if (isAuthPath(pathname)) {
+      const response = await updateSession(request)
+      const location = response.headers.get('location') ?? ''
+      if ((response.status === 307 || response.status === 308) && location.includes('/dashboard')) {
+        return NextResponse.redirect(new URL('/lavanderia', request.url))
+      }
+      return response
     }
-    return NextResponse.next()
+
+    // Rutas ya bajo /lavanderia → solo actualizar sesión
+    if (pathname.startsWith('/lavanderia')) {
+      return await updateSession(request)
+    }
+
+    // Cualquier otra ruta (incluida /) → rewrite a /lavanderia equivalente
+    const url = request.nextUrl.clone()
+    url.pathname = pathname === '/' ? '/lavanderia' : `/lavanderia${pathname}`
+    return NextResponse.rewrite(url)
   }
 
   // ── 3. Vercel preview URL del proyecto lavandería → Landing Page ─────────

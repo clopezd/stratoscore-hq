@@ -1,7 +1,7 @@
 import type { UserRole } from '@/types/database'
 
 const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
-  '/': ['owner', 'admin', 'member'],
+  '/dashboard': ['owner', 'admin', 'member'],
   '/profile': ['owner', 'admin', 'member'],
   '/chat': ['owner'],
   '/activity': ['owner'],

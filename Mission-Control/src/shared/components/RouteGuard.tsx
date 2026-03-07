@@ -13,7 +13,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return
     if (!canAccessRoute(pathname, role)) {
-      router.replace('/')
+      router.replace('/dashboard')
     }
   }, [pathname, role, loading, router])
 

@@ -135,7 +135,7 @@ export function SearchDialog() {
       description: 'View the Kanban board',
       icon: LayoutGrid,
       shortcut: 'G then K',
-      action: () => { close(); setSelectedView('kanban'); router.push('/') },
+      action: () => { close(); setSelectedView('kanban'); router.push('/dashboard') },
       category: 'navigation',
     },
     {
@@ -257,14 +257,14 @@ export function SearchDialog() {
     (result: SearchResult) => {
       if (result.type === 'task') {
         selectTask(result.id)
-        router.push('/')
+        router.push('/dashboard')
       } else if (result.type === 'message' && result.taskId) {
         selectTask(result.taskId)
-        router.push('/')
+        router.push('/dashboard')
       } else if (result.type === 'activity') {
         router.push('/activity')
       } else {
-        router.push('/')
+        router.push('/dashboard')
       }
       close()
     },
