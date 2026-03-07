@@ -2,10 +2,9 @@ import type { NextConfig } from 'next'
 import path from 'path'
 
 const nextConfig: NextConfig = {
-  // Activa el MCP server en /_next/mcp (Next.js 16+)
-  experimental: {
-    mcpServer: true,
-  },
+  // mcpServer deshabilitado: causaba que código de test (node:async_hooks)
+  // se incluyera en el bundle del Edge Middleware, rompiendo producción.
+  // experimental: { mcpServer: true },
   // Fix Turbopack workspace root: prevent Turbopack from picking up the
   // monorepo-level lockfile and dragging in unrelated packages.
   turbopack: {
