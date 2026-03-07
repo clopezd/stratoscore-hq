@@ -16,10 +16,10 @@ const MAIN_HOSTNAMES = new Set(['stratoscore.app', 'www.stratoscore.app'])
 /**
  * Devuelve true si el hostname tiene el subdominio EXACTAMENTE 'lavanderia'
  * seguido por un punto (no 'lavanderia-logistica' ni 'lavanderia2').
+ * Recibe request.nextUrl.hostname — ya limpio, sin puerto.
  */
-function isLavanderiaSubdomain(host: string): boolean {
-  const hostname = host.split(':')[0]
-  return hostname.startsWith('lavanderia.')
+function isLavanderiaSubdomain(hostname: string): boolean {
+  return hostname.startsWith('lavanderia.') && !hostname.startsWith('lavanderia-')
 }
 
 // ── Auth helpers (inlined to avoid Edge Function module resolution issues) ──
@@ -105,8 +105,11 @@ function isAuthPath(pathname: string): boolean {
 // ── Middleware principal ───────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
-  const host = request.headers.get('host') ?? ''
-  const hostname = host.split(':')[0]
+  // En Vercel el custom domain llega en x-forwarded-host; nextUrl.hostname
+  // puede devolver el hostname interno del deployment (*.vercel.app).
+  // Usamos x-forwarded-host como fuente primaria de verdad.
+  const forwardedHost = request.headers.get('x-forwarded-host')?.split(':')[0]
+  const hostname = forwardedHost ?? request.nextUrl.hostname
   const pathname = request.nextUrl.pathname
 
   // ── 1. Dominios raíz → flujo normal (landing en /, dashboard con auth) ──
@@ -118,8 +121,8 @@ export async function middleware(request: NextRequest) {
 
   // ── 2. Subdominio 'lavanderia.' → App operativa ──────────────────────────
   if (isLavanderiaSubdomain(hostname)) {
-    // API routes: sin rewrite ni auth extra
-    if (pathname.startsWith('/api')) return NextResponse.next()
+    // Assets y rutas internas de Next.js: nunca tocar
+    if (pathname.startsWith('/_next') || pathname.startsWith('/api')) return NextResponse.next()
 
     // Rutas de auth: se sirven normales; si login redirige a /dashboard,
     // lo capturamos y lo mandamos a /lavanderia
@@ -137,10 +140,11 @@ export async function middleware(request: NextRequest) {
       return await updateSession(request)
     }
 
-    // Cualquier otra ruta (incluida /) → rewrite a /lavanderia equivalente
-    const url = request.nextUrl.clone()
-    url.pathname = pathname === '/' ? '/lavanderia' : `/lavanderia${pathname}`
-    return NextResponse.rewrite(url)
+    // Cualquier otra ruta (incluida /) → rewrite interno a /lavanderia
+    // Construimos con request.url para que Next.js lo trate como ruta interna
+    // y no como proxy a un host externo.
+    const rewritePath = pathname === '/' ? '/lavanderia' : `/lavanderia${pathname}`
+    return NextResponse.rewrite(new URL(rewritePath, request.url))
   }
 
   // ── 3. Vercel preview URL del proyecto lavandería → Landing Page ─────────
