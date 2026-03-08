@@ -1,166 +1,80 @@
-import { createServerClient } from '@supabase/ssr'
+// Solo Web APIs — sin imports de Node.js ni librerías SSR.
+// La validación completa de sesión Supabase ocurre en los Server Components/layouts.
 import { type NextRequest, NextResponse } from 'next/server'
 
 // ── Routing table ─────────────────────────────────────────────────────────
 //
-//  stratoscore.app          → flujo normal (/ = landing, /dashboard = auth…)
-//  www.stratoscore.app      → flujo normal
-//  lavanderia.stratoscore.app → rewrite a /lavanderia  (app operativa)
-//  lavanderia-logistica-*.vercel.app → landing page (/)
+//  stratoscore.app / www.stratoscore.app  → landing (/) pública, resto protegido
+//  lavanderia.stratoscore.app             → rewrite a /lavanderia
+//  lavanderia-logistica-*.vercel.app      → siempre landing (/)
 //
 // ─────────────────────────────────────────────────────────────────────────
 
-/** Dominios raíz: siempre flujo normal de auth/landing. */
 const MAIN_HOSTNAMES = new Set(['stratoscore.app', 'www.stratoscore.app'])
 
-/**
- * Devuelve true si el hostname tiene el subdominio EXACTAMENTE 'lavanderia'
- * seguido por un punto (no 'lavanderia-logistica' ni 'lavanderia2').
- * Recibe request.nextUrl.hostname — ya limpio, sin puerto.
- */
+const PUBLIC_PATHS = ['/', '/login', '/signup', '/check-email', '/forgot-password', '/update-password']
+
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))
+}
+
 function isLavanderiaSubdomain(hostname: string): boolean {
   return hostname.startsWith('lavanderia.') && !hostname.startsWith('lavanderia-')
 }
 
-// ── Auth helpers (inlined to avoid Edge Function module resolution issues) ──
-
-function isEmailAllowed(email: string): boolean {
-  const allowed = process.env.ALLOWED_EMAILS?.split(',').map(e => e.trim().toLowerCase()).filter(Boolean) ?? []
-  // Sin lista configurada → todos permitidos
-  if (allowed.length === 0) return true
-  return allowed.includes(email.toLowerCase())
-}
-
-const SESSION_MAX_AGE = 60 * 60 * 24 * 30 // 30 days
-
-async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, {
-              path: '/',
-              sameSite: 'lax',
-              httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
-              maxAge: SESSION_MAX_AGE,
-              ...(options as object),
-            })
-          )
-        },
-      },
-    }
+/**
+ * Detecta si hay una sesión Supabase activa usando solo cookies (Web API).
+ * No valida el JWT — esa responsabilidad recae en createServerClient dentro
+ * de cada layout/page protegida. Aquí solo se decide si redirigir o no.
+ */
+function hasSession(request: NextRequest): boolean {
+  return request.cookies.getAll().some(
+    c => c.name.startsWith('sb-') && c.name.includes('-auth-token')
   )
-
-  const { data: { user } } = await supabase.auth.getUser()
-
-  const pathname = request.nextUrl.pathname
-  const isApiRoute = pathname.startsWith('/api/')
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup')
-  const isPublicRoute =
-    isAuthRoute ||
-    pathname === '/' ||
-    pathname.startsWith('/lavanderia') ||
-    pathname.startsWith('/check-email') ||
-    pathname.startsWith('/forgot-password') ||
-    pathname.startsWith('/update-password')
-
-  if (isApiRoute) return supabaseResponse
-
-  if (!isPublicRoute && !user) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  if (user && !isEmailAllowed(user.email ?? '')) {
-    await supabase.auth.signOut()
-    const url = new URL('/login', request.url)
-    url.searchParams.set('error', 'unauthorized')
-    return NextResponse.redirect(url)
-  }
-
-  if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
-
-  return supabaseResponse
-}
-
-// ── Rutas de auth que deben servirse tal cual en el subdominio lavanderia ──
-const AUTH_PATHS = [
-  '/login', '/signup', '/check-email', '/forgot-password', '/update-password',
-]
-
-function isAuthPath(pathname: string): boolean {
-  return AUTH_PATHS.some((p) => pathname.startsWith(p))
 }
 
 // ── Middleware principal ───────────────────────────────────────────────────
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
-  // ── 0. Landing pública — siempre pública sin importar hostname ───────────
-  if (pathname === '/') return NextResponse.next()
-
-  // En Vercel el custom domain puede llegar en x-forwarded-host.
-  // Usamos x-forwarded-host → host header → nextUrl.hostname como cadena de fallbacks.
+  // Resolución de hostname: x-forwarded-host → host → nextUrl.hostname
   const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.split(':')[0]?.trim()
   const hostHeader = request.headers.get('host')?.split(':')[0]?.trim()
   const hostname = forwardedHost ?? hostHeader ?? request.nextUrl.hostname
 
-  // ── 1. Dominios raíz → flujo normal (landing en /, dashboard con auth) ──
-  if (MAIN_HOSTNAMES.has(hostname)) {
-    return await updateSession(request)
-  }
-
-  // ── 2. Subdominio 'lavanderia.' → App operativa ──────────────────────────
+  // ── 1. Subdominio lavanderia → rewrite a /lavanderia ─────────────────────
   if (isLavanderiaSubdomain(hostname)) {
-    // Assets y rutas internas de Next.js: nunca tocar
     if (pathname.startsWith('/_next') || pathname.startsWith('/api')) return NextResponse.next()
-
-    // Rutas de auth: se sirven normales; si login redirige a /dashboard,
-    // lo capturamos y lo mandamos a /lavanderia
-    if (isAuthPath(pathname)) {
-      const response = await updateSession(request)
-      const location = response.headers.get('location') ?? ''
-      if ((response.status === 307 || response.status === 308) && location.includes('/dashboard')) {
-        return NextResponse.redirect(new URL('/lavanderia', request.url))
-      }
-      return response
-    }
-
-    // Rutas ya bajo /lavanderia → solo actualizar sesión
-    if (pathname.startsWith('/lavanderia')) {
-      return await updateSession(request)
-    }
-
-    // Cualquier otra ruta (incluida /) → rewrite interno a /lavanderia
-    // Construimos con request.url para que Next.js lo trate como ruta interna
-    // y no como proxy a un host externo.
     const rewritePath = pathname === '/' ? '/lavanderia' : `/lavanderia${pathname}`
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }
 
-  // ── 3. Vercel preview URL del proyecto lavandería → Landing Page ─────────
+  // ── 2. Preview URLs de lavanderia-logistica → forzar landing ─────────────
   if (hostname.includes('lavanderia-logistica')) {
-    if (pathname === '/') return NextResponse.next()
-    const url = request.nextUrl.clone()
-    url.pathname = '/'
-    return NextResponse.rewrite(url)
+    if (pathname !== '/') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.rewrite(url)
+    }
+    return NextResponse.next()
   }
 
-  // ── 4. Cualquier otro host → flujo normal de auth ──────────────────────
-  return await updateSession(request)
+  // ── 3. Dominios raíz (stratoscore.app, www.) ─────────────────────────────
+  if (MAIN_HOSTNAMES.has(hostname)) {
+    // Rutas públicas: siempre accesibles
+    if (isPublicPath(pathname) || pathname.startsWith('/api/') || pathname.startsWith('/lavanderia')) {
+      return NextResponse.next()
+    }
+    // Rutas protegidas: redirigir a login si no hay sesión
+    if (!hasSession(request)) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+    return NextResponse.next()
+  }
+
+  // ── 4. Cualquier otro host → pasar sin tocar ─────────────────────────────
+  return NextResponse.next()
 }
 
 export const config = {
