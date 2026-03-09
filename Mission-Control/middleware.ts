@@ -38,6 +38,10 @@ function hasSession(request: NextRequest): boolean {
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
+  // Inyectar pathname como header para que los layouts puedan leerlo
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-pathname', pathname)
+
   // Resolución de hostname: x-forwarded-host → host → nextUrl.hostname
   const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.split(':')[0]?.trim()
   const hostHeader = request.headers.get('host')?.split(':')[0]?.trim()
@@ -66,15 +70,17 @@ export function middleware(request: NextRequest) {
     if (isPublicPath(pathname) || pathname.startsWith('/api/') || pathname.startsWith('/lavanderia')) {
       return NextResponse.next()
     }
-    // Rutas protegidas: redirigir a login si no hay sesión
+    // Rutas protegidas: redirigir a login si no hay sesión (preserva la ruta original)
     if (!hasSession(request)) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      const loginUrl = new URL('/login', request.url)
+      if (pathname !== '/') loginUrl.searchParams.set('next', pathname)
+      return NextResponse.redirect(loginUrl)
     }
     return NextResponse.next()
   }
 
-  // ── 4. Cualquier otro host → pasar sin tocar ─────────────────────────────
-  return NextResponse.next()
+  // ── 4. Cualquier otro host (incluyendo localhost) → pasar con headers ────
+  return NextResponse.next({ request: { headers: requestHeaders } })
 }
 
 export const config = {

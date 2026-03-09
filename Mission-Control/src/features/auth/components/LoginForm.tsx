@@ -17,6 +17,8 @@ export function LoginForm() {
     }
   }, [searchParams])
 
+  const next = searchParams.get('next') ?? ''
+
   async function handleSubmit(formData: FormData) {
     setLoading(true)
     setError(null)
@@ -31,6 +33,7 @@ export function LoginForm() {
 
   return (
     <form action={handleSubmit} className="space-y-5">
+      {next && <input type="hidden" name="next" value={next} />}
       {/* Email */}
       <div className="space-y-2">
         <label htmlFor="email" className="block text-sm font-medium text-white/50 tracking-wide pl-1">
