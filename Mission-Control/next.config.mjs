@@ -1,12 +1,20 @@
 // @ts-check
+import { fileURLToPath } from 'url'
+
+// ESM-safe equivalent of __dirname — evaluated at build time only, never in Edge Runtime.
+const projectRoot = fileURLToPath(new URL('.', import.meta.url))
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Anchor Turbopack's workspace root to Mission-Control/ so it doesn't pick up
+  // lockfiles from sibling monorepo packages (agent-server/, finance-os/) on Vercel,
+  // which caused it to resolve the wrong root and inject __dirname into the edge bundle.
+  turbopack: {
+    root: projectRoot,
+  },
   // mcpServer deshabilitado: causaba que código de test (node:async_hooks)
   // se incluyera en el bundle del Edge Middleware, rompiendo producción.
   // experimental: { mcpServer: true },
-  // turbopack.root eliminado: activaba Turbopack en producción y su runtime
-  // inyectaba __dirname, no disponible en Edge Runtime.
   // ssh2 uses native 'fs' — keep it out of the static bundle.
   // The import in calendar/route.ts is now dynamic, so this is a belt-and-suspenders guard.
   serverExternalPackages: ['ssh2'],
