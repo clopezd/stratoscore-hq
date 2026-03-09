@@ -11,6 +11,8 @@ export const EMAIL_ROLES: Record<string, UserRole> = Object.fromEntries(
 )
 
 export function isEmailAllowed(email: string): boolean {
+  // Si no hay lista configurada, todos los emails están permitidos
+  if (ALLOWED_EMAILS.length === 0) return true
   return ALLOWED_EMAILS.includes(email.toLowerCase())
 }
 

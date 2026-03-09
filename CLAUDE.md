@@ -118,3 +118,6 @@ Nota: Requiere que las tablas de Finance OS existan en Supabase (pendiente BUG-0
 - Si algo puede romper producción, avisa antes de ejecutar.
 - Nunca fabricar datos. Si no lo sabes, dilo.
 - Responde siempre en español.
+
+## Lecciones Aprendidas:
+ "Problema de race condition resuelto: sincronización de rol de usuario en RouteGuard y limpieza de espacios en .env.local

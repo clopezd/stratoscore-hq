@@ -7,6 +7,7 @@ const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
   '/activity': ['owner'],
   '/cron': ['owner'],
   '/calendar': ['owner', 'admin'],
+  '/videndum': ['owner'],
   '/draw': ['owner', 'admin'],
   '/settings': ['owner', 'admin', 'member'],
   '/team': ['owner', 'admin', 'member'],

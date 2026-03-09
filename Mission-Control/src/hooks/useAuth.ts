@@ -26,20 +26,20 @@ export function useAuth() {
       setProfile(data)
     }
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       setUser(user)
       if (user) {
-        getProfile(user.id)
+        await getProfile(user.id)
       }
       setLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         const currentUser = session?.user ?? null
         setUser(currentUser)
         if (currentUser) {
-          getProfile(currentUser.id)
+          await getProfile(currentUser.id)
         } else {
           setProfile(null)
         }

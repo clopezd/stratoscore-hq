@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { OrderDashboard } from '@/features/lavanderia/dashboard/components/OrderDashboard'
 import { OrderBlocked } from '@/features/lavanderia/dashboard/components/OrderBlocked'
 import { MisPedidos } from '@/features/lavanderia/dashboard/components/MisPedidos'
+import { CodeGate } from '@/features/lavanderia/dashboard/components/CodeGate'
+import { hasLavanderiaAccess } from '@/features/lavanderia/dashboard/actions/access'
 
 function getSixHoursAgo() {
   return new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
@@ -13,6 +15,10 @@ export default async function LavanderiaPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')
+
+  // Verificar código de acceso (cookie httpOnly seteada por CodeGate)
+  const hasAccess = await hasLavanderiaAccess()
+  if (!hasAccess) return <CodeGate />
 
   const { data: todayOrder } = await supabase
     .from('cc_orders')
