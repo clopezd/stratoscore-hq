@@ -1,11 +1,12 @@
-import type { NextConfig } from 'next'
+// @ts-check
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // mcpServer deshabilitado: causaba que código de test (node:async_hooks)
   // se incluyera en el bundle del Edge Middleware, rompiendo producción.
   // experimental: { mcpServer: true },
-  // turbopack.root eliminado: en Next.js 15.3+ activa Turbopack en producción y su runtime
-  // inyecta referencias a __dirname que no existen en Edge Runtime → MIDDLEWARE_INVOCATION_FAILED.
+  // turbopack.root eliminado: activaba Turbopack en producción y su runtime
+  // inyectaba __dirname, no disponible en Edge Runtime.
   // ssh2 uses native 'fs' — keep it out of the static bundle.
   // The import in calendar/route.ts is now dynamic, so this is a belt-and-suspenders guard.
   serverExternalPackages: ['ssh2'],
