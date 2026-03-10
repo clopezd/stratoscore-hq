@@ -16,11 +16,10 @@ const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
 
+// Guard: in Edge Runtime __dirname is undefined → use "" as base (safe, require() doesn't work in Edge anyway).
+// In Node.js __dirname IS defined → keeps the real path so jest-worker/processChild.js etc. are found.
 const PATTERN = '__nccwpck_require__.ab=__dirname+"/"'
-const REPLACEMENT = '__nccwpck_require__.ab="/"'
-// Some compiled files use __dirname+"/" without the ncc check
-const PATTERN2 = '(__dirname+"/")'
-const REPLACEMENT2 = '("/")'
+const REPLACEMENT = '__nccwpck_require__.ab=(typeof __dirname!=="undefined"?__dirname:"")+"/"'
 
 const compiledDir = path.join(__dirname, '../node_modules/next/dist/compiled')
 
