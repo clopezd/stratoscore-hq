@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import type { VarianceRow } from '@/features/videndum/types'
 
 const MGMT_URL   = 'https://api.supabase.com/v1/projects/csiiulvqzkgijxbgdqcv/database/query'
@@ -17,6 +18,10 @@ async function sql<T = Record<string, unknown>>(query: string): Promise<T[]> {
 }
 
 export async function GET() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   try {
     // Top 10 con mayor desviación negativa (actual muy por debajo del forecast)
     const negativeRows = await sql<{

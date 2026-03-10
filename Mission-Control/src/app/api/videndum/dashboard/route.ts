@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import type { AnnualRow, SeasonalityRow, TopPartRow, VidendumKPIs } from '@/features/videndum/types'
 
 const MGMT_URL = 'https://api.supabase.com/v1/projects/csiiulvqzkgijxbgdqcv/database/query'
@@ -30,6 +31,10 @@ function cagr(first: number, last: number, years: number): number {
 }
 
 export async function GET(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { searchParams } = req.nextUrl
   const catalogType = searchParams.get('catalog_type') ?? 'all'
   const yearRange   = searchParams.get('year_range') ?? 'all'
