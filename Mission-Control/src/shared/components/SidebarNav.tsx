@@ -34,7 +34,7 @@ const NAV_LINKS = [
   { href: '/dashboard', label: 'Board', icon: LayoutGrid },
   { href: '/chat', label: 'Chat', icon: Bot },
   { href: '/activity', label: 'Activity', icon: Activity },
-  { href: '/videndum', label: 'Videndum', icon: BarChart2 },
+  { href: '/videndum', label: 'Videndum Analytics', icon: BarChart2 },
   { href: '/draw', label: 'Draw', icon: PenLine },
   { href: '/settings', label: 'Settings', icon: Settings },
 ] as const
