@@ -17,8 +17,9 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
     }
   }, [pathname, role, loading, router])
 
-  if (loading) return null
-  if (!canAccessRoute(pathname, role)) return null
+  // Durante la carga no bloqueamos — el server layout ya validó la sesión.
+  // El useEffect redirigirá si el rol no tiene permiso una vez que cargue.
+  if (!loading && !canAccessRoute(pathname, role)) return null
 
   return <>{children}</>
 }
