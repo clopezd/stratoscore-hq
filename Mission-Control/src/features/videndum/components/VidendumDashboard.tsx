@@ -9,6 +9,7 @@ import { SeasonalityChart } from './SeasonalityChart'
 import { TopPartsTable } from './TopPartsTable'
 import { VarianceChart } from './VarianceChart'
 import { AnalysisPanel } from './AnalysisPanel'
+import { AnalyticsDashboard } from './AnalyticsDashboard'
 import { RefreshCw } from 'lucide-react'
 
 export function VidendumDashboard() {
@@ -58,6 +59,12 @@ export function VidendumDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <RevenueChart data={data.annual} />
             <SeasonalityChart data={data.seasonality} />
+          </div>
+
+          {/* Analytics: Revenue vs Intake mensual + Pipeline + KPIs */}
+          <div>
+            <p className="text-[11px] text-white/25 uppercase tracking-widest mb-3 px-0.5">Analytics · Full Context</p>
+            <AnalyticsDashboard />
           </div>
 
           {/* Variance forecast vs actual */}

@@ -35,6 +35,41 @@ export interface VidendumKPIs {
   year_to: number
 }
 
+// ── Analytics (videndum_full_context) ────────────────────────────────────────
+
+export interface MonthlyIntakeRow {
+  month: number
+  label: string          // 'Ene', 'Feb'…
+  revenue_qty: number
+  order_intake_qty: number
+  book_to_bill: number | null
+}
+
+export interface PipelineRow {
+  part_number: string
+  catalog_type: string | null
+  order_book_qty: number
+  opportunities_qty: number
+  opp_unfactored_qty: number
+  pipeline_factor_pct: number | null
+}
+
+export interface AnalyticsKPIs {
+  current_b2b: number | null        // B2B del último mes con datos
+  current_month: number
+  current_year: number
+  total_order_book: number
+  total_opportunities: number       // ponderadas
+  total_opp_unfactored: number      // brutas
+  coverage_ratio: number | null     // order_book / revenue (últimos 12m)
+}
+
+export interface AnalyticsData {
+  monthly: MonthlyIntakeRow[]
+  pipeline: PipelineRow[]
+  kpis: AnalyticsKPIs
+}
+
 export interface VarianceRow {
   part_number: string
   catalog_type: string | null
