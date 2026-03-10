@@ -183,9 +183,8 @@ export function DecisionMatrix() {
     setData(null)
     try {
       const res = await fetch('/api/videndum/intelligence-ui', { method: 'POST' })
-      if (!res.ok) throw new Error(await res.text())
       const json = await res.json()
-      if (json.error) throw new Error(json.error)
+      if (!res.ok || json.error) throw new Error(json.error ?? `HTTP ${res.status}`)
       setData(json as DecisionMatrixData)
       setActiveTab('risks')
     } catch (e) {
