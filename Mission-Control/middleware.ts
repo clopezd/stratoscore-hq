@@ -49,7 +49,7 @@ export function middleware(request: NextRequest) {
 
   // ── 1. Subdominio lavanderia → rewrite a /lavanderia ─────────────────────
   if (isLavanderiaSubdomain(hostname)) {
-    if (pathname.startsWith('/_next') || pathname.startsWith('/api')) return NextResponse.next()
+    if (pathname.startsWith('/_next') || pathname.startsWith('/api')) return NextResponse.next({ request: { headers: requestHeaders } })
     const rewritePath = pathname === '/' ? '/lavanderia' : `/lavanderia${pathname}`
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }
@@ -61,14 +61,14 @@ export function middleware(request: NextRequest) {
       url.pathname = '/'
       return NextResponse.rewrite(url)
     }
-    return NextResponse.next()
+    return NextResponse.next({ request: { headers: requestHeaders } })
   }
 
   // ── 3. Dominios raíz (stratoscore.app, www.) ─────────────────────────────
   if (MAIN_HOSTNAMES.has(hostname)) {
     // Rutas públicas: siempre accesibles
     if (isPublicPath(pathname) || pathname.startsWith('/api/') || pathname.startsWith('/lavanderia')) {
-      return NextResponse.next()
+      return NextResponse.next({ request: { headers: requestHeaders } })
     }
     // Rutas protegidas: redirigir a login si no hay sesión (preserva la ruta original)
     if (!hasSession(request)) {
@@ -76,7 +76,7 @@ export function middleware(request: NextRequest) {
       if (pathname !== '/') loginUrl.searchParams.set('next', pathname)
       return NextResponse.redirect(loginUrl)
     }
-    return NextResponse.next()
+    return NextResponse.next({ request: { headers: requestHeaders } })
   }
 
   // ── 4. Cualquier otro host (incluyendo localhost) → pasar con headers ────
