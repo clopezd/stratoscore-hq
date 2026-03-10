@@ -8,6 +8,7 @@ import { RevenueChart } from './RevenueChart'
 import { SeasonalityChart } from './SeasonalityChart'
 import { TopPartsTable } from './TopPartsTable'
 import { VarianceChart } from './VarianceChart'
+import { AnalysisPanel } from './AnalysisPanel'
 import { RefreshCw } from 'lucide-react'
 
 export function VidendumDashboard() {
@@ -61,6 +62,9 @@ export function VidendumDashboard() {
 
           {/* Variance forecast vs actual */}
           <VarianceChart />
+
+          {/* Análisis IA */}
+          <AnalysisPanel />
 
           {/* Top Parts */}
           <TopPartsTable data={data.top_parts} />
