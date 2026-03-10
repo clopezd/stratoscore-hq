@@ -1,12 +1,5 @@
 // Solo Web APIs — sin imports de Node.js ni librerías SSR.
 // La validación completa de sesión Supabase ocurre en los Server Components/layouts.
-
-// Edge Runtime polyfill: algunos paquetes compilados con ncc (incluidos en el bundle
-// por Next.js/Turbopack) usan __dirname. En Edge Runtime no existe como variable
-// CJS, así que lo definimos en globalThis antes de que cualquier módulo lo acceda.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-;(globalThis as any).__dirname ??= '/'
-
 import { type NextRequest, NextResponse } from 'next/server'
 
 // ── Routing table ─────────────────────────────────────────────────────────
