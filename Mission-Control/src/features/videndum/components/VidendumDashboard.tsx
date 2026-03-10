@@ -10,6 +10,7 @@ import { TopPartsTable } from './TopPartsTable'
 import { VarianceChart } from './VarianceChart'
 import { AnalysisPanel } from './AnalysisPanel'
 import { AnalyticsDashboard } from './AnalyticsDashboard'
+import { DecisionMatrix } from './DecisionMatrix'
 import { RefreshCw } from 'lucide-react'
 
 export function VidendumDashboard() {
@@ -69,6 +70,12 @@ export function VidendumDashboard() {
 
           {/* Variance forecast vs actual */}
           <VarianceChart />
+
+          {/* Radar de Inteligencia Competitiva */}
+          <div>
+            <p className="text-[11px] text-white/25 uppercase tracking-widest mb-3 px-0.5">Inteligencia Competitiva · Matriz de Decisión</p>
+            <DecisionMatrix />
+          </div>
 
           {/* Análisis IA */}
           <AnalysisPanel />

@@ -70,6 +70,44 @@ export interface AnalyticsData {
   kpis: AnalyticsKPIs
 }
 
+// ── Decision Matrix (Radar de Inteligencia Competitiva) ───────────────────────
+
+export interface RiskEntry {
+  part_number: string | null
+  segment: string
+  risk_type: 'OBSOLESCENCIA' | 'COMPETENCIA_CHINA' | 'SUSTITUCIÓN_IP' | 'DEMANDA_LATENTE' | 'GOING_CONCERN'
+  severity: 'CRÍTICA' | 'ALTA' | 'MEDIA' | 'BAJA'
+  competitor_threat: string | null
+  evidence: string
+  immediate_action: 'LIQUIDAR' | 'PROVISIONAR' | 'VIGILAR' | 'MANTENER'
+}
+
+export interface OpportunityEntry {
+  segment: string
+  market_trend: string
+  cagr: string | null
+  videndum_asset: string
+  current_exploitation: 'SUBUTILIZADA' | 'BIEN_EXPLOTADA' | 'SIN_EXPLOTAR'
+  gap: string
+  recommendation: string
+}
+
+export interface ActionEntry {
+  target: string
+  type: 'SKU' | 'SEGMENTO' | 'MARCA'
+  decision: 'LIQUIDAR' | 'PROVISIONAR' | 'VENDER_CANAL' | 'MANTENER' | 'INVERTIR' | 'VIGILAR'
+  rationale: string
+  urgency: 'INMEDIATA' | 'Q2_2026' | 'H2_2026' | '2027+'
+}
+
+export interface DecisionMatrixData {
+  snapshot_date: string
+  executive_summary: string
+  risk_matrix: RiskEntry[]
+  opportunity_matrix: OpportunityEntry[]
+  action_table: ActionEntry[]
+}
+
 export interface VarianceRow {
   part_number: string
   catalog_type: string | null
