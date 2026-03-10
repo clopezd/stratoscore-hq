@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server'
 import type { VarianceRow } from '@/features/videndum/types'
 
 const MGMT_URL   = 'https://api.supabase.com/v1/projects/csiiulvqzkgijxbgdqcv/database/query'
-const MGMT_TOKEN = process.env.SUPABASE_MGMT_TOKEN ?? 'sbp_34619b60d4c8b10f2e30a500caae0adb73be1747'
+const MGMT_TOKEN = process.env.SUPABASE_MGMT_TOKEN
 
 async function sql<T = Record<string, unknown>>(query: string): Promise<T[]> {
+  if (!MGMT_TOKEN) throw new Error('SUPABASE_MGMT_TOKEN no configurado')
   const res = await fetch(MGMT_URL, {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${MGMT_TOKEN}`, 'Content-Type': 'application/json' },
