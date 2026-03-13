@@ -25,6 +25,7 @@ export type SSEEvent =
   | { type: 'result'; text: string }
   | { type: 'model_changed'; model: string }
   | { type: 'interrupt' }
+  | { type: 'session_corrupted' }
   | { type: 'error'; message: string }
 
 /**
@@ -160,6 +161,11 @@ export async function* runAgentStream(
     const msg = String(err)
     if (ac.signal.aborted || msg.includes('abort')) {
       yield { type: 'error', message: 'Aborted.' }
+    } else if (msg.includes('ModelMessage') || msg.includes('messages do not match')) {
+      // Corrupted session: stored messages have content blocks the SDK can't validate.
+      // Caller (server.ts) must clear the session so next request starts fresh.
+      logger.warn({ sessionId }, 'Corrupted session detected — emitting session_corrupted')
+      yield { type: 'session_corrupted' }
     } else {
       yield { type: 'error', message: msg }
     }

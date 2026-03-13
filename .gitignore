@@ -38,3 +38,4 @@ agent-server/workspace/
 # Large media
 *.mp4
 *.mov
+BACKUP_ANTES_LIMPIEZA.tar.gz

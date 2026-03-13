@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StratosCore — Wireframe Landing</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:    #2563EB;
+      --blue-dk: #1D4ED8;
+      --blue-lt: #EFF6FF;
+      --green:   #16A34A;
+      --gray-50: #F9FAFB;
+      --gray-100:#F3F4F6;
+      --gray-300:#D1D5DB;
+      --gray-500:#6B7280;
+      --gray-700:#374151;
+      --gray-900:#111827;
+      --white:   #FFFFFF;
+      --radius:  12px;
+      --shadow:  0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: var(--gray-900);
+      background: var(--white);
+      line-height: 1.6;
+    }
+
+    /* ── Utilities ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .btn-primary {
+      display: inline-block;
+      background: var(--blue);
+      color: var(--white);
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background .2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary:hover { background: var(--blue-dk); }
+    .btn-ghost {
+      display: inline-block;
+      background: transparent;
+      color: var(--blue);
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 2px solid var(--blue);
+      transition: all .2s;
+      cursor: pointer;
+    }
+    .btn-ghost:hover { background: var(--blue-lt); }
+    .tag {
+      display: inline-block;
+      background: var(--blue-lt);
+      color: var(--blue);
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: var(--gray-900);
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--gray-500);
+      max-width: 540px;
+    }
+    .section-header { margin-bottom: 48px; }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 16px 0;
+    }
+    nav .inner {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.4rem; font-weight: 900;
+      color: var(--blue); text-decoration: none;
+      letter-spacing: -.03em;
+    }
+    .logo span { color: var(--gray-900); }
+    nav .links { display: flex; gap: 28px; align-items: center; }
+    nav .links a {
+      color: var(--gray-700); text-decoration: none;
+      font-weight: 500; font-size: 0.95rem;
+    }
+    nav .links a:hover { color: var(--blue); }
+
+    /* ── HERO ── */
+    #hero {
+      padding: 96px 0 80px;
+      background: linear-gradient(160deg, #EFF6FF 0%, #FFFFFF 60%);
+      text-align: center;
+    }
+    #hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.15;
+      color: var(--gray-900);
+      margin-bottom: 20px;
+      max-width: 760px;
+      margin-left: auto; margin-right: auto;
+    }
+    #hero h1 em {
+      font-style: normal;
+      color: var(--blue);
+    }
+    #hero .scene {
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      border-left: 4px solid var(--blue);
+      border-radius: var(--radius);
+      padding: 20px 28px;
+      max-width: 600px;
+      margin: 0 auto 32px;
+      text-align: left;
+      font-size: 1rem;
+      color: var(--gray-700);
+      line-height: 1.8;
+      box-shadow: var(--shadow);
+    }
+    #hero .scene strong { color: var(--gray-900); }
+    #hero p.sub {
+      font-size: 1.15rem;
+      color: var(--gray-500);
+      margin-bottom: 40px;
+    }
+    #hero .cta-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── PAIN SECTION ── */
+    #pain { padding: 80px 0; background: var(--white); }
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+    .pain-card {
+      background: var(--gray-50);
+      border-radius: var(--radius);
+      padding: 28px;
+      border-top: 3px solid var(--blue);
+    }
+    .pain-card .emoji { font-size: 2rem; margin-bottom: 12px; display: block; }
+    .pain-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .pain-card p { font-size: 0.9rem; color: var(--gray-500); }
+    .pain-card .quote {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: var(--blue);
+      font-style: italic;
+    }
+
+    /* ── HOW IT WORKS ── */
+    #how { padding: 80px 0; background: var(--blue-lt); }
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .flow-step {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      position: relative;
+    }
+    .flow-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 23px; top: 52px;
+      width: 2px; height: calc(100% - 8px);
+      background: var(--blue);
+      opacity: 0.25;
+    }
+    .flow-dot {
+      width: 48px; height: 48px; flex-shrink: 0;
+      background: var(--blue);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--white); font-size: 1.3rem;
+    }
+    .flow-body { padding: 8px 0 40px; }
+    .flow-body h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .flow-body p { font-size: 0.9rem; color: var(--gray-500); }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials { padding: 80px 0; background: var(--white); }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .testi-card {
+      background: var(--gray-50);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    .stars { color: #F59E0B; font-size: 1rem; margin-bottom: 12px; }
+    .testi-card blockquote {
+      font-size: 0.95rem;
+      color: var(--gray-700);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .testi-author { display: flex; gap: 12px; align-items: center; }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--white); font-weight: 700; font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .testi-author .info strong { display: block; font-size: 0.9rem; }
+    .testi-author .info span { font-size: 0.8rem; color: var(--gray-500); }
+
+    /* ── RESULTS ── */
+    #results { padding: 80px 0; background: var(--blue); color: var(--white); }
+    #results .section-title { color: var(--white); text-align: center; }
+    #results .section-sub { color: rgba(255,255,255,0.7); text-align: center; margin: 0 auto 48px; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      text-align: center;
+    }
+    .metric-box {
+      background: rgba(255,255,255,0.1);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+    }
+    .metric-box .number {
+      font-size: 2.8rem; font-weight: 900;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .metric-box p { font-size: 0.9rem; opacity: 0.8; }
+
+    /* ── INDUSTRIES ── */
+    #industries { padding: 80px 0; background: var(--gray-50); }
+    .industry-grid {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .industry-pill {
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      border-radius: 999px;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ── GUARANTEE ── */
+    #guarantee { padding: 64px 0; background: var(--white); text-align: center; }
+    #guarantee .box {
+      background: var(--blue-lt);
+      border-radius: var(--radius);
+      padding: 40px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    #guarantee .box h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 12px; }
+    #guarantee .box p { color: var(--gray-700); margin-bottom: 24px; }
+    .guarantee-list {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 8px;
+      text-align: left; margin-bottom: 28px;
+    }
+    .guarantee-list li {
+      font-size: 0.95rem; color: var(--gray-700);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .guarantee-list li::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 900;
+      font-size: 1.1rem;
+    }
+
+    /* ── CTA FINAL ── */
+    #cta-final {
+      padding: 96px 0;
+      background: linear-gradient(135deg, #1D4ED8, #2563EB);
+      text-align: center;
+      color: var(--white);
+    }
+    #cta-final h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900; margin-bottom: 16px;
+    }
+    #cta-final p { font-size: 1.1rem; opacity: 0.85; margin-bottom: 40px; }
+    .btn-white {
+      display: inline-block;
+      background: var(--white);
+      color: var(--blue);
+      padding: 18px 36px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform .15s;
+    }
+    .btn-white:hover { transform: scale(1.03); }
+    #cta-final .note { margin-top: 20px; font-size: 0.85rem; opacity: 0.6; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 0;
+      background: var(--gray-900);
+      color: var(--gray-500);
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    footer .logo { color: var(--white); font-size: 1.1rem; display: block; margin-bottom: 8px; }
+
+    /* ── WIREFRAME ANNOTATIONS ── */
+    .wf-note {
+      position: relative;
+    }
+    .wf-badge {
+      display: inline-block;
+      background: #FDE68A;
+      color: #92400E;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+    .wf-bar {
+      background: #FEF3C7;
+      border: 1px dashed #F59E0B;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 0.8rem;
+      color: #92400E;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      nav .links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════ -->
+<nav>
+  <div class="container inner">
+    <a class="logo" href="#">Stratos<span>Core</span></a>
+    <div class="links">
+      <a href="#pain">¿Te identificas?</a>
+      <a href="#how">Cómo funciona</a>
+      <a href="#testimonials">Clientes</a>
+      <a class="btn-primary" href="#cta-final" style="padding:10px 20px;font-size:.9rem;">
+        Quiero una demo
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="container">
+
+    <div class="wf-bar">
+      📝 WIREFRAME — Hero Section · Reemplazar "sistemas" por una escena real del problema
+    </div>
+
+    <div class="tag">Para dueños de negocios, no para ingenieros</div>
+
+    <h1>
+      ¿Cansado de perder clientes<br>
+      por no poder <em>atender todo</em> a la vez?
+    </h1>
+
+    <!-- Escena emocional — el gancho humano -->
+    <div class="scene">
+      <strong>Son las 9pm.</strong> Tienes 23 mensajes de WhatsApp sin contestar,
+      dos citas que se cruzaron, y no sabes cuánto facturaste esta semana.<br><br>
+      <strong>StratosCore se encarga de eso.<br>Tú solo trabaja.</strong>
+    </div>
+
+    <p class="sub">
+      Tu asistente digital que atiende clientes, agenda citas y hace seguimiento —
+      <strong>las 24 horas</strong>, sin que tengas que estar pegado al celular.
+    </p>
+
+    <div class="cta-group">
+      <a class="btn-primary" href="https://wa.me/TUNUMERO?text=Quiero%20ver%20StratosCore%20en%20mi%20negocio" target="_blank">
+        📲 Ver cómo funciona en mi negocio
+      </a>
+      <a class="btn-ghost" href="#how">Ver un ejemplo real</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PAIN — ¿Te identificas?
+════════════════════════════════════════════ -->
+<section id="pain">
+  <div class="container">
+    <div class="section-header">
+      <div class="wf-bar">
+        📝 WIREFRAME — Pain Section · Sin alertas de sistema, solo situaciones reales
+      </div>
+      <div class="tag">¿Te ha pasado esto?</div>
+      <h2 class="section-title">El día a día de manejar un negocio no debería ser así</h2>
+      <p class="section-sub">
+        Si alguno de estos te suena familiar, tenemos algo para ti.
+      </p>
+    </div>
+
+    <div class="pain-grid">
+
+      <div class="pain-card">
+        <span class="emoji">📱</span>
+        <h3>WhatsApp que nunca para</h3>
+        <p>Clientes que preguntan precios, horarios y disponibilidad a toda hora — y si no contestas rápido, se van con la competencia.</p>
+        <p class="quote">"Siento que soy el asistente de mi propio negocio."</p>
+      </div>
+
+      <div class="pain-card">
+        <span class="emoji">📅</span>
+        <h3>Citas que se cruzan o se olvidan</h3>
+        <p>Llevas la agenda en el celular, en un cuaderno, en tu cabeza. Y aun así los clientes llegan a horas equivocadas.</p>
+        <p class="quote">"Me tocó cancelar dos citas en un día por confusión."</p>
+      </div>
+
+      <div class="pain-card">
+        <span class="emoji">🙈</span>
+        <h3>Clientes que quedan en el aire</h3>
+        <p>Alguien preguntó hace tres días, le dijiste "ya te confirmo" — y nunca más volviste. Esa persona ya contrató a otro.</p>
+        <p class="quote">"Sé que pierdo ventas por no dar seguimiento."</p>
+      </div>
+
+      <div class="pain-card">
+        <span class="emoji">📊</span>
+        <h3>No sabes qué funciona</h3>
+        <p>Inviertes en publicidad, pero no sabes cuántos clientes llegan por ahí. Tu dinero se va y no sabes si valió la pena.</p>
+        <p class="quote">"Gasto en ads pero no sé si están sirviendo."</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     HOW IT WORKS
+════════════════════════════════════════════ -->
+<section id="how">
+  <div class="container">
+    <div class="section-header" style="text-align:center;">
+      <div class="wf-bar">
+        📝 WIREFRAME — How It Works · Flujo visual tipo historieta, sin jerga técnica
+      </div>
+      <div class="tag">Así funciona</div>
+      <h2 class="section-title">Lo que pasa cuando un cliente te escribe</h2>
+      <p class="section-sub" style="margin:0 auto;">
+        Sin apps nuevas. Sin capacitación. Tú sigues haciendo lo mismo — nosotros ponemos el resto.
+      </p>
+    </div>
+
+    <div class="flow">
+
+      <div class="flow-step">
+        <div class="flow-dot">💬</div>
+        <div class="flow-body">
+          <h3>Tu cliente escribe por WhatsApp o Instagram</h3>
+          <p>A cualquier hora, desde cualquier lugar. Pregunta precios, disponibilidad o quiere agendar.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-dot">⚡</div>
+        <div class="flow-body">
+          <h3>Recibe respuesta en segundos — sin que tú hagas nada</h3>
+          <p>Tu asistente virtual responde con información real de tu negocio, como si fueras tú mismo.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-dot">📅</div>
+        <div class="flow-body">
+          <h3>La cita queda agendada automáticamente</h3>
+          <p>Se bloquea en tu calendario, se manda confirmación al cliente, y un recordatorio el día anterior.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-dot">📲</div>
+        <div class="flow-body">
+          <h3>Tú recibes el resumen en tu celular</h3>
+          <p>Ves cuántas citas tienes, cuántos clientes nuevos llegaron, y cuánto facturaste — sin abrir ninguna app complicada.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TESTIMONIALS
+════════════════════════════════════════════ -->
+<section id="testimonials">
+  <div class="container">
+    <div class="section-header">
+      <div class="wf-bar">
+        📝 WIREFRAME — Testimonios · Esta sección es CLAVE. Reemplazar con fotos y nombres reales de clientes.
+      </div>
+      <div class="tag">Lo que dicen nuestros clientes</div>
+      <h2 class="section-title">Dueños de negocio, igual que tú</h2>
+    </div>
+
+    <div class="testi-grid">
+
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>
+          "Antes me llegaban 40 mensajes al día y no alcanzaba a contestar todos.
+          Ahora el asistente los atiende y yo solo confirmo las citas que ya están listas.
+          <strong>Subí un 35% mis agendamientos sin contratar a nadie.</strong>"
+        </blockquote>
+        <div class="testi-author">
+          <div class="avatar">ML</div>
+          <div class="info">
+            <strong>María López</strong>
+            <span>Centro Estético · Medellín</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>
+          "Lo que más me gustó es que no tuve que aprender nada raro.
+          Me lo configuraron, me explicaron en 30 minutos, y al día siguiente
+          ya estaba funcionando solo. <strong>Mis clientes ni saben que es automático.</strong>"
+        </blockquote>
+        <div class="testi-author">
+          <div class="avatar">JR</div>
+          <div class="info">
+            <strong>Jorge Restrepo</strong>
+            <span>Consultorio Dental · Bogotá</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>
+          "Recuperé las noches. En serio. Antes contestaba WhatsApp hasta las 11pm.
+          Ahora el sistema atiende y yo reviso al día siguiente lo que quedó listo.
+          <strong>Vale cada peso.</strong>"
+        </blockquote>
+        <div class="testi-author">
+          <div class="avatar">CP</div>
+          <div class="info">
+            <strong>Carolina Pinto</strong>
+            <span>Lavandería Premium · Cali</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     RESULTS
+════════════════════════════════════════════ -->
+<section id="results">
+  <div class="container">
+    <div class="tag" style="background:rgba(255,255,255,0.15);color:white;">Resultados reales</div>
+    <h2 class="section-title">Lo que ven nuestros clientes en los primeros 30 días</h2>
+    <p class="section-sub">Promedio entre negocios activos. Sin incluir el tiempo que recuperan.</p>
+    <div class="metrics">
+      <div class="metric-box">
+        <div class="number">+40%</div>
+        <p>Más citas agendadas sin contratar personal adicional</p>
+      </div>
+      <div class="metric-box">
+        <div class="number">0</div>
+        <p>Clientes perdidos por no contestar a tiempo</p>
+      </div>
+      <div class="metric-box">
+        <div class="number">24/7</div>
+        <p>Tu negocio atiende aunque estés durmiendo</p>
+      </div>
+      <div class="metric-box">
+        <div class="number">3h</div>
+        <p>Tiempo promedio que recuperan al día</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     INDUSTRIES
+════════════════════════════════════════════ -->
+<section id="industries">
+  <div class="container">
+    <div class="section-header">
+      <div class="tag">¿Para quién es?</div>
+      <h2 class="section-title">Funciona para tu tipo de negocio</h2>
+      <p class="section-sub">Lo configuramos según cómo trabaja tu negocio específico, no con una plantilla genérica.</p>
+    </div>
+    <div class="industry-grid">
+      <div class="industry-pill">🦷 Consultorios y clínicas</div>
+      <div class="industry-pill">💆 Centros de estética</div>
+      <div class="industry-pill">👗 Lavanderías</div>
+      <div class="industry-pill">🍽️ Restaurantes</div>
+      <div class="industry-pill">🚗 Talleres y servicios automotriz</div>
+      <div class="industry-pill">💊 Farmacias</div>
+      <div class="industry-pill">🏋️ Gimnasios</div>
+      <div class="industry-pill">📦 Empresas de servicios</div>
+      <div class="industry-pill">+ Tu negocio</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     GUARANTEE
+════════════════════════════════════════════ -->
+<section id="guarantee">
+  <div class="container">
+    <div class="wf-bar" style="max-width:640px;margin:0 auto 24px;">
+      📝 WIREFRAME — Garantía · Bajar la fricción con compromisos claros y sin letra pequeña
+    </div>
+    <div class="box">
+      <h2>Sin riesgos. Sin letra pequeña.</h2>
+      <p>Sabemos que probar algo nuevo da miedo. Por eso lo hacemos simple:</p>
+      <ul class="guarantee-list">
+        <li>Demo gratis de 30 minutos — sin presión de compra</li>
+        <li>Configuración incluida — no tienes que hacer nada técnico</li>
+        <li>Sin contratos largos — mes a mes, te quedas porque quieres</li>
+        <li>Soporte en WhatsApp — una persona real, no un bot</li>
+        <li>Si en 15 días no ves resultados, te devolvemos el dinero</li>
+      </ul>
+      <a class="btn-primary" href="https://wa.me/TUNUMERO?text=Quiero%20una%20demo%20gratuita%20de%20StratosCore" target="_blank">
+        Quiero mi demo gratis
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     CTA FINAL
+════════════════════════════════════════════ -->
+<section id="cta-final">
+  <div class="container">
+    <h2>30 minutos. Sin tecnicismos.<br>Y te mostramos todo en vivo.</h2>
+    <p>
+      Agenda una llamada gratuita y te mostramos cómo funcionaría<br>
+      StratosCore exactamente en <strong>tu negocio</strong>.
+    </p>
+    <a class="btn-white" href="https://wa.me/TUNUMERO?text=Quiero%20ver%20StratosCore%20en%20mi%20negocio" target="_blank">
+      📲 Escribir por WhatsApp ahora
+    </a>
+    <p class="note">Sin compromisos · Respuesta en menos de 1 hora · Lunes a sábado</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <a class="logo" href="#">StratosCore</a>
+    <p>© 2026 StratosCore · Automatización para negocios que crecen</p>
+    <p style="margin-top:8px;">
+      <a href="#" style="color:var(--gray-500);text-decoration:none;margin:0 8px;">Política de privacidad</a>
+      <a href="#" style="color:var(--gray-500);text-decoration:none;margin:0 8px;">Términos de servicio</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd business-os && npm run build",
+  "devCommand": "cd business-os && npm run dev",
+  "installCommand": "cd business-os && npm install",
+  "outputDirectory": "business-os/.next"
+}

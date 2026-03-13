@@ -241,6 +241,11 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
         if (event.type === 'result') {
           resultText = event.text
         }
+        // Corrupted session: clear it so the next request starts a fresh conversation
+        if (event.type === 'session_corrupted') {
+          clearSession(SESSION_KEY)
+          newSessionId = undefined
+        }
 
         // Save usage data to SQLite
         if (event.type === 'usage') {

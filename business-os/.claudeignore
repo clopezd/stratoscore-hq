@@ -1,0 +1,8 @@
+# Excluir archivos pesados para ahorrar tokens de contexto
+node_modules/
+.next/
+dist/
+.git/
+*.log
+.claude/cache/
+public/assets/

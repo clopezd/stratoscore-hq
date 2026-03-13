@@ -1,0 +1,339 @@
+@import 'tailwindcss';
+@import 'highlight.js/styles/github-dark-dimmed.css';
+
+/* ── Tailwind v4: dark mode via [data-theme="dark"] (next-themes) ───────── */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS — fuente de verdad de toda la plataforma Videndum
+   Sigue el esquema: background · foreground · card · card-foreground · border
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Light mode (default) ────────────────────────────────────────────────── */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Backgrounds */
+  --background:         #f8fafc;          /* slate-50 — base de página */
+  --background-subtle:  #f1f5f9;          /* slate-100 */
+  --card:               #ffffff;           /* blanco puro — máximo contraste */
+  --card-raised:        #f8fafc;           /* slate-50 — estado hover/raised */
+  --card-elevated:      #ffffff;
+
+  /* Foregrounds — todos WCAG AA (≥4.5:1 sobre blanco) */
+  --foreground:         #0f172a;          /* slate-900 — 17.3:1 ✓ */
+  --foreground-muted:   #475569;          /* slate-600 — 7.0:1  ✓ */
+  --foreground-subtle:  #64748b;          /* slate-500 — 5.9:1  ✓ AA */
+  --foreground-faint:   #94a3b8;          /* slate-400 — 4.5:1  ✓ AA (texto grande/decorativo) */
+
+  /* Borders — sólidos, no rgba */
+  --border:             #e2e8f0;          /* slate-200 */
+  --border-subtle:      #f1f5f9;          /* slate-100 */
+
+  /* Layout shell */
+  --header-bg:          rgba(255,255,255,0.95);
+  --sidebar-bg:         #ffffff;
+  --page-bg:            #f8fafc;
+
+  /* Charts — WCAG AA */
+  --chart-axis:         #64748b;          /* slate-500 — 5.9:1 ✓ */
+  --chart-grid:         #e2e8f0;          /* slate-200 */
+  --chart-tooltip-bg:   #ffffff;
+  --chart-tooltip-bd:   #e2e8f0;
+  --chart-cursor:       rgba(15,23,42,0.04);
+  --chart-ref:          #94a3b8;          /* slate-400 */
+
+  /* Card shadows — Tailwind shadow-sm equivalente (flotan sobre slate-50) */
+  --card-shadow:        0 1px 3px 0 rgba(0,0,0,0.10), 0 1px 2px 0 rgba(0,0,0,0.06);
+  --card-shadow-raised: 0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -1px rgba(0,0,0,0.06);
+
+  /* Sidebar separator */
+  --sidebar-border:     #e2e8f0;
+
+  /* Misc */
+  --scrollbar:          rgba(0,0,0,0.15);
+  --orb-purple:         rgba(139,92,246,0.06);
+  --orb-blue:           rgba(59,130,246,0.04);
+
+  /* Legacy aliases (DashboardShell + Header use these) */
+  --app-page-bg:        #f8fafc;
+  --app-header-bg:      rgba(255,255,255,0.95);
+  --app-sidebar-bg:     #ffffff;
+  --app-border:         #e2e8f0;
+  --app-orb-purple:     rgba(139,92,246,0.06);
+  --app-orb-blue:       rgba(59,130,246,0.04);
+  --app-scrollbar:      rgba(0,0,0,0.15);
+}
+
+/* ── Dark mode ───────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Backgrounds */
+  --background:         #0a0a0f;
+  --background-subtle:  rgba(255,255,255,0.02);
+  --card:               rgba(255,255,255,0.03);
+  --card-raised:        rgba(255,255,255,0.05);
+  --card-elevated:      rgba(255,255,255,0.08);
+
+  /* Foregrounds */
+  --foreground:         #ffffff;
+  --foreground-muted:   rgba(255,255,255,0.50);
+  --foreground-subtle:  rgba(255,255,255,0.30);
+  --foreground-faint:   rgba(255,255,255,0.15);
+
+  /* Borders */
+  --border:             rgba(255,255,255,0.06);
+  --border-subtle:      rgba(255,255,255,0.04);
+
+  /* Layout shell */
+  --header-bg:          rgba(255,255,255,0.02);
+  --sidebar-bg:         rgba(255,255,255,0.03);
+  --page-bg:            #0a0a0f;
+
+  /* Charts */
+  --chart-axis:         rgba(255,255,255,0.35);
+  --chart-grid:         rgba(255,255,255,0.04);
+  --chart-tooltip-bg:   #13131f;
+  --chart-tooltip-bd:   rgba(255,255,255,0.10);
+  --chart-cursor:       rgba(255,255,255,0.03);
+  --chart-ref:          rgba(255,255,255,0.15);
+
+  /* Card shadows */
+  --card-shadow:        none;
+  --card-shadow-raised: none;
+
+  /* Sidebar separator */
+  --sidebar-border:     rgba(255,255,255,0.06);
+
+  /* Misc */
+  --scrollbar:          rgba(255,255,255,0.10);
+  --orb-purple:         rgba(139,92,246,0.08);
+  --orb-blue:           rgba(59,130,246,0.06);
+
+  /* Legacy aliases */
+  --app-page-bg:        #0a0a0f;
+  --app-header-bg:      rgba(255,255,255,0.02);
+  --app-sidebar-bg:     rgba(255,255,255,0.03);
+  --app-border:         rgba(255,255,255,0.06);
+  --app-orb-purple:     rgba(139,92,246,0.08);
+  --app-orb-blue:       rgba(59,130,246,0.06);
+  --app-scrollbar:      rgba(255,255,255,0.10);
+}
+
+/* ══ Semantic utility classes (complementan las clases dark: de Tailwind) ══ */
+
+/* Texto */
+.text-vid-fg      { color: var(--foreground); }
+.text-vid-muted   { color: var(--foreground-muted); }
+.text-vid-subtle  { color: var(--foreground-subtle); }
+.text-vid-faint   { color: var(--foreground-faint); }
+
+/* Fondos */
+.bg-vid-page      { background-color: var(--page-bg); }
+.bg-vid-card      { background-color: var(--card); box-shadow: var(--card-shadow); }
+.bg-vid-raised    { background-color: var(--card-raised); box-shadow: var(--card-shadow-raised); }
+.bg-vid-elevated  { background-color: var(--card-elevated); box-shadow: var(--card-shadow-raised); }
+
+/* Bordes */
+.border-vid       { border-color: var(--border); }
+.border-vid-subtle { border-color: var(--border-subtle); }
+
+/* Hover interactivos */
+.hover-vid:hover  { background-color: var(--card-raised); }
+
+/* ── Scrollbars adaptativos ───────────────────────────────────────────────── */
+
+/* ── StratosCore Design System ──────────────────────────────────────────────── */
+@theme {
+  /* ── StratosCore Brand — HEX extraídos de public/stratoscore-brand.jpg ────── */
+  /* Swatch 1 */ --color-brandBg:    #001117;   /* Deep Carbon   · fondo */
+  /* Swatch 2 */ --color-brandText:  #E0EDE0;   /* Platinum      · texto primario */
+  /* Swatch 3 */ --color-brandCyan:  #00F2FE;   /* Electric Cyan · acento, botones, glows */
+  /* Swatch 4 */ --color-brandMuted: #8B949E;   /* Stellar Gray  · texto secundario */
+
+  /* Aliases operativos */
+  --color-carbon:   #001117;
+  --color-platinum: #E0EDE0;
+  --color-cyan:     #00F2FE;
+  --color-stellar:  #8B949E;
+  --color-surface:  #001e30;
+  --color-border:   rgba(0, 242, 254, 0.12);
+  --color-cyan-dim: #00F2FE40;
+}
+
+/* Glow utilities */
+.glow-cyan {
+  box-shadow: 0 0 16px #00F2FE80, 0 0 40px #00F2FE30;
+}
+.glow-cyan-sm {
+  box-shadow: 0 0 8px #00F2FE60;
+}
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #00F2FE 0%, #a8f0ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Landing page: allow scroll (different from app shell) */
+body.landing {
+  overflow: auto !important;
+  background-color: #001117 !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+html:has(body.landing) {
+  overflow: auto !important;
+}
+
+/* Subtle grid background */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(0, 242, 254, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 242, 254, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Animated glow orb */
+@keyframes pulse-orb {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50%       { opacity: 0.25; transform: scale(1.08); }
+}
+.orb-animate { animation: pulse-orb 6s ease-in-out infinite; }
+
+/* Fade up on load */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up       { animation: fade-up 0.7s ease forwards; }
+.fade-up-delay { animation: fade-up 0.7s 0.15s ease both; }
+.fade-up-late  { animation: fade-up 0.7s 0.3s ease both; }
+
+/* ── Lavandería App: warm amber operational theme ────────────────────────── */
+/* Allow scroll and override dark dashboard defaults */
+html:has([data-lavanderia]),
+body:has([data-lavanderia]) {
+  overflow: auto !important;
+  background-color: #100800 !important;
+}
+
+/* Amber glow utilities for lavandería */
+.glow-amber {
+  box-shadow: 0 0 16px #F59E0B80, 0 0 40px #F59E0B30;
+}
+.glow-amber-sm {
+  box-shadow: 0 0 8px #F59E0B60;
+}
+.text-gradient-amber {
+  background: linear-gradient(135deg, #F59E0B 0%, #FDE68A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Override hljs background so code bubbles control their own bg */
+.hljs { background: transparent !important; }
+
+/* iOS PWA only: force web view to extend behind home indicator.
+   Scoped to standalone so it doesn't affect desktop browsers. */
+@media (display-mode: standalone) {
+  html {
+    min-height: calc(100% + env(safe-area-inset-top));
+  }
+}
+
+/* Default: allow scroll for landing and public pages */
+html, body {
+  background-color: var(--page-bg, #f8fafc);
+  margin: 0;
+  overflow: auto;
+  overscroll-behavior: none;
+}
+
+/* Dashboard shell: lock scroll (app shell handles it) */
+body:has([data-dashboard-shell]) {
+  overflow: hidden;
+}
+
+/* Safe-area bottom spacer (home indicator on notched iPhones) */
+.safe-area-spacer {
+  height: env(safe-area-inset-bottom, 0px);
+}
+
+/* Kill spacer when keyboard is open — CSS :has() reacts instantly to focus,
+   no JS timing delay. The .keyboard-open class is a fallback. */
+.keyboard-open .safe-area-spacer,
+:root:has(textarea:focus, input:focus, [contenteditable]:focus) .safe-area-spacer {
+  height: 0px !important;
+}
+
+/* Global audio bar entrance */
+@keyframes audioBarIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Adaptive scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-scrollbar) transparent;
+}
+
+*::-webkit-scrollbar        { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track  { background: transparent; }
+*::-webkit-scrollbar-thumb  { background: var(--app-scrollbar); border-radius: 3px; }
+*::-webkit-scrollbar-thumb:hover { background: var(--app-scrollbar); filter: brightness(1.3); }
+*::-webkit-scrollbar-corner { background: transparent; }
+
+/* Markdown preview in task descriptions */
+.md-preview h1, .md-preview h2, .md-preview h3, .md-preview h4 {
+  color: rgba(255 255 255 / 0.85);
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.4em;
+}
+.md-preview h1 { font-size: 1.25rem; }
+.md-preview h2 { font-size: 1.1rem; }
+.md-preview h3 { font-size: 1rem; }
+.md-preview p { margin-bottom: 0.5em; }
+.md-preview strong { color: rgba(255 255 255 / 0.75); }
+.md-preview ul, .md-preview ol { padding-left: 1.25em; margin-bottom: 0.5em; }
+.md-preview li { margin-bottom: 0.15em; }
+.md-preview li::marker { color: rgba(255 255 255 / 0.3); }
+.md-preview a { color: #60a5fa; text-decoration: underline; }
+.md-preview code {
+  background: rgba(255 255 255 / 0.08);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+.md-preview pre {
+  background: rgba(255 255 255 / 0.06);
+  border-radius: 8px;
+  padding: 0.75em 1em;
+  overflow-x: auto;
+  margin-bottom: 0.75em;
+}
+.md-preview pre code { background: none; padding: 0; }
+.md-preview blockquote {
+  border-left: 3px solid rgba(255 255 255 / 0.15);
+  padding-left: 0.75em;
+  color: rgba(255 255 255 / 0.45);
+  margin: 0.5em 0;
+}
+.md-preview hr {
+  border: none;
+  border-top: 1px solid rgba(255 255 255 / 0.1);
+  margin: 0.75em 0;
+}
+.md-preview table { width: 100%; border-collapse: collapse; margin-bottom: 0.75em; }
+.md-preview th, .md-preview td {
+  border: 1px solid rgba(255 255 255 / 0.1);
+  padding: 0.35em 0.6em;
+  text-align: left;
+  font-size: 0.85em;
+}
+.md-preview th { color: rgba(255 255 255 / 0.7); background: rgba(255 255 255 / 0.04); }

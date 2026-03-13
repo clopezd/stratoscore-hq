@@ -10,6 +10,7 @@ import { downloadMedia, buildPhotoMessage, buildDocumentMessage } from './media.
 import { listTasks } from './db.js'
 import { logger } from './logger.js'
 import { mcStart, mcEnd, mcError } from './mc-client.js'
+import { getFinanceSummary } from './finance-client.js'
 
 // ─── Formatting ─────────────────────────────────────────────────────────────
 
@@ -226,15 +227,23 @@ export function createBot(): Bot {
       return
     }
     await ctx.reply(
-      'Hello! I\'m your personal AI assistant.\n\n' +
-      'Available commands:\n' +
-      '/newchat — Start a new conversation\n' +
-      '/memory — View saved memories\n' +
-      '/forget — Clear all memories\n' +
-      '/voice — Voice status (STT/TTS)\n' +
-      '/schedule — View scheduled tasks\n' +
-      '/chatid — Show your chat ID\n\n' +
-      `STT: ${caps.stt ? '✓' : '✗'}  TTS: ${caps.tts ? '✓' : '✗'}`
+      '⚡ <b>EXECUTOR — Tu Asistente Ejecutivo IA</b>\n\n' +
+      '<b>Comandos EXECUTOR:</b>\n' +
+      '/finanzas — Resumen financiero del mes\n' +
+      '/tareas — Tareas de Mission Control\n' +
+      '/reporte — Reporte ejecutivo completo\n\n' +
+      '<b>Comandos básicos:</b>\n' +
+      '/newchat — Nueva conversación\n' +
+      '/memory — Ver memorias guardadas\n' +
+      '/forget — Borrar memorias\n' +
+      '/schedule — Tareas programadas\n' +
+      '/voice — Estado de voz (STT/TTS)\n' +
+      '/chatid — Mostrar chat ID\n\n' +
+      `<b>Capacidades:</b>\n` +
+      `STT: ${caps.stt ? '✓ Activo' : '✗ Desactivado'}\n` +
+      `TTS: ${caps.tts ? '✓ Activo' : '✗ Desactivado'}\n\n` +
+      `<i>Powered by Claude Agent SDK</i>`,
+      { parse_mode: 'HTML' }
     )
   })
 
@@ -308,6 +317,149 @@ export function createBot(): Bot {
     const chunks = splitMessage(text)
     for (const chunk of chunks) {
       await ctx.reply(chunk, { parse_mode: 'HTML' })
+    }
+  })
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // EXECUTOR COMMANDS — Comandos especializados del agente ejecutivo
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // /finanzas — resumen financiero del mes actual
+  bot.command('finanzas', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+
+    try {
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+      const summary = await getFinanceSummary()
+
+      if (!summary) {
+        await ctx.reply('⚠️ Finance OS no está configurado. Configura ANALYTICS_SUPABASE_URL y ANALYTICS_SUPABASE_KEY.')
+        return
+      }
+
+      const { month, income, expenses, net_balance, pending_amount, active_recurring_monthly, recent_transactions } = summary
+
+      let text = `<b>💰 Resumen Financiero — ${month}</b>\n\n`
+      text += `<b>Ingresos:</b> $${income.toLocaleString()}\n`
+      text += `<b>Gastos:</b> $${expenses.toLocaleString()}\n`
+      text += `<b>Balance neto:</b> $${net_balance.toLocaleString()}\n\n`
+
+      if (pending_amount > 0) {
+        text += `⚠️ <b>Pendiente de pago:</b> $${pending_amount.toLocaleString()}\n\n`
+      }
+
+      if (active_recurring_monthly > 0) {
+        text += `🔄 <b>Gastos recurrentes/mes:</b> $${active_recurring_monthly.toLocaleString()}\n\n`
+      }
+
+      if (recent_transactions.length > 0) {
+        text += `<b>Últimas 5 transacciones:</b>\n`
+        recent_transactions.forEach((tx) => {
+          const tipo = tx.tipo === 'ingreso' ? '📈' : tx.tipo === 'gasto' ? '📉' : '↔️'
+          const estado = tx.estado === 'pendiente' ? ' ⏳' : ''
+          text += `${tipo} $${tx.monto} — ${tx.descripcion || tx.categoria || 'Sin descripción'}${estado}\n`
+        })
+      }
+
+      const chunks = splitMessage(text)
+      for (const chunk of chunks) {
+        await ctx.reply(chunk, { parse_mode: 'HTML' })
+      }
+    } catch (err) {
+      logger.error({ err }, '/finanzas error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
+  // /tareas — lista de tareas de Mission Control (desde el board)
+  bot.command('tareas', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+
+    try {
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+
+      // Por ahora, un mensaje placeholder
+      // TODO: Integrar con Mission Control API cuando esté disponible
+      await ctx.reply(
+        '<b>📋 Tareas de Mission Control</b>\n\n' +
+        'Esta función estará disponible cuando se complete la integración con el API de tareas.\n\n' +
+        'Mientras tanto, usa <b>/schedule</b> para ver tareas programadas.',
+        { parse_mode: 'HTML' }
+      )
+    } catch (err) {
+      logger.error({ err }, '/tareas error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
+  // /reporte — reporte ejecutivo completo (finanzas + tareas + agenda)
+  bot.command('reporte', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+
+    try {
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+
+      let text = '<b>📊 REPORTE EJECUTIVO</b>\n'
+      text += `<i>Generado el ${new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}</i>\n\n`
+
+      // 1. Finanzas
+      const summary = await getFinanceSummary()
+      if (summary) {
+        const { month, income, expenses, net_balance, pending_amount } = summary
+        text += '<b>💰 FINANZAS</b>\n'
+        text += `Mes: ${month}\n`
+        text += `Ingresos: $${income.toLocaleString()}\n`
+        text += `Gastos: $${expenses.toLocaleString()}\n`
+        text += `Balance: $${net_balance.toLocaleString()}`
+
+        if (net_balance < 0) text += ' ⚠️'
+        if (net_balance > 0) text += ' ✅'
+
+        text += '\n'
+
+        if (pending_amount > 0) {
+          text += `Pendiente: $${pending_amount.toLocaleString()} ⏳\n`
+        }
+      } else {
+        text += '<b>💰 FINANZAS</b>\n'
+        text += 'Finance OS no configurado\n'
+      }
+
+      text += '\n'
+
+      // 2. Tareas programadas
+      const tasks = listTasks()
+      const activeTasks = tasks.filter(t => t.status === 'active')
+      text += '<b>⏰ TAREAS PROGRAMADAS</b>\n'
+      text += `Total: ${tasks.length} | Activas: ${activeTasks.length}\n`
+
+      if (activeTasks.length > 0) {
+        const nextTask = activeTasks
+          .filter(t => t.next_run)
+          .sort((a, b) => (a.next_run ?? 0) - (b.next_run ?? 0))[0]
+
+        if (nextTask && nextTask.next_run) {
+          const nextDate = new Date(nextTask.next_run * 1000)
+          const tz = process.env['SCHEDULER_TZ'] ?? 'UTC'
+          text += `Próxima: ${nextTask.id} — ${nextDate.toLocaleString('es-MX', { timeZone: tz })}\n`
+        }
+      }
+
+      text += '\n'
+
+      // 3. Estado del sistema
+      text += '<b>⚙️ SISTEMA</b>\n'
+      text += `Agent Server: ✅ Online\n`
+      text += `Telegram Bot: ✅ Activo\n`
+      text += `Mission Control: http://localhost:3000\n`
+
+      const chunks = splitMessage(text)
+      for (const chunk of chunks) {
+        await ctx.reply(chunk, { parse_mode: 'HTML' })
+      }
+    } catch (err) {
+      logger.error({ err }, '/reporte error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
     }
   })
 
