@@ -1,0 +1,13 @@
+BACKUP_ANTES_LIMPIEZA.tar.gz
+agent-server/
+data/
+docs/
+src/
+supabase/
+tools/
+*.md
+!business-os/README.md
+.git/
+.vscode/
+.continue/
+.claude/
