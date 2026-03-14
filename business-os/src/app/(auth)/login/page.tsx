@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { LoginForm } from '@/features/auth/components'
-import { Logo } from '@/shared/components/Logo'
+import { StratoscoreLogo } from '@/shared/components/StratoscoreLogo'
 
 export default function LoginPage() {
   return (
@@ -17,7 +17,7 @@ export default function LoginPage() {
 
         {/* Header — Stratoscore logo + título */}
         <div className="relative z-10 text-center mb-8">
-          <Logo size={80} className="mx-auto mb-6" />
+          <StratoscoreLogo width={160} className="mx-auto mb-6 text-white" />
           <h1 className="text-2xl font-bold tracking-tight text-white">Welcome back</h1>
           <p className="mt-2 text-sm text-white/40">Mission Control</p>
         </div>
