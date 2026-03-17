@@ -17,7 +17,7 @@ export default async function MobilityPage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile || !['admin', 'operador'].includes(profile.role)) {
+  if (!profile || !['owner', 'admin', 'operador'].includes(profile.role)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -32,5 +32,9 @@ export default async function MobilityPage() {
     )
   }
 
-  return <DashboardMobility />
+  return (
+    <div className="h-screen overflow-y-auto">
+      <DashboardMobility />
+    </div>
+  )
 }

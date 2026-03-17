@@ -9,12 +9,12 @@ import { useGlobalShortcuts } from '@/shared/hooks/useGlobalShortcuts'
 import { KeyboardShortcutsHelp } from '@/shared/components/KeyboardShortcutsHelp'
 import { X } from 'lucide-react'
 import { RouteGuard } from '@/shared/components/RouteGuard'
-import { ChatBubble } from '@/shared/components/ChatBubble'
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const { leftSidebarOpen, closeLeftSidebar } = useLayoutStore()
   const [helpOpen, setHelpOpen] = useState(false)
   const pathname = usePathname()
+  const isMissionControl = pathname === '/'
 
   // Persist last visited route for cross-session restore (desktop)
   useEffect(() => {
@@ -91,44 +91,46 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <div className="fixed top-[-30%] left-[-15%] w-[50%] h-[50%] rounded-full blur-[150px] pointer-events-none" style={{ backgroundColor: 'var(--app-orb-purple)' }} />
       <div className="fixed bottom-[-30%] right-[-15%] w-[45%] h-[45%] rounded-full blur-[150px] pointer-events-none" style={{ backgroundColor: 'var(--app-orb-blue)' }} />
 
-      {/* Header */}
-      <Header />
+      {/* Header (oculto en Mission Control) */}
+      {!isMissionControl && <Header />}
 
       {/* Body */}
       <div className="flex-1 flex md:overflow-hidden relative min-h-0">
         {/* Mobile overlay */}
-        {leftSidebarOpen && (
+        {!isMissionControl && leftSidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 z-30 md:hidden"
             onClick={closeLeftSidebar}
           />
         )}
 
-        {/* Left Sidebar */}
-        <aside
-          className={`
-            ${leftSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-            fixed md:relative z-40 md:z-0
-            w-64 ${leftSidebarOpen ? 'md:w-60' : 'md:w-0'}
-            border-r
-            transition-all duration-300 ease-in-out
-            flex flex-col overflow-hidden shrink-0
-          `}
-          style={{
-            backgroundColor: 'var(--app-sidebar-bg)',
-            borderColor: 'var(--sidebar-border)',
-            height: 'calc(var(--app-h, 100dvh) - 3.5rem - env(safe-area-inset-top, 0px))',
-          }}
-        >
-          <button
-            onClick={closeLeftSidebar}
-            className="absolute top-3 right-3 p-1 rounded-lg hover:bg-white/[0.08] text-white/40 md:hidden z-10"
+        {/* Left Sidebar (oculto en Mission Control) */}
+        {!isMissionControl && (
+          <aside
+            className={`
+              ${leftSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+              fixed md:relative z-40 md:z-0
+              w-64 ${leftSidebarOpen ? 'md:w-60' : 'md:w-0'}
+              border-r
+              transition-all duration-300 ease-in-out
+              flex flex-col overflow-hidden shrink-0
+            `}
+            style={{
+              backgroundColor: 'var(--app-sidebar-bg)',
+              borderColor: 'var(--sidebar-border)',
+              height: 'calc(var(--app-h, 100dvh) - 3.5rem - env(safe-area-inset-top, 0px))',
+            }}
           >
-            <X size={16} />
-          </button>
+            <button
+              onClick={closeLeftSidebar}
+              className="absolute top-3 right-3 p-1 rounded-lg hover:bg-white/[0.08] text-white/40 md:hidden z-10"
+            >
+              <X size={16} />
+            </button>
 
-          <SidebarNav />
-        </aside>
+            <SidebarNav />
+          </aside>
+        )}
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto md:overflow-hidden min-w-0">
@@ -138,7 +140,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
       <SearchDialog />
       <KeyboardShortcutsHelp isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
-      <ChatBubble />
     </div>
     </div>
   )

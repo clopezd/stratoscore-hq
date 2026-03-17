@@ -23,9 +23,9 @@ export async function login(formData: FormData) {
     return { error: error.message }
   }
 
-  // Redirigir a la ruta original si viene de middleware, o al dashboard por defecto
+  // Redirigir a la ruta original si viene de middleware, o a Mission Control por defecto
   const next = (formData.get('next') as string | null)?.trim()
-  const destination = next?.startsWith('/') ? next : '/dashboard'
+  const destination = next?.startsWith('/') ? next : '/'
 
   revalidatePath('/', 'layout')
   redirect(destination)
