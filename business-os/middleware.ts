@@ -12,7 +12,16 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 const MAIN_HOSTNAMES = new Set(['stratoscore.app', 'www.stratoscore.app'])
 
-const PUBLIC_PATHS = ['/', '/login', '/signup', '/check-email', '/forgot-password', '/update-password']
+const PUBLIC_PATHS = [
+  '/',
+  '/login',
+  '/signup',
+  '/check-email',
+  '/forgot-password',
+  '/update-password',
+  '/videndum-discovery',
+  '/videndum/discovery'
+]
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))
