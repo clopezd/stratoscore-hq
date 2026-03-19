@@ -69,23 +69,22 @@ export interface ClientDiscoveryPayload {
 /**
  * POST /api/videndum/discovery
  * Guarda el discovery del cliente para diseñar la plataforma
+ * NOTA: Este endpoint permite submissions anónimas (sin autenticación)
  */
 export async function POST(request: Request) {
   const supabase = await createClient()
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // Intentar obtener el usuario, pero permitir submissions anónimas
+  const { data: { user } } = await supabase.auth.getUser()
 
   try {
     const payload: ClientDiscoveryPayload = await request.json()
 
     const { data, error } = await supabase
-      .from('client_discovery')
+      .from('client_discovery_videndum')
       .insert({
-        user_id: user.id,
-        user_email: user.email,
+        user_id: user?.id || null,
+        user_email: user?.email || null,
         submitted_at: new Date().toISOString(),
         status: 'pending',
         ...payload
