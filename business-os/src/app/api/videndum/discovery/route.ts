@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export interface ClientDiscoveryPayload {
   // 1️⃣ PROCESO ACTUAL
@@ -72,19 +73,25 @@ export interface ClientDiscoveryPayload {
  * NOTA: Este endpoint permite submissions anónimas (sin autenticación)
  */
 export async function POST(request: Request) {
-  const supabase = await createClient()
-
-  // Intentar obtener el usuario, pero permitir submissions anónimas
-  const { data: { user } } = await supabase.auth.getUser()
-
   try {
     const payload: ClientDiscoveryPayload = await request.json()
+
+    // Usar service role client para permitir inserts anónimos
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
 
     const { data, error } = await supabase
       .from('client_discovery')
       .insert({
-        user_id: user?.id || null,
-        user_email: user?.email || null,
+        user_id: null,
+        user_email: null,
         submitted_at: new Date().toISOString(),
         status: 'pending',
         ...payload
