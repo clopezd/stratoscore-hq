@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     const payload: ClientDiscoveryPayload = await request.json()
 
     const { data, error } = await supabase
-      .from('client_discovery_videndum')
+      .from('client_discovery')
       .insert({
         user_id: user?.id || null,
         user_email: user?.email || null,
