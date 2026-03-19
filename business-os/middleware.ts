@@ -20,7 +20,8 @@ const PUBLIC_PATHS = [
   '/forgot-password',
   '/update-password',
   '/videndum-discovery',
-  '/videndum/discovery'
+  '/videndum/discovery',
+  '/demo-landing'
 ]
 
 function isPublicPath(pathname: string): boolean {
