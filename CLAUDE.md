@@ -7,7 +7,7 @@
 ## Quién eres y con quién trabajas
 
 **Propietario:** Carlos Mario
-**Negocios:** Lavandería (CleanXpress), Mobility, Agencia de Seguros, Videndum (Sales Intelligence) + proyectos de automatización
+**Negocios:** Lavandería (CleanXpress), Mobility, Agencia de Seguros, Videndum (Inteligencia de Ventas) + proyectos de automatización
 **Comunicación:** Telegram es la consola principal de mando. Cuando recibes una instrucción de desarrollo, la implementas.
 
 ---
@@ -40,46 +40,46 @@ stratoscore-hq/
 │
 ├── business-os/                        ← Dashboard Next.js 16 + Supabase (Vercel)
 │   ├── src/
-│   │   ├── app/                        ← Next.js App Router
+│   │   ├── app/                        ← App Router de Next.js
 │   │   │   ├── (auth)/                 ← Rutas de autenticación (login, signup, etc.)
 │   │   │   ├── (main)/                 ← Rutas protegidas del dashboard
 │   │   │   ├── (public)/               ← Rutas públicas
-│   │   │   ├── api/                    ← API routes (auth, calendar, chat, cron, etc.)
+│   │   │   ├── api/                    ← Rutas de API (auth, calendar, chat, cron, etc.)
 │   │   │   ├── demo-landing/           ← Landing de demo
 │   │   │   └── mobility/               ← Módulo mobility
-│   │   ├── features/                   ← Feature-first architecture (ver sección)
-│   │   ├── shared/                     ← Código compartido (components, hooks, stores, utils)
-│   │   └── lib/                        ← Supabase client, Videndum utils
-│   ├── middleware.ts                   ← Routing multi-dominio + auth guard
-│   ├── supabase/migrations/           ← SQL migrations
-│   └── public/                         ← Assets estáticos, manifest.json, sw.js (PWA)
+│   │   ├── features/                   ← Arquitectura feature-first (ver sección)
+│   │   ├── shared/                     ← Código compartido (componentes, hooks, stores, utils)
+│   │   └── lib/                        ← Cliente Supabase, utilidades Videndum
+│   ├── middleware.ts                   ← Enrutamiento multi-dominio + guardia de auth
+│   ├── supabase/migrations/           ← Migraciones SQL
+│   └── public/                         ← Recursos estáticos, manifest.json, sw.js (PWA)
 │
 ├── agent-server/                       ← Bot Telegram + Claude Agent SDK + SQLite
 │   ├── src/
-│   │   ├── index.ts                   ← Entry point (PID lock, init, bot start)
-│   │   ├── bot.ts                     ← grammY bot (handlers, commands, formatting)
-│   │   ├── agent.ts                   ← Claude Agent SDK wrapper (runAgent, runAgentStream)
-│   │   ├── server.ts                  ← HTTP API (localhost:3099) para Mission Control
-│   │   ├── config.ts                  ← Constantes y env vars
+│   │   ├── index.ts                   ← Punto de entrada (PID lock, inicio, arranque del bot)
+│   │   ├── bot.ts                     ← Bot grammY (manejadores, comandos, formato)
+│   │   ├── agent.ts                   ← Envoltorio de Claude Agent SDK (runAgent, runAgentStream)
+│   │   ├── server.ts                  ← API HTTP (localhost:3099) para Mission Control
+│   │   ├── config.ts                  ← Constantes y variables de entorno
 │   │   ├── env.ts                     ← Lector de .env seguro (no contamina process.env)
-│   │   ├── db.ts                      ← SQLite (sessions, memories, tasks, usage)
-│   │   ├── memory.ts                  ← Sistema de memoria dual (semantic + episodic)
-│   │   ├── scheduler.ts              ← Cron scheduler (tareas programadas)
+│   │   ├── db.ts                      ← SQLite (sesiones, memorias, tareas, uso)
+│   │   ├── memory.ts                  ← Sistema de memoria dual (semántica + episódica)
+│   │   ├── scheduler.ts              ← Programador cron (tareas programadas)
 │   │   ├── voice.ts                   ← STT (Groq Whisper) + TTS (ElevenLabs)
 │   │   ├── media.ts                   ← Descarga y manejo de fotos/documentos/audio
 │   │   ├── mc-client.ts              ← Cliente para notificar a Mission Control
 │   │   ├── finance-client.ts         ← Cliente para consultar Finance OS (Supabase)
 │   │   ├── approvals.ts              ← Sistema de aprobaciones vía botones de Telegram
-│   │   └── logger.ts                  ← Pino logger
-│   ├── scripts/                        ← Scripts utilitarios (status, analytics, image gen)
-│   ├── .claude/skills/                 ← Skills del agente (image-generation, etc.)
-│   └── ecosystem.config.cjs           ← PM2 config para producción
+│   │   └── logger.ts                  ← Registrador Pino
+│   ├── scripts/                        ← Scripts utilitarios (estado, analíticas, gen. de imágenes)
+│   ├── .claude/skills/                 ← Habilidades del agente (generación de imágenes, etc.)
+│   └── ecosystem.config.cjs           ← Config PM2 para producción
 │
 ├── src/features/clients/Videndum/      ← Lógica de importación de datos Videndum
-├── data/                               ← SQL inserts generados, imports
+├── data/                               ← SQL inserts generados, importaciones
 ├── docs/                               ← Documentación
-│   ├── SETUP_PROMPT.md                ← Mega-prompt de setup guiado
-│   ├── PRP-STRATOSCORE-FASE1.md       ← Product Requirements (Fase 1)
+│   ├── SETUP_PROMPT.md                ← Mega-prompt de configuración guiada
+│   ├── PRP-STRATOSCORE-FASE1.md       ← Requerimientos de Producto (Fase 1)
 │   ├── MARKET_CONTEXT.md             ← Contexto de mercado
 │   └── OBSOLESCENCE_REPORT.md        ← Reporte de obsolescencia
 ├── supabase/                           ← Config Supabase CLI
@@ -91,18 +91,18 @@ stratoscore-hq/
 ### Flujo de comunicación
 
 ```
-Carlos (Telegram) → grammY bot → runAgent() → Claude Agent SDK → código
+Carlos (Telegram) → bot grammY → runAgent() → Claude Agent SDK → código
                                                     ↓
                                             Respuesta → Telegram
 
-Mission Control (browser) → HTTP POST /chat → runAgentStream() → SSE → browser
+Mission Control (navegador) → HTTP POST /chat → runAgentStream() → SSE → navegador
 ```
 
 ---
 
 ## Stack por sub-proyecto
 
-| Sub-proyecto | Stack | Puerto dev | Build | Deploy |
+| Sub-proyecto | Stack | Puerto dev | Compilación | Despliegue |
 |---|---|---|---|---|
 | business-os | Next.js 16, React 19, Supabase, Zustand, Tailwind CSS 4, Recharts | 3000 | `npm run build` | Vercel |
 | agent-server | Claude Agent SDK, grammY, SQLite (better-sqlite3), Pino, TypeScript | 3099 | `npm run build` (tsc) | PM2 en máquina local |
@@ -110,42 +110,42 @@ Mission Control (browser) → HTTP POST /chat → runAgentStream() → SSE → b
 ### Dependencias clave por sub-proyecto
 
 **business-os:**
-- `@supabase/ssr` + `@supabase/supabase-js` — Auth y DB
-- `zustand` — State management
+- `@supabase/ssr` + `@supabase/supabase-js` — Autenticación y BD
+- `zustand` — Gestión de estado
 - `ai` + `@ai-sdk/openai` — AI SDK (Vercel AI)
-- `@excalidraw/excalidraw` — Drawing/whiteboard
+- `@excalidraw/excalidraw` — Dibujo/pizarra
 - `recharts` — Gráficas
 - `framer-motion` — Animaciones
 - `lucide-react` — Iconos
 - `zod` — Validación
-- `next-themes` — Dark/light mode
-- `web-push` — Push notifications (PWA)
-- Path alias: `@/*` → `./src/*`
+- `next-themes` — Modo oscuro/claro
+- `web-push` — Notificaciones push (PWA)
+- Alias de ruta: `@/*` → `./src/*`
 
 **agent-server:**
-- `@anthropic-ai/claude-agent-sdk` — Spawns real `claude` CLI
-- `grammy` — Telegram bot framework
-- `better-sqlite3` — Local DB (sessions, memories, cron tasks, usage)
+- `@anthropic-ai/claude-agent-sdk` — Ejecuta el CLI real de `claude`
+- `grammy` — Framework de bot para Telegram
+- `better-sqlite3` — BD local (sesiones, memorias, tareas cron, uso)
 - `cron-parser` — Parseo de expresiones cron
 - `fluent-ffmpeg` + `ffmpeg-static` — Procesamiento de audio
-- `pino` + `pino-pretty` — Logging estructurado
-- ESM modules (`"type": "module"`) con `NodeNext` resolution
+- `pino` + `pino-pretty` — Registro estructurado
+- Módulos ESM (`"type": "module"`) con resolución `NodeNext`
 
 ---
 
 ## Arquitectura del business-os
 
-### Feature-First Architecture
+### Arquitectura Feature-First
 
 Cada feature en `business-os/src/features/` es autocontenida:
 
 ```
-features/{feature-name}/
-├── components/     ← UI components
-├── hooks/          ← Custom hooks
-├── services/       ← Data fetching / business logic
-├── types/          ← TypeScript types
-└── index.ts        ← Public API
+features/{nombre-feature}/
+├── components/     ← Componentes de UI
+├── hooks/          ← Hooks personalizados
+├── services/       ← Obtención de datos / lógica de negocio
+├── types/          ← Tipos TypeScript
+└── index.ts        ← API pública
 ```
 
 **Features actuales:** activity, admin, agent, agents, analytics, auth, calculator, calendar, chat, consultant, conversations, cron, dashboard, data-ingestion, draw, finance-agent, finances, mission-control, mobility, notifications, search, tasks, videndum
@@ -153,9 +153,9 @@ features/{feature-name}/
 **Reglas:**
 - Features NO importan de otras features
 - Código compartido va en `src/shared/`
-- Template para nuevas features: `cp -r src/features/.template src/features/nueva-feature`
+- Plantilla para nuevas features: `cp -r src/features/.template src/features/nueva-feature`
 
-### Routing multi-dominio (middleware.ts)
+### Enrutamiento multi-dominio (middleware.ts)
 
 - `stratoscore.app` / `www.stratoscore.app` → Landing pública en `/`, resto protegido por sesión Supabase
 - `lavanderia.stratoscore.app` → Rewrite a `/lavanderia` (CleanXpress)
@@ -174,22 +174,22 @@ features/{feature-name}/
 
 ### Módulos principales
 
-- **agent.ts** — Wrapper de Claude Agent SDK. `runAgent()` (non-streaming) y `runAgentStream()` (SSE). Ejecuta el CLI real de Claude Code como subprocess con `bypassPermissions`.
+- **agent.ts** — Envoltorio de Claude Agent SDK. `runAgent()` (sin streaming) y `runAgentStream()` (SSE). Ejecuta el CLI real de Claude Code como subproceso con `bypassPermissions`.
 - **bot.ts** — Bot de Telegram. Comandos: `/start`, `/newchat`, `/memory`, `/forget`, `/voice`, `/schedule`, `/finanzas`, `/tareas`, `/reporte`, `/chatid`. Maneja texto, voz, fotos y documentos.
-- **server.ts** — HTTP API en puerto 3099. Endpoints: `POST /chat`, `POST /chat/stream` (SSE), `POST /chat/interrupt`, `POST /newchat`, `GET /commands`, `GET /models`, `GET /usage`, `GET /schedule`, `POST /schedule/:id/:action`. Auth via Bearer token.
-- **memory.ts** — Sistema de memoria dual: sector `semantic` (datos del usuario) y `episodic` (conversaciones). FTS5 search + decay diario (salience *= 0.98, elimina < 0.1).
-- **scheduler.ts** — Cron jobs via polling cada 60s. Parsea expresiones cron con timezone configurable (`SCHEDULER_TZ`).
-- **voice.ts** — STT via Groq Whisper API, TTS via ElevenLabs. Opcional (requiere API keys).
-- **env.ts** — Lee `.env` sin contaminar `process.env` (importante: el subprocess de Agent SDK hereda process.env).
+- **server.ts** — API HTTP en puerto 3099. Endpoints: `POST /chat`, `POST /chat/stream` (SSE), `POST /chat/interrupt`, `POST /newchat`, `GET /commands`, `GET /models`, `GET /usage`, `GET /schedule`, `POST /schedule/:id/:action`. Autenticación vía Bearer token.
+- **memory.ts** — Sistema de memoria dual: sector `semantic` (datos del usuario) y `episodic` (conversaciones). Búsqueda FTS5 + decaimiento diario (salience *= 0.98, elimina < 0.1).
+- **scheduler.ts** — Tareas cron vía polling cada 60s. Parsea expresiones cron con zona horaria configurable (`SCHEDULER_TZ`).
+- **voice.ts** — STT vía Groq Whisper API, TTS vía ElevenLabs. Opcional (requiere claves de API).
+- **env.ts** — Lee `.env` sin contaminar `process.env` (importante: el subproceso de Agent SDK hereda process.env).
 
-### Singleton y PID lock
+### Singleton y bloqueo PID
 
-El agent-server usa un PID file en `store/agent-server.pid` para prevenir múltiples instancias.
+El agent-server usa un archivo PID en `store/agent-server.pid` para prevenir múltiples instancias.
 
 ### Sesiones
 
 - Telegram: sesión por `chatId` en SQLite
-- Web (Mission Control): sesión con key `mc-web`
+- Web (Mission Control): sesión con clave `mc-web`
 - Cada sesión mantiene el `sessionId` de Claude Code para conversaciones continuas
 
 ---
@@ -199,26 +199,26 @@ El agent-server usa un PID file en `store/agent-server.pid` para prevenir múlti
 ```bash
 # ── Agent Server ──
 cd agent-server && npm run build              # Compilar TypeScript
-cd agent-server && npm run dev                # Dev mode con tsx
-cd agent-server && npm run typecheck          # Solo type-check sin emitir
+cd agent-server && npm run dev                # Modo desarrollo con tsx
+cd agent-server && npm run typecheck          # Solo verificación de tipos sin emitir
 cd agent-server && npm test                   # Vitest
 pm2 restart ecosystem.config.cjs --update-env # Aplicar cambios en prod
 
 # ── Business OS ──
-cd business-os && npm run build               # Build de producción
-cd business-os && npm run dev                 # Dev con Turbopack
+cd business-os && npm run build               # Compilación de producción
+cd business-os && npm run dev                 # Desarrollo con Turbopack
 cd business-os && npm run lint                # ESLint
 
-# ── Videndum Data Import ──
-cd business-os && npm run import:videndum     # Import real
-cd business-os && npm run import:videndum:dry # Dry run
+# ── Importación de datos Videndum ──
+cd business-os && npm run import:videndum     # Importación real
+cd business-os && npm run import:videndum:dry # Ejecución en seco
 cd business-os && npm run import:videndum:csv # Desde CSV
 
 # ── Estado del sistema ──
 pm2 status
 pm2 logs stratoscore-agent --lines 50
 
-# ── Scheduler ──
+# ── Programador de tareas ──
 cd agent-server && npx tsx src/schedule-cli.ts list
 cd agent-server && npx tsx src/schedule-cli.ts create "prompt" "0 9 * * *" CHAT_ID
 ```
@@ -229,24 +229,24 @@ cd agent-server && npx tsx src/schedule-cli.ts create "prompt" "0 9 * * *" CHAT_
 
 ### Servicios
 
-| Componente | Estado | Puerto | Deploy | Notas |
+| Componente | Estado | Puerto | Despliegue | Notas |
 |---|---|---|---|---|
-| Agent Server | ✅ Operativo | 3099 | PM2 local | Bot Telegram + HTTP API |
-| Business OS | ✅ Operativo | 3000 | Vercel | Dev OK; build prod tiene bug TS de Next.js 16 |
+| Agent Server | ✅ Operativo | 3099 | PM2 local | Bot Telegram + API HTTP |
+| Business OS | ✅ Operativo | 3000 | Vercel | Dev OK; compilación prod tiene bug TS de Next.js 16 |
 | Finance OS | ⚠️ Migrado a business-os | — | — | Integrado como feature `finances` + `finance-agent` |
 
 ### Dominios
 
 - `stratoscore.app` — Business OS (producción en Vercel)
-- `lavanderia.stratoscore.app` — CleanXpress (subdomain rewrite)
+- `lavanderia.stratoscore.app` — CleanXpress (reescritura de subdominio)
 
 ### Bugs conocidos
 
 | ID | Descripción | Estado |
 |----|-------------|--------|
-| BUG-001 | Token mismatch MC ↔ Agent Server | ✅ Resuelto — ambos usan `tumision_2026` |
+| BUG-001 | Desajuste de token MC ↔ Agent Server | ✅ Resuelto — ambos usan `tumision_2026` |
 | BUG-002 | Finance OS sin columna `estado` en transacciones | ⚠️ Pendiente migración SQL manual en Supabase |
-| BUG-003 | Build TypeScript de business-os falla en prod | ✅ Workaround — dev mode funciona |
+| BUG-003 | Compilación TypeScript de business-os falla en prod | ✅ Solución temporal — modo dev funciona |
 
 ---
 
@@ -257,28 +257,28 @@ cd agent-server && npx tsx src/schedule-cli.ts create "prompt" "0 9 * * *" CHAT_
 | Variable | Requerida | Descripción |
 |---|---|---|
 | `TELEGRAM_BOT_TOKEN` | Sí | Token de @BotFather |
-| `ALLOWED_CHAT_ID` | Sí | Chat ID autorizado de Telegram |
+| `ALLOWED_CHAT_ID` | Sí | ID de chat autorizado de Telegram |
 | `OPENCLAW_GATEWAY_TOKEN` | Sí | Token compartido con Mission Control |
 | `GROQ_API_KEY` | No | STT con Groq Whisper |
 | `ELEVENLABS_API_KEY` | No | TTS con ElevenLabs |
 | `ELEVENLABS_VOICE_ID` | No | Voz para TTS |
-| `ANALYTICS_SUPABASE_URL` | No | Supabase URL para métricas financieras |
-| `ANALYTICS_SUPABASE_KEY` | No | Supabase key para métricas financieras |
-| `SCHEDULER_TZ` | No | Timezone para cron (default: UTC) |
-| `MC_SERVER_PORT` | No | Puerto HTTP (default: 3099) |
-| `MISSION_CONTROL_ORIGIN` | No | CORS origin (default: http://localhost:3000) |
+| `ANALYTICS_SUPABASE_URL` | No | URL de Supabase para métricas financieras |
+| `ANALYTICS_SUPABASE_KEY` | No | Clave de Supabase para métricas financieras |
+| `SCHEDULER_TZ` | No | Zona horaria para cron (por defecto: UTC) |
+| `MC_SERVER_PORT` | No | Puerto HTTP (por defecto: 3099) |
+| `MISSION_CONTROL_ORIGIN` | No | Origen CORS (por defecto: http://localhost:3000) |
 
 ### business-os/.env.local
 
 | Variable | Requerida | Descripción |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Sí | URL del proyecto Supabase |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Sí | Supabase anon/public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Sí | Supabase service role key |
-| `ALLOWED_EMAILS` | Sí | Emails autorizados (comma-separated) |
-| `AGENT_URL` | No | URL del Agent Server (default: http://localhost:3099) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Sí | Clave pública/anónima de Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Sí | Clave de rol de servicio de Supabase |
+| `ALLOWED_EMAILS` | Sí | Emails autorizados (separados por coma) |
+| `AGENT_URL` | No | URL del Agent Server (por defecto: http://localhost:3099) |
 | `OPENCLAW_GATEWAY_TOKEN` | No | Token para comunicación con Agent Server |
-| `OPENROUTER_API_KEY` | No | Para AI CFO agent |
+| `OPENROUTER_API_KEY` | No | Para agente AI CFO |
 
 ---
 
@@ -310,7 +310,7 @@ Cuando Carlos pida "saldos", "finanzas", "gastos del mes", "cuánto he gastado":
 
 ### Blueprint (para implementaciones complejas)
 
-Ver `.claude/prompts/bucle-agentico-blueprint.md`. Enfoque por fases con mapeo de contexto just-in-time:
+Ver `.claude/prompts/bucle-agentico-blueprint.md`. Enfoque por fases con mapeo de contexto justo a tiempo:
 1. Definir FASES (sin subtareas)
 2. Al entrar en cada fase, mapear contexto real del código
 3. Generar subtareas basadas en contexto real (no suposiciones)
@@ -318,14 +318,14 @@ Ver `.claude/prompts/bucle-agentico-blueprint.md`. Enfoque por fases con mapeo d
 
 ### Convenciones de código
 
-- **TypeScript** en todo el proyecto (strict mode)
-- **ESM modules** en agent-server (`"type": "module"`, imports con `.js` extension)
+- **TypeScript** en todo el proyecto (modo estricto)
+- **Módulos ESM** en agent-server (`"type": "module"`, imports con extensión `.js`)
 - **App Router** en business-os (Next.js 16)
 - **Feature-first** — cada feature es autocontenida
-- **Zustand** para state management en el frontend
-- **Supabase** para auth y DB (PostgreSQL) en business-os
+- **Zustand** para gestión de estado en el frontend
+- **Supabase** para autenticación y BD (PostgreSQL) en business-os
 - **SQLite** (better-sqlite3) para datos locales en agent-server
-- **Pino** para logging en agent-server
+- **Pino** para registro de logs en agent-server
 - **Tailwind CSS 4** para estilos en business-os
 
 ---
@@ -342,8 +342,8 @@ Ver `.claude/prompts/bucle-agentico-blueprint.md`. Enfoque por fases con mapeo d
 
 ## Lecciones Aprendidas
 
-- Race condition resuelto: sincronización de rol de usuario en RouteGuard y limpieza de espacios en `.env.local`
-- El subprocess de Agent SDK hereda `process.env` — nunca contaminar con secrets. Usar `readEnvFile()` en su lugar.
-- `fileURLToPath` siempre — nunca `new URL().pathname` (rompe con espacios en paths)
-- Build de producción de Next.js 16 tiene bugs con TypeScript — dev mode funciona como workaround
+- Condición de carrera resuelta: sincronización de rol de usuario en RouteGuard y limpieza de espacios en `.env.local`
+- El subproceso de Agent SDK hereda `process.env` — nunca contaminar con secrets. Usar `readEnvFile()` en su lugar.
+- `fileURLToPath` siempre — nunca `new URL().pathname` (rompe con espacios en rutas)
+- Compilación de producción de Next.js 16 tiene bugs con TypeScript — modo dev funciona como solución temporal
 - `cron-parser` es CJS — usar `createRequire` para importar en ESM
