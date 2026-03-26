@@ -24,7 +24,7 @@ export function Header() {
 
   return (
     <header
-      className="h-14 backdrop-blur-xl flex items-center justify-between px-4 relative z-10 border-b"
+      className="h-14 backdrop-blur-xl flex items-center justify-between px-4 sticky top-0 md:relative z-10 border-b shrink-0"
       style={{ backgroundColor: 'var(--app-header-bg)', borderColor: 'var(--app-border)' }}
     >
       {/* Specular rim */}

@@ -2,6 +2,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { Header } from '@/shared/components/Header'
+import { AuthenticatedHeader } from '@/shared/components/AuthenticatedHeader'
 import { SearchDialog } from '@/features/search/components'
 import { SidebarNav } from '@/shared/components/SidebarNav'
 import { useLayoutStore } from '@/shared/stores/layout-store'
@@ -9,12 +10,18 @@ import { useGlobalShortcuts } from '@/shared/hooks/useGlobalShortcuts'
 import { KeyboardShortcutsHelp } from '@/shared/components/KeyboardShortcutsHelp'
 import { X } from 'lucide-react'
 import { RouteGuard } from '@/shared/components/RouteGuard'
+import type { UserProfile } from '@/lib/supabase/user-profile'
 
-export function DashboardShell({ children }: { children: React.ReactNode }) {
+interface DashboardShellProps {
+  children: React.ReactNode
+  userProfile: UserProfile | null
+}
+
+export function DashboardShell({ children, userProfile }: DashboardShellProps) {
   const { leftSidebarOpen, closeLeftSidebar } = useLayoutStore()
   const [helpOpen, setHelpOpen] = useState(false)
   const pathname = usePathname()
-  const isMissionControl = pathname === '/'
+  const isDashboard = pathname === '/dashboard'
 
   // Persist last visited route for cross-session restore (desktop)
   useEffect(() => {
@@ -79,33 +86,49 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <div className="fixed inset-0" style={{ backgroundColor: 'var(--app-page-bg)' }} data-dashboard-shell>
+    <div
+      className="min-h-dvh md:fixed md:inset-0"
+      style={{ backgroundColor: 'var(--app-page-bg)' }}
+      data-dashboard-shell
+    >
     <div
       className="flex flex-col md:overflow-hidden"
       style={{
-        height: 'var(--app-h, 100dvh)',
+        minHeight: '100dvh',
+        height: undefined,
         paddingTop: 'env(safe-area-inset-top)',
       }}
     >
+      {/* Desktop: fixed height shell */}
+      <style>{`
+        @media (min-width: 768px) {
+          [data-dashboard-shell] > div { height: var(--app-h, 100dvh); min-height: auto; }
+        }
+      `}</style>
+
       {/* Aurora orbs */}
       <div className="fixed top-[-30%] left-[-15%] w-[50%] h-[50%] rounded-full blur-[150px] pointer-events-none" style={{ backgroundColor: 'var(--app-orb-purple)' }} />
       <div className="fixed bottom-[-30%] right-[-15%] w-[45%] h-[45%] rounded-full blur-[150px] pointer-events-none" style={{ backgroundColor: 'var(--app-orb-blue)' }} />
 
-      {/* Header (oculto en Mission Control) */}
-      {!isMissionControl && <Header />}
+      {/* Header condicional */}
+      {isDashboard && userProfile ? (
+        <AuthenticatedHeader userProfile={{ email: userProfile.email, role: userProfile.role, full_name: userProfile.full_name }} />
+      ) : !isDashboard ? (
+        <Header />
+      ) : null}
 
       {/* Body */}
-      <div className="flex-1 flex md:overflow-hidden relative min-h-0">
+      <div className="flex-1 flex md:overflow-hidden relative md:min-h-0">
         {/* Mobile overlay */}
-        {!isMissionControl && leftSidebarOpen && (
+        {!isDashboard && leftSidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 z-30 md:hidden"
             onClick={closeLeftSidebar}
           />
         )}
 
-        {/* Left Sidebar (oculto en Mission Control) */}
-        {!isMissionControl && (
+        {/* Left Sidebar (oculto en Dashboard) */}
+        {!isDashboard && (
           <aside
             className={`
               ${leftSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
@@ -132,8 +155,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </aside>
         )}
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto md:overflow-hidden min-w-0">
+        {/* Main Content — mobile: natural flow (body scrolls), desktop: overflow scroll */}
+        <main className="flex-1 md:overflow-y-auto min-w-0">
           <RouteGuard>{children}</RouteGuard>
         </main>
       </div>

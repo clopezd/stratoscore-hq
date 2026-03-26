@@ -16,8 +16,8 @@ export default function IngestaPage() {
   }, [])
 
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="p-5 space-y-5 max-w-7xl mx-auto">
+    <div>
+      <div className="p-3 md:p-5 space-y-4 md:space-y-5 max-w-7xl mx-auto pb-8">
 
         {/* Header */}
         <div>
@@ -51,17 +51,24 @@ export default function IngestaPage() {
 
           {/* Formato esperado */}
           <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 space-y-3">
-            <p className="text-[11px] text-white/25 uppercase tracking-widest">Formato esperado</p>
-            <div className="space-y-1.5">
-              <FormatRow label="Hoja"    value='"Forecast Production"' />
-              <FormatRow label="Fila 1"  value="Años (ej: 2024, 2025, 2026…)" />
-              <FormatRow label="Fila 2"  value="Meses (ene, feb, mar… o jan, feb…)" />
-              <FormatRow label="Fila 3"  value='Header con "Part number"' />
-              <FormatRow label="Fila 4+" value="Part number · qty por mes" />
-              <FormatRow label="CSV alt" value="part_number, year, month, quantity" />
+            <p className="text-[11px] text-white/25 uppercase tracking-widest">Formatos soportados</p>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <p className="text-[10px] text-white/40 font-medium">📊 Forecast Production</p>
+                <FormatRow label="Hoja"    value='"Forecast Production"' />
+                <FormatRow label="Fila 1"  value="Años (ej: 2024, 2025, 2026…)" />
+                <FormatRow label="Fila 2"  value="Meses (ene, feb, mar…)" />
+                <FormatRow label="Fila 3+" value="Part number · qty por mes" />
+              </div>
+              <div className="space-y-1.5 pt-2 border-t border-white/[0.04]">
+                <p className="text-[10px] text-white/40 font-medium">📈 Ventas Reales</p>
+                <FormatRow label="Hoja"    value='"Ventas" o "Sales"' />
+                <FormatRow label="Fila 1"  value='SKU, "September 2025", "October 2025"…' />
+                <FormatRow label="Fila 2+" value="Part number · qty por mes" />
+              </div>
             </div>
-            <p className="text-[10px] text-white/20 pt-1 border-t border-white/[0.04]">
-              UPSERT activo — los registros existentes se actualizan sin duplicar.
+            <p className="text-[10px] text-white/20 pt-2 border-t border-white/[0.04]">
+              ✅ Detección automática · UPSERT activo · Guarda en tabla correcta según tipo
             </p>
           </div>
         </div>

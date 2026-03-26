@@ -54,7 +54,7 @@ export function VidendumDashboard() {
   useEffect(() => { setMounted(true) }, [])
 
   return (
-    <div className="p-5 space-y-5 overflow-y-auto h-full text-vid-fg">
+    <div className="p-3 md:p-5 space-y-4 md:space-y-5 text-vid-fg pb-8">
 
       {/* Header + Filtros */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

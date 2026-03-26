@@ -4,13 +4,15 @@ import { useState } from 'react'
 import { Microscope } from 'lucide-react'
 import { DecisionMatrix } from './DecisionMatrix'
 import { ConsultantChat } from '@/features/consultant/components/ConsultantChat'
+import { ForecastAccuracy } from './ForecastAccuracy'
+import { TimeSeriesChart } from './TimeSeriesChart'
 import type { DecisionMatrixData } from '../types'
 
 export function AnalisisProfundo() {
   const [radarData, setRadarData] = useState<DecisionMatrixData | null>(null)
 
   return (
-    <div className="p-5 h-full overflow-y-auto space-y-5">
+    <div className="p-3 md:p-5 space-y-4 md:space-y-5 pb-8">
 
       {/* Header */}
       <div className="flex items-start justify-between">
@@ -20,7 +22,7 @@ export function AnalisisProfundo() {
             <h1 className="text-base font-semibold text-white">Análisis Profundo</h1>
           </div>
           <p className="text-xs text-white/35">
-            Radar de Inteligencia Competitiva · Consultor Estratégico en tiempo real
+            Radar de Inteligencia Competitiva · Correlación competencia → fallos DPRO
           </p>
         </div>
         {radarData && (
@@ -29,6 +31,23 @@ export function AnalisisProfundo() {
           </span>
         )}
       </div>
+
+      {/* NUEVO: Callout explicativo para el gerente de planta */}
+      <div className="bg-gradient-to-r from-indigo-500/[0.08] to-violet-500/[0.08] border border-indigo-500/20 rounded-lg p-3">
+        <p className="text-[11px] text-indigo-200/90 leading-relaxed">
+          <span className="font-semibold text-indigo-300">Para el Gerente de Planta:</span> Este radar identifica{' '}
+          <span className="text-orange-300 font-medium">qué competidores directos</span>{' '}
+          (Cartoni, Miller, Camgear, Libec, Neewer) están robando deals que el DPRO proyectaba como "cerrados".{' '}
+          Cada riesgo incluye la <span className="text-red-300 font-medium">razón específica del fallo de forecast</span>{' '}
+          (precio, lead time, canal ciego, región).
+        </p>
+      </div>
+
+      {/* Precisión del Forecast */}
+      <ForecastAccuracy />
+
+      {/* Serie Temporal */}
+      <TimeSeriesChart />
 
       {/* Layout 2 columnas en desktop */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 items-start">
