@@ -112,7 +112,7 @@ export function ClientDiscoveryForm() {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Diseño de Plataforma Videndum</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Diseño de Plataforma Videndum</h1>
         <p className="text-gray-400">Cuéntanos cómo trabajas HOY para diseñar la herramienta perfecta para ti</p>
         <p className="text-sm text-gray-500 mt-1">⏱️ Tiempo estimado: 10-12 minutos</p>
 
@@ -129,7 +129,7 @@ export function ClientDiscoveryForm() {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* SECCIÓN 1: Proceso Actual */}
         {currentSection === 1 && (
-          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-6">
+          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 sm:p-6">
             <h2 className="text-xl font-semibold text-white mb-4">1️⃣ ¿Cómo Trabajas HOY?</h2>
             <p className="text-sm text-gray-400 mb-6">Describe tu proceso actual de forecast y análisis</p>
 
@@ -141,7 +141,7 @@ export function ClientDiscoveryForm() {
                   onChange={(e) => setFormData(prev => ({ ...prev, current_forecast_process: e.target.value }))}
                   placeholder="Ej: Descargamos ventas del mes anterior de Excel, calculamos promedios móviles manualmente, ajustamos según experiencia del equipo..."
                   rows={4}
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -152,11 +152,11 @@ export function ClientDiscoveryForm() {
                   value={formData.current_tools}
                   onChange={(e) => setFormData(prev => ({ ...prev, current_tools: e.target.value }))}
                   placeholder="Ej: Excel, Power BI, ERP SAP, Google Sheets"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-300 mb-2">¿Cuántas horas/semana?</label>
                   <input
@@ -164,7 +164,7 @@ export function ClientDiscoveryForm() {
                     value={formData.time_spent_weekly}
                     onChange={(e) => setFormData(prev => ({ ...prev, time_spent_weekly: e.target.value }))}
                     placeholder="Ej: 10 horas"
-                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 </div>
                 <div>
@@ -174,12 +174,12 @@ export function ClientDiscoveryForm() {
                     value={formData.approval_frequency}
                     onChange={(e) => setFormData(prev => ({ ...prev, approval_frequency: e.target.value }))}
                     placeholder="Ej: Semanal"
-                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-300 mb-2">¿Quién hace el forecast?</label>
                   <input
@@ -187,7 +187,7 @@ export function ClientDiscoveryForm() {
                     value={formData.who_does_forecast}
                     onChange={(e) => setFormData(prev => ({ ...prev, who_does_forecast: e.target.value }))}
                     placeholder="Ej: Equipo planeación CR"
-                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 </div>
                 <div>
@@ -197,7 +197,7 @@ export function ClientDiscoveryForm() {
                     value={formData.who_approves}
                     onChange={(e) => setFormData(prev => ({ ...prev, who_approves: e.target.value }))}
                     placeholder="Ej: Gerencia UK"
-                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 </div>
               </div>
@@ -207,7 +207,7 @@ export function ClientDiscoveryForm() {
 
         {/* SECCIÓN 2: Información Necesaria */}
         {currentSection === 2 && (
-          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-6">
+          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 sm:p-6">
             <h2 className="text-xl font-semibold text-white mb-4">2️⃣ ¿Qué Información Necesitas Ver?</h2>
             <div className="space-y-4">
               <div>
@@ -217,7 +217,7 @@ export function ClientDiscoveryForm() {
                   value={formData.key_metrics_needed?.join(', ') || ''}
                   onChange={(e) => handleArrayChange('key_metrics_needed', e.target.value)}
                   placeholder="Ej: Precisión del forecast, SKUs con problemas, Tendencias de venta, Desviaciones grandes"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -228,7 +228,7 @@ export function ClientDiscoveryForm() {
                   value={formData.comparison_needs}
                   onChange={(e) => setFormData(prev => ({ ...prev, comparison_needs: e.target.value }))}
                   placeholder="Ej: Forecast vs Real, Mes actual vs anterior, Este año vs año pasado"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -239,7 +239,7 @@ export function ClientDiscoveryForm() {
                   value={formData.time_periods_needed?.join(', ') || ''}
                   onChange={(e) => handleArrayChange('time_periods_needed', e.target.value)}
                   placeholder="Ej: Semana actual, Mes actual, Últimos 3 meses, Año completo"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -250,7 +250,7 @@ export function ClientDiscoveryForm() {
                   value={formData.detail_level_needed}
                   onChange={(e) => setFormData(prev => ({ ...prev, detail_level_needed: e.target.value }))}
                   placeholder="Ej: Por SKU individual, Por categoría, Por tipo (INV/PKG), Agregado total"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
             </div>
@@ -259,7 +259,7 @@ export function ClientDiscoveryForm() {
 
         {/* SECCIÓN 3: Decisiones y Preguntas */}
         {currentSection === 3 && (
-          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-6">
+          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 sm:p-6">
             <h2 className="text-xl font-semibold text-white mb-4">3️⃣ Decisiones y Preguntas Clave</h2>
             <div className="space-y-4">
               <div>
@@ -269,11 +269,11 @@ export function ClientDiscoveryForm() {
                   value={formData.decision_examples?.join(', ') || ''}
                   onChange={(e) => handleArrayChange('decision_examples', e.target.value)}
                   placeholder="Ej: Ajustar producción semanal, Contactar proveedores, Revisar inventario, Escalar a gerencia"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-300 mb-2">¿Cada cuánto decides?</label>
                   <input
@@ -281,7 +281,7 @@ export function ClientDiscoveryForm() {
                     value={formData.decision_frequency}
                     onChange={(e) => setFormData(prev => ({ ...prev, decision_frequency: e.target.value }))}
                     placeholder="Ej: Diario, Semanal"
-                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 </div>
                 <div>
@@ -291,7 +291,7 @@ export function ClientDiscoveryForm() {
                     value={formData.urgency_level}
                     onChange={(e) => setFormData(prev => ({ ...prev, urgency_level: e.target.value }))}
                     placeholder="Ej: Mismo día, Semana"
-                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 </div>
               </div>
@@ -303,7 +303,7 @@ export function ClientDiscoveryForm() {
                   onChange={(e) => handleArrayChange('daily_questions', e.target.value)}
                   placeholder="Ej: ¿Qué debo producir esta semana?, ¿Hay algún SKU con problema crítico?, ¿Qué necesita ajuste urgente?"
                   rows={3}
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -314,7 +314,7 @@ export function ClientDiscoveryForm() {
                   onChange={(e) => handleArrayChange('monthly_questions', e.target.value)}
                   placeholder="Ej: ¿Cómo fue la precisión del mes?, ¿Qué SKUs están fallando consistentemente?, ¿Mejoramos vs trimestre pasado?"
                   rows={3}
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
             </div>
@@ -323,7 +323,7 @@ export function ClientDiscoveryForm() {
 
         {/* SECCIÓN 4: Problemas Actuales */}
         {currentSection === 4 && (
-          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-6">
+          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 sm:p-6">
             <h2 className="text-xl font-semibold text-white mb-4">4️⃣ Problemas Actuales</h2>
             <p className="text-sm text-gray-400 mb-6">¿Qué te hace perder tiempo o te complica el trabajo HOY?</p>
 
@@ -335,7 +335,7 @@ export function ClientDiscoveryForm() {
                   value={formData.biggest_problem}
                   onChange={(e) => setFormData(prev => ({ ...prev, biggest_problem: e.target.value }))}
                   placeholder="Ej: Toma 2 horas generar el reporte semanal manualmente"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -346,7 +346,7 @@ export function ClientDiscoveryForm() {
                   value={formData.second_problem}
                   onChange={(e) => setFormData(prev => ({ ...prev, second_problem: e.target.value }))}
                   placeholder="Ej: No vemos problemas hasta que es tarde"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -357,7 +357,7 @@ export function ClientDiscoveryForm() {
                   value={formData.third_problem}
                   onChange={(e) => setFormData(prev => ({ ...prev, third_problem: e.target.value }))}
                   placeholder="Ej: Difícil colaborar entre CR y UK"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -368,7 +368,7 @@ export function ClientDiscoveryForm() {
                   onChange={(e) => setFormData(prev => ({ ...prev, manual_work: e.target.value }))}
                   placeholder="Ej: Copiar datos entre Excel, Calcular MAPE a mano, Generar reportes en Power BI, Enviar emails con resumen"
                   rows={3}
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -379,7 +379,7 @@ export function ClientDiscoveryForm() {
                   value={formData.time_wasted}
                   onChange={(e) => setFormData(prev => ({ ...prev, time_wasted: e.target.value }))}
                   placeholder="Ej: Buscando datos en diferentes archivos, Cruzando información, Esperando aprobaciones"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
             </div>
@@ -388,7 +388,7 @@ export function ClientDiscoveryForm() {
 
         {/* SECCIÓN 5: Flujo Ideal */}
         {currentSection === 5 && (
-          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-6">
+          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 sm:p-6">
             <h2 className="text-xl font-semibold text-white mb-4">5️⃣ ¿Cómo Te Gustaría Trabajar?</h2>
             <div className="space-y-4">
               <div>
@@ -398,7 +398,7 @@ export function ClientDiscoveryForm() {
                   onChange={(e) => setFormData(prev => ({ ...prev, ideal_workflow: e.target.value }))}
                   placeholder="Ej: Entrar a la plataforma → Ver resumen ejecutivo con alertas → Identificar problemas críticos en segundos → Tomar decisión → Aprobar con un click"
                   rows={4}
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -409,7 +409,7 @@ export function ClientDiscoveryForm() {
                   value={formData.must_have_features?.join(', ') || ''}
                   onChange={(e) => handleArrayChange('must_have_features', e.target.value)}
                   placeholder="Ej: Ver forecast vs real, Filtrar por SKU, Exportar a Excel, Ver desviaciones grandes"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -420,7 +420,7 @@ export function ClientDiscoveryForm() {
                   value={formData.nice_to_have_features?.join(', ') || ''}
                   onChange={(e) => handleArrayChange('nice_to_have_features', e.target.value)}
                   placeholder="Ej: Alertas automáticas, Gráficos interactivos, Acceso móvil, Comentarios en tiempo real"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -431,7 +431,7 @@ export function ClientDiscoveryForm() {
                   onChange={(e) => setFormData(prev => ({ ...prev, success_looks_like: e.target.value }))}
                   placeholder="Ej: Tomar decisiones en 5 minutos en vez de 2 horas, MAPE <15%, Eliminar trabajo manual, Ver problemas antes de que exploten"
                   rows={3}
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
             </div>
@@ -440,10 +440,10 @@ export function ClientDiscoveryForm() {
 
         {/* SECCIÓN 6: Contexto y Equipo */}
         {currentSection === 6 && (
-          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-6">
+          <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 sm:p-6">
             <h2 className="text-xl font-semibold text-white mb-4">6️⃣ Contexto y Equipo</h2>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-300 mb-2">Cantidad de SKUs</label>
                   <input
@@ -451,7 +451,7 @@ export function ClientDiscoveryForm() {
                     value={formData.num_skus || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, num_skus: parseInt(e.target.value) || undefined }))}
                     placeholder="Ej: 1500"
-                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 </div>
                 <div>
@@ -461,7 +461,7 @@ export function ClientDiscoveryForm() {
                     value={formData.forecast_horizon}
                     onChange={(e) => setFormData(prev => ({ ...prev, forecast_horizon: e.target.value }))}
                     placeholder="Ej: 6 meses"
-                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 </div>
               </div>
@@ -482,12 +482,12 @@ export function ClientDiscoveryForm() {
                     value={formData.historical_months || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, historical_months: parseInt(e.target.value) || undefined }))}
                     placeholder="¿Cuántos meses? Ej: 24"
-                    className="ml-7 w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="ml-7 w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-300 mb-2">Tamaño del equipo</label>
                   <input
@@ -495,7 +495,7 @@ export function ClientDiscoveryForm() {
                     value={formData.team_size || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, team_size: parseInt(e.target.value) || undefined }))}
                     placeholder="Ej: 3 personas"
-                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 </div>
                 <div>
@@ -505,7 +505,7 @@ export function ClientDiscoveryForm() {
                     value={formData.team_locations?.join(', ') || ''}
                     onChange={(e) => handleArrayChange('team_locations', e.target.value)}
                     placeholder="Ej: Costa Rica, UK"
-                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
                 </div>
               </div>
@@ -517,7 +517,7 @@ export function ClientDiscoveryForm() {
                   value={formData.technical_level}
                   onChange={(e) => setFormData(prev => ({ ...prev, technical_level: e.target.value }))}
                   placeholder="Ej: Avanzado Excel/Power BI, Intermedio Excel, Básico"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -528,7 +528,7 @@ export function ClientDiscoveryForm() {
                   value={formData.integration_needs?.join(', ') || ''}
                   onChange={(e) => handleArrayChange('integration_needs', e.target.value)}
                   placeholder="Ej: SAP, Odoo, Excel automático, Power BI, API"
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
 
@@ -539,7 +539,7 @@ export function ClientDiscoveryForm() {
                   onChange={(e) => setFormData(prev => ({ ...prev, additional_context: e.target.value }))}
                   placeholder="Cualquier otra información importante que debamos saber..."
                   rows={3}
-                  className="w-full px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
               </div>
             </div>
@@ -547,37 +547,43 @@ export function ClientDiscoveryForm() {
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex items-center justify-between pt-6 border-t border-white/[0.05]">
+        {error && (
+          <div className="text-red-400 text-sm text-center">
+            {error}
+          </div>
+        )}
+
+        <div className="flex items-center justify-between gap-3 pt-6 border-t border-white/[0.05]">
           <button
             type="button"
-            onClick={() => setCurrentSection(prev => Math.max(1, prev - 1))}
+            onClick={() => {
+              setCurrentSection(prev => Math.max(1, prev - 1))
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
             disabled={currentSection === 1}
-            className="px-6 py-2 bg-white/[0.05] hover:bg-white/[0.1] disabled:bg-white/[0.02] disabled:text-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+            className="px-5 sm:px-6 py-3 bg-white/[0.05] hover:bg-white/[0.1] active:bg-white/[0.15] disabled:bg-white/[0.02] disabled:text-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors text-sm sm:text-base min-h-[48px]"
           >
-            ← Anterior
+            Anterior
           </button>
-
-          {error && (
-            <div className="text-red-400 text-sm">
-              ❌ {error}
-            </div>
-          )}
 
           {currentSection < totalSections ? (
             <button
               type="button"
-              onClick={() => setCurrentSection(prev => Math.min(totalSections, prev + 1))}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              onClick={() => {
+                setCurrentSection(prev => Math.min(totalSections, prev + 1))
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+              className="px-5 sm:px-6 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-lg transition-colors text-sm sm:text-base min-h-[48px]"
             >
-              Siguiente →
+              Siguiente
             </button>
           ) : (
             <button
               type="submit"
               disabled={loading}
-              className="px-8 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+              className="px-6 sm:px-8 py-3 bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors text-sm sm:text-base min-h-[48px]"
             >
-              {loading ? 'Enviando...' : 'Enviar Información'}
+              {loading ? 'Enviando...' : 'Enviar'}
             </button>
           )}
         </div>
