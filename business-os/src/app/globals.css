@@ -245,11 +245,15 @@ body:has([data-lavanderia]) {
 }
 
 /* Default: allow scroll for landing and public pages */
-html, body {
+html {
+  background-color: var(--page-bg, #f8fafc);
+}
+
+body {
   background-color: var(--page-bg, #f8fafc);
   margin: 0;
   overflow: auto;
-  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Dashboard shell: lock body scroll on desktop only (app shell handles it).
