@@ -123,7 +123,9 @@ const S = {
 export async function exportVidendumExcel(kpis: SummaryKPIs) {
   let XLSX: typeof import('xlsx')
   try {
-    XLSX = await import('xlsx-js-style' as string) as typeof import('xlsx')
+    // Use a variable so Turbopack/webpack won't try to resolve the optional dep at build time
+    const styledPkg = 'xlsx-js-style'
+    XLSX = await import(/* webpackIgnore: true */ styledPkg) as typeof import('xlsx')
   } catch {
     XLSX = await import('xlsx')
   }

@@ -29,11 +29,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Skip ESLint check en build
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   // Allow images from Supabase Storage (generated images, avatars, etc.)
   images: {
     remotePatterns: [
