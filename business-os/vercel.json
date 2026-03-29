@@ -1,5 +1,11 @@
 {
   "buildCommand": "next build",
   "framework": "nextjs",
-  "version": 2
+  "version": 2,
+  "crons": [
+    {
+      "path": "/api/cron/agents",
+      "schedule": "0 16 * * *"
+    }
+  ]
 }
