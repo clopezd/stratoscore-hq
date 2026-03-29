@@ -1,9 +1,14 @@
 import { generateText } from 'ai'
-import { openai } from '@ai-sdk/openai'
+import { createOpenAI } from '@ai-sdk/openai'
 import { getSystemPrompt } from '../config/prompts'
 import { getToolsForAgent } from '../tools/definitions'
 import { AGENTS } from '../config/agents'
 import type { AgentSlug, AgentRunResult } from '../types'
+
+const openrouter = createOpenAI({
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_API_KEY,
+})
 
 export async function runAgent(
   slug: AgentSlug,
@@ -29,7 +34,7 @@ export async function runAgent(
 
   try {
     const result = await generateText({
-      model: openai('gpt-4o'),
+      model: openrouter('anthropic/claude-sonnet-4'),
       system: systemPrompt,
       prompt,
       tools,
