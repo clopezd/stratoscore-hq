@@ -5,6 +5,7 @@ import { AGENTS, DAILY_EXECUTION_ORDER } from '@/features/agents/config/agents'
 import { BusinessAgentCard } from '@/features/agents/components/BusinessAgentCard'
 import { PipelineStatus } from '@/features/agents/components/PipelineStatus'
 import { ReportModal } from '@/features/agents/components/ReportModal'
+import { IdeaConsole } from '@/features/agents/components/IdeaConsole'
 import { useAgentRunner } from '@/features/agents/hooks/useAgentRunner'
 import type { AgentSlug } from '@/features/agents/types'
 
@@ -52,6 +53,11 @@ export default function AgentsDashboardPage() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Idea Console */}
+      <div className="mb-8">
+        <IdeaConsole onResult={(slug, report) => setSelectedReport(report)} />
       </div>
 
       {/* Pipeline visualization */}
