@@ -20,16 +20,16 @@ export default function AgentsDashboardPage() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-xs font-mono uppercase tracking-wider text-indigo-400/60">
+          <span className="text-xs font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400/60">
             [ BUSINESS_OS ]
           </span>
         </div>
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white/90">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white/90">
               Centro de Agentes
             </h1>
-            <p className="text-sm text-white/40 mt-1">
+            <p className="text-sm text-gray-500 dark:text-white/40 mt-1">
               10 agentes autónomos operando tu portafolio
             </p>
           </div>
@@ -39,14 +39,14 @@ export default function AgentsDashboardPage() {
             <button
               onClick={() => runPipeline('daily')}
               disabled={pipelineRunning}
-              className="px-4 py-2 rounded-xl text-sm font-medium bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-xl text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 dark:hover:bg-indigo-500/30 border border-indigo-600 dark:border-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {pipelineRunning ? '⏳ Ejecutando pipeline...' : '▶ Pipeline Diario'}
             </button>
             <button
               onClick={() => runPipeline('weekly')}
               disabled={pipelineRunning}
-              className="px-4 py-2 rounded-xl text-sm font-medium bg-white/[0.06] text-white/50 hover:bg-white/[0.1] border border-white/[0.07] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-xl text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-white/[0.06] dark:text-white/50 dark:hover:bg-white/[0.1] border border-gray-200 dark:border-white/[0.07] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               📊 Semanal
             </button>
@@ -61,7 +61,7 @@ export default function AgentsDashboardPage() {
 
       {/* Operational Agents */}
       <div className="mb-8">
-        <h2 className="text-xs font-semibold text-blue-300/60 uppercase tracking-wider mb-4">
+        <h2 className="text-xs font-semibold text-blue-600 dark:text-blue-300/60 uppercase tracking-wider mb-4">
           Equipo Operacional
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -80,7 +80,7 @@ export default function AgentsDashboardPage() {
 
       {/* Strategic Agents */}
       <div className="mb-8">
-        <h2 className="text-xs font-semibold text-purple-300/60 uppercase tracking-wider mb-4">
+        <h2 className="text-xs font-semibold text-purple-600 dark:text-purple-300/60 uppercase tracking-wider mb-4">
           Equipo Estratégico (C-Suite)
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -98,9 +98,9 @@ export default function AgentsDashboardPage() {
       </div>
 
       {/* Schedule info */}
-      <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 text-center">
-        <p className="text-xs text-white/30">
-          ⏰ Pipeline diario automático a las <span className="text-white/50">10:00am CT</span> · Domingos: Limpieza 2am + Estratega 11am
+      <div className="bg-gray-50 dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.05] rounded-xl p-4 text-center">
+        <p className="text-xs text-gray-500 dark:text-white/30">
+          ⏰ Pipeline diario automático a las <span className="text-gray-700 dark:text-white/50 font-medium">10:00am CT</span> · Domingos: Limpieza 2am + Estratega 11am
         </p>
       </div>
 
