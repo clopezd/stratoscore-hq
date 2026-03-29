@@ -34,7 +34,7 @@ export async function runAgent(
 
   try {
     const result = await generateText({
-      model: openrouter('anthropic/claude-sonnet-4'),
+      model: openrouter('google/gemini-2.0-flash-001'),
       system: systemPrompt,
       prompt,
       tools,
