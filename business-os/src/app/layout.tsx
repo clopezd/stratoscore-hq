@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from 'next'
-import { Space_Grotesk } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 import { PWARegister } from '@/components/PWARegister'
 import { ThemeProvider } from '@/shared/providers/ThemeProvider'
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
+const spaceGrotesk = localFont({
+  src: '../fonts/SpaceGrotesk-Regular.woff2',
   variable: '--font-grotesk',
   display: 'swap',
+  fallback: ['system-ui', 'sans-serif'],
 })
 
 export const metadata: Metadata = {
