@@ -7,7 +7,7 @@ const nextConfig = {
   // experimental: { mcpServer: true },
   // ssh2 uses native 'fs' — keep it out of the static bundle.
   // The import in calendar/route.ts is now dynamic, so this is a belt-and-suspenders guard.
-  serverExternalPackages: ['ssh2'],
+  serverExternalPackages: ['ssh2', 'xlsx', 'xlsx-js-style'],
 
   // Optimizaciones de build
   experimental: {
