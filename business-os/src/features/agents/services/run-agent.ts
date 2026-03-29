@@ -30,15 +30,18 @@ export async function runAgent(
   const tools = getToolsForAgent(slug, slug)
 
   const today = new Date().toISOString().split('T')[0]
+  const isCustomPrompt = !!userMessage
   const prompt = userMessage ?? `Ejecuta tu análisis diario. Fecha: ${today}. Usa tus tools para obtener datos reales y genera tu reporte.`
 
   try {
     const result = await generateText({
       model: openrouter('google/gemini-2.0-flash-001'),
-      system: systemPrompt,
+      system: systemPrompt + (isCustomPrompt
+        ? '\n\nIMPORTANTE: Te están consultando sobre una idea o pregunta estratégica. Responde con tu análisis experto basado en tu rol. Si no hay datos en las tablas, usa tu criterio profesional. NO digas que necesitas datos — da tu opinión fundamentada. Sé concreto y accionable.'
+        : ''),
       prompt,
-      tools,
-      maxSteps: 10,
+      tools: isCustomPrompt ? undefined : tools,
+      maxSteps: isCustomPrompt ? 1 : 10,
     })
 
     return {
