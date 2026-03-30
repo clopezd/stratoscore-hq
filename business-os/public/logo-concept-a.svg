@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Concepto A: "Ascending Layers" — 3 capas atmosféricas con flecha ascendente -->
+  <rect width="200" height="200" rx="40" fill="#001117"/>
+
+  <!-- Atmospheric layers (arcs) -->
+  <path d="M40,140 Q100,110 160,140" stroke="#00F2FE" stroke-width="2" opacity="0.2" stroke-linecap="round"/>
+  <path d="M50,120 Q100,90 150,120" stroke="#00F2FE" stroke-width="2.5" opacity="0.4" stroke-linecap="round"/>
+  <path d="M60,100 Q100,70 140,100" stroke="#00F2FE" stroke-width="3" opacity="0.6" stroke-linecap="round"/>
+
+  <!-- Rising element — abstract rocket/arrow piercing through layers -->
+  <path d="M100,155 L100,50" stroke="url(#a-grad)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M100,50 L88,72" stroke="#00F2FE" stroke-width="4" stroke-linecap="round"/>
+  <path d="M100,50 L112,72" stroke="#00F2FE" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Glow at peak -->
+  <circle cx="100" cy="48" r="6" fill="#00F2FE" opacity="0.3"/>
+  <circle cx="100" cy="48" r="3" fill="#00F2FE" opacity="0.8"/>
+
+  <defs>
+    <linearGradient id="a-grad" x1="100" y1="155" x2="100" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#001117"/>
+      <stop offset="100%" stop-color="#00F2FE"/>
+    </linearGradient>
+  </defs>
+</svg>
