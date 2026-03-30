@@ -34,12 +34,6 @@ interface SavedView {
   filters: Record<string, unknown>
 }
 
-/**
- * Nav item visibility:
- *   (no flag)    → todos los roles (member, admin, owner)
- *   adminOnly    → admin + owner   (no visible para member)
- *   ownerOnly    → solo owner      (herramientas de gestión/inteligencia)
- */
 interface NavItem {
   href: string
   label: string
@@ -131,6 +125,13 @@ export function SidebarNav() {
     setSavedViews((prev) => prev.filter((v) => v.id !== viewId))
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      action()
+    }
+  }
+
   const myTasksActive = !!(profile && assigneeFilter === profile.id)
 
   return (
@@ -141,7 +142,7 @@ export function SidebarNav() {
       {/* Logo — StratosCore por defecto, Videndum solo en rutas /videndum */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-2.5">
         {pathname.startsWith('/videndum') ? (
-          <VidendumLogo width={120} className="text-white" />
+          <VidendumLogo width={120} className="text-vid-fg" />
         ) : (
           <>
             <Logo
@@ -168,7 +169,7 @@ export function SidebarNav() {
           className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all duration-200
             ${myTasksActive
               ? 'bg-blue-500/15 text-blue-600 border border-blue-500/25 dark:text-blue-400 dark:border-blue-500/20'
-              : 'text-black/45 hover:text-black/75 hover:bg-black/[0.06] dark:text-white/50 dark:hover:text-white/80 dark:hover:bg-white/[0.06] border border-transparent'
+              : 'text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--card-raised)] border border-transparent'
             }`}
         >
           <CircleUserRound size={15} />
@@ -190,8 +191,8 @@ export function SidebarNav() {
               href={href}
               className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
                 ${isActive
-                  ? 'bg-black/[0.08] text-black dark:bg-white/[0.1] dark:text-white'
-                  : 'text-black/40 hover:text-black/70 hover:bg-black/[0.05] dark:text-white/40 dark:hover:text-white/70 dark:hover:bg-white/[0.05]'
+                  ? 'bg-[var(--card-elevated)] text-[var(--foreground)]'
+                  : 'text-[var(--foreground-subtle)] hover:text-[var(--foreground)] hover:bg-[var(--card-raised)]'
                 }`}
             >
               <Icon size={15} />
@@ -207,15 +208,17 @@ export function SidebarNav() {
       <div className="flex flex-col min-h-0">
         <div
           onClick={() => setTeamExpanded(!teamExpanded)}
+          onKeyDown={(e) => handleKeyDown(e, () => setTeamExpanded(!teamExpanded))}
           role="button"
+          tabIndex={0}
           className="flex items-center justify-between px-5 py-2 cursor-pointer"
         >
           <div className="flex items-center gap-2">
-            {teamExpanded ? <ChevronDown size={12} className="text-white/25" /> : <ChevronRight size={12} className="text-white/25" />}
-            <Users size={14} className="text-white/40" />
-            <span className="text-[10px] uppercase tracking-widest text-white/40 font-semibold">Team</span>
+            {teamExpanded ? <ChevronDown size={12} className="text-vid-faint" /> : <ChevronRight size={12} className="text-vid-faint" />}
+            <Users size={14} className="text-vid-subtle" />
+            <span className="text-[10px] uppercase tracking-widest text-vid-subtle font-semibold">Team</span>
           </div>
-          <span className="text-[9px] bg-white/[0.06] px-1.5 py-0.5 rounded-full text-white/30">
+          <span className="text-[9px] bg-[var(--card-raised)] px-1.5 py-0.5 rounded-full text-vid-faint">
             {members.length}
           </span>
         </div>
@@ -225,7 +228,7 @@ export function SidebarNav() {
             {membersLoading ? (
               <div className="space-y-2 px-1">
                 {[1, 2].map(i => (
-                  <div key={i} className="h-10 rounded-xl bg-white/[0.04] animate-pulse" />
+                  <div key={i} className="h-10 rounded-xl bg-[var(--card-raised)] animate-pulse" />
                 ))}
               </div>
             ) : (
@@ -234,17 +237,17 @@ export function SidebarNav() {
                   key={member.id}
                   onClick={() => handleMemberClick(member.id)}
                   className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all duration-200
-                    hover:bg-white/[0.04] border border-transparent"
+                    hover:bg-[var(--card-raised)] border border-transparent"
                 >
                   {member.avatar_url ? (
                     <img src={member.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-white/[0.1] flex items-center justify-center text-xs text-white/60 flex-shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-[var(--card-elevated)] flex items-center justify-center text-xs text-vid-muted flex-shrink-0">
                       {(member.full_name ?? '?')[0]}
                     </div>
                   )}
                   <div className="min-w-0 text-left">
-                    <span className="text-xs text-white/80 truncate block">{member.full_name ?? 'User'}</span>
+                    <span className="text-xs text-vid-muted truncate block">{member.full_name ?? 'User'}</span>
                   </div>
                 </button>
               ))
@@ -262,10 +265,10 @@ export function SidebarNav() {
               onClick={() => setViewsExpanded(!viewsExpanded)}
               className="w-full flex items-center gap-2 px-2.5 py-1 mb-1"
             >
-              {viewsExpanded ? <ChevronDown size={12} className="text-white/25" /> : <ChevronRight size={12} className="text-white/25" />}
-              <Bookmark size={14} className="text-white/40" />
-              <span className="text-[10px] uppercase tracking-widest text-white/40 font-semibold">Views</span>
-              <span className="text-[9px] bg-white/[0.06] px-1 py-0.5 rounded-full text-white/30 ml-auto">
+              {viewsExpanded ? <ChevronDown size={12} className="text-vid-faint" /> : <ChevronRight size={12} className="text-vid-faint" />}
+              <Bookmark size={14} className="text-vid-subtle" />
+              <span className="text-[10px] uppercase tracking-widest text-vid-subtle font-semibold">Views</span>
+              <span className="text-[9px] bg-[var(--card-raised)] px-1 py-0.5 rounded-full text-vid-faint ml-auto">
                 {savedViews.length}
               </span>
             </button>
@@ -275,13 +278,13 @@ export function SidebarNav() {
                   <div key={view.id} className="group flex items-center">
                     <button
                       onClick={() => handleLoadView(view)}
-                      className="flex-1 text-left px-2.5 py-1 rounded-lg text-xs text-white/40 hover:text-white/70 hover:bg-white/[0.05] transition-colors truncate"
+                      className="flex-1 text-left px-2.5 py-1 rounded-lg text-xs text-vid-subtle hover:text-vid-fg hover:bg-[var(--card-raised)] transition-colors truncate"
                     >
                       {view.name}
                     </button>
                     <button
                       onClick={() => handleDeleteView(view.id)}
-                      className="p-1 text-white/15 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                      className="p-1 text-vid-faint hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
                     >
                       <X size={10} />
                     </button>
@@ -304,14 +307,14 @@ export function SidebarNav() {
       >
         {/* Powered by Stratoscore */}
         <div className="flex items-center justify-center gap-1.5 py-2 opacity-30 hover:opacity-50 transition-opacity">
-          <span className="text-[9px] text-white/60 tracking-widest uppercase">Powered by</span>
-          <span className="text-[9px] font-semibold text-white/80 tracking-tight">Stratoscore</span>
+          <span className="text-[9px] text-vid-subtle tracking-widest uppercase">Powered by</span>
+          <span className="text-[9px] font-semibold text-vid-fg tracking-tight">Stratoscore</span>
         </div>
 
         <form action={signout}>
           <button
             type="submit"
-            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-black/30 hover:text-red-600/70 hover:bg-red-400/[0.05] dark:text-white/30 dark:hover:text-red-400/70 transition-colors"
+            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-vid-faint hover:text-red-500 hover:bg-red-500/[0.06] transition-colors"
           >
             <LogOut size={14} />
             Sign out

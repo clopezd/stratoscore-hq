@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react';
+import Image from 'next/image';
 import {
   ArrowRight,
   TrendingUp,
@@ -49,10 +50,13 @@ export default function PublicLandingPage() {
 
           <div className="relative hidden lg:block">
             <div className="bg-gradient-to-tr from-cyan-500/20 to-transparent p-1 rounded-[3rem] border border-white/10">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=800"
+                width={800}
+                height={533}
                 className="rounded-[2.8rem] opacity-80 mix-blend-luminosity hover:mix-blend-normal transition-all duration-700"
                 alt="Empresa Digital Inteligente"
+                unoptimized
               />
               <div className="absolute -bottom-6 -left-6 bg-[#0A1929] border border-cyan-500/50 p-6 rounded-2xl shadow-2xl animate-float">
                 <BrainCircuit className="text-cyan-500 w-10 h-10 mb-2" />
@@ -124,10 +128,13 @@ export default function PublicLandingPage() {
             </div>
 
             <div className="relative">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1590105577767-e21a1067899f?auto=format&fit=crop&q=80&w=800"
+                width={800}
+                height={533}
                 className="rounded-[2rem] shadow-2xl grayscale hover:grayscale-0 transition-all duration-1000"
                 alt="Clínica dental trabajando"
+                unoptimized
               />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-8 py-4 rounded-full font-black text-sm shadow-2xl animate-pulse">
                 +45 CITAS NUEVAS ESTA SEMANA
