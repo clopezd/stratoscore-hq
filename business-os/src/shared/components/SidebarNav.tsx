@@ -138,7 +138,7 @@ export function SidebarNav() {
       {/* Scrollable content */}
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
 
-      {/* Logo del tenant — dinámico vía useTenant() o Videndum si estás en /videndum */}
+      {/* Logo — StratosCore por defecto, Videndum solo en rutas /videndum */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-2.5">
         {pathname.startsWith('/videndum') ? (
           <VidendumLogo width={120} className="text-white" />

@@ -69,7 +69,7 @@ export function Header() {
               </div>
             </div>
             {avatarOpen && <AvatarLightbox src="/avatar.png" alt="Assistant" onClose={() => setAvatarOpen(false)} />}
-            {/* Desktop: logo del tenant o Videndum */}
+            {/* Desktop: StratosCore por defecto, Videndum solo en /videndum */}
             <div className="hidden md:flex items-center gap-2">
               {pathname.startsWith('/videndum') ? (
                 <VidendumLogo width={110} className="text-white" />

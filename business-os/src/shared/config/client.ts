@@ -1,17 +1,12 @@
 /**
- * Configuración de marca del cliente activo.
+ * Configuración de marca del Business OS.
  *
- * Para cambiar el cliente (white-label):
- *   1. Cambia `ClientLogo` al componente SVG del nuevo cliente.
- *   2. Cambia `CLIENT_NAME` al nombre de la empresa.
- *   3. (Opcional) Actualiza `CLIENT_SUBTITLE` para la barra lateral.
- *
- * Esta es la única fuente de verdad para la identidad del cliente
- * en el área autenticada (Header + SidebarNav).
- * La pantalla de login siempre muestra <StratoscoreLogo />.
+ * Esta es la fuente de verdad para la identidad de StratosCore
+ * en el área autenticada (Header + SidebarNav) cuando no hay
+ * tenant específico configurado.
  */
 
-export { VidendumLogo as ClientLogo } from '@/shared/components/VidendumLogo'
+export { StratoscoreLogo as ClientLogo } from '@/shared/components/StratoscoreLogo'
 
-export const CLIENT_NAME     = 'Videndum'
-export const CLIENT_SUBTITLE = 'Sales Intelligence Platform'
+export const CLIENT_NAME     = 'StratosCore'
+export const CLIENT_SUBTITLE = 'Business OS'
