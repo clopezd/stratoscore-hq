@@ -472,3 +472,64 @@ export async function archiveGoals(): Promise<number> {
   if (delErr) throw new Error(`archiveGoals delete: ${delErr.message}`)
   return goals.length
 }
+
+// ── Surveys ──
+
+export async function getSurveyResponses(surveySlug: string): Promise<{
+  survey: { id: string; title: string; questions: unknown[] }
+  responses: { answers: Record<string, unknown>; contact: string | null; created_at: string }[]
+  total: number
+}> {
+  const { data: survey, error: surveyErr } = await supabase()
+    .from('surveys')
+    .select('id, title, questions')
+    .eq('slug', surveySlug)
+    .single()
+
+  if (surveyErr || !survey) throw new Error(`getSurveyResponses: survey not found`)
+
+  const { data: responses, error: respErr } = await supabase()
+    .from('survey_responses')
+    .select('answers, contact, created_at')
+    .eq('survey_id', survey.id)
+    .order('created_at', { ascending: false })
+
+  if (respErr) throw new Error(`getSurveyResponses: ${respErr.message}`)
+
+  return {
+    survey,
+    responses: responses ?? [],
+    total: responses?.length ?? 0,
+  }
+}
+
+export async function getSurveySummary(surveySlug: string): Promise<Record<string, unknown>> {
+  const { survey, responses, total } = await getSurveyResponses(surveySlug)
+  if (total === 0) return { total: 0, message: 'No hay respuestas aún' }
+
+  const questions = survey.questions as { id: string; question: string; type: string; options?: string[] }[]
+  const summary: Record<string, unknown> = { total_responses: total }
+
+  for (const q of questions) {
+    if (q.type === 'single' || q.type === 'multiple') {
+      const counts: Record<string, number> = {}
+      for (const r of responses) {
+        const answer = r.answers[q.id]
+        if (Array.isArray(answer)) {
+          for (const a of answer) counts[a] = (counts[a] || 0) + 1
+        } else if (typeof answer === 'string') {
+          counts[answer] = (counts[answer] || 0) + 1
+        }
+      }
+      // Sort by count descending
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1])
+      summary[q.id] = { question: q.question, results: sorted, total_answers: sorted.reduce((s, e) => s + e[1], 0) }
+    } else {
+      // Text answers
+      const texts = responses.map(r => r.answers[q.id]).filter(Boolean)
+      summary[q.id] = { question: q.question, answers: texts, total_answers: texts.length }
+    }
+  }
+
+  return summary
+}

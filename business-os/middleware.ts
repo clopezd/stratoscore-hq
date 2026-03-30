@@ -21,6 +21,7 @@ const PUBLIC_PATHS = [
   '/update-password',
   '/videndum-discovery',
   '/videndum/discovery',
+  '/encuesta',
   '/demo-landing'
 ]
 

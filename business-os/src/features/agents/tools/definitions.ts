@@ -301,6 +301,19 @@ const archiveGoalsTool = tool({
   },
 })
 
+// ── Survey tools ──
+
+const getSurveySummaryTool = tool({
+  description: 'Obtiene resumen agregado de respuestas de una encuesta. Muestra conteos por opción y textos libres.',
+  parameters: z.object({
+    survey_slug: z.string().default('validacion-nicho-v1').describe('Slug de la encuesta'),
+  }),
+  execute: async ({ survey_slug }) => {
+    const summary = await db.getSurveySummary(survey_slug)
+    return summary
+  },
+})
+
 // ── Tool sets per agent ──
 
 export function getToolsForAgent(slug: AgentSlug, agentSlugForReport: AgentSlug) {
@@ -336,6 +349,7 @@ export function getToolsForAgent(slug: AgentSlug, agentSlugForReport: AgentSlug)
       get_financial_summary: getFinancialSummaryTool,
       get_subscriptions: getSubscriptionsTool,
       get_latest_snapshots: getLatestSnapshotsTool,
+      get_survey_summary: getSurveySummaryTool,
       create_alert: createAlertTool,
       save_report: saveReportWithSlug,
     },
@@ -351,6 +365,7 @@ export function getToolsForAgent(slug: AgentSlug, agentSlugForReport: AgentSlug)
     cmo: {
       get_latest_snapshots: getLatestSnapshotsTool,
       get_pipeline_summary: getPipelineSummaryTool,
+      get_survey_summary: getSurveySummaryTool,
       create_alert: createAlertTool,
       save_report: saveReportWithSlug,
     },
@@ -358,6 +373,7 @@ export function getToolsForAgent(slug: AgentSlug, agentSlugForReport: AgentSlug)
     cpo: {
       get_latest_snapshots: getLatestSnapshotsTool,
       get_goals: getGoalsTool,
+      get_survey_summary: getSurveySummaryTool,
       save_report: saveReportWithSlug,
     },
 
@@ -365,6 +381,7 @@ export function getToolsForAgent(slug: AgentSlug, agentSlugForReport: AgentSlug)
       get_latest_reports: getLatestReportsTool,
       get_goals: getGoalsTool,
       get_active_alerts: getActiveAlertsTool,
+      get_survey_summary: getSurveySummaryTool,
       save_daily_actions: saveDailyActionsTool,
       save_report: saveReportWithSlug,
     },
@@ -374,6 +391,7 @@ export function getToolsForAgent(slug: AgentSlug, agentSlugForReport: AgentSlug)
       get_latest_reports: getLatestReportsTool,
       get_goals: getGoalsTool,
       get_journal_entries: getJournalEntriesTool,
+      get_survey_summary: getSurveySummaryTool,
       save_weekly_report: saveWeeklyReportTool,
       save_report: saveReportWithSlug,
     },
