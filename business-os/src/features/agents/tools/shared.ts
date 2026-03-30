@@ -473,6 +473,103 @@ export async function archiveGoals(): Promise<number> {
   return goals.length
 }
 
+// ── Design Audits (CDO) ──
+
+export interface DesignAudit {
+  id: string
+  product_id: string | null
+  audit_type: string
+  area: string
+  severity: string
+  finding: string
+  recommendation: string | null
+  score: number | null
+  resolved: boolean
+  resolved_at: string | null
+  metadata: Record<string, unknown> | null
+  created_at: string
+}
+
+export async function getDesignAudits(
+  productId?: string,
+  resolved?: boolean
+): Promise<DesignAudit[]> {
+  let q = supabase()
+    .from('design_audits')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (productId) q = q.eq('product_id', productId)
+  if (resolved !== undefined) q = q.eq('resolved', resolved)
+
+  const { data, error } = await q
+  if (error) throw new Error(`getDesignAudits: ${error.message}`)
+  return data ?? []
+}
+
+export async function saveDesignAudit(audit: {
+  product_id?: string
+  audit_type: string
+  area: string
+  severity: string
+  finding: string
+  recommendation?: string
+  score?: number
+  metadata?: Record<string, unknown>
+}): Promise<void> {
+  const { error } = await supabase()
+    .from('design_audits')
+    .insert({
+      product_id: audit.product_id ?? null,
+      audit_type: audit.audit_type,
+      area: audit.area,
+      severity: audit.severity,
+      finding: audit.finding,
+      recommendation: audit.recommendation ?? null,
+      score: audit.score ?? null,
+      metadata: audit.metadata ?? null,
+    })
+
+  if (error) throw new Error(`saveDesignAudit: ${error.message}`)
+}
+
+export async function getDesignDebtSummary(): Promise<{
+  total: number
+  critical: number
+  warning: number
+  info: number
+  by_area: Record<string, number>
+}> {
+  const { data, error } = await supabase()
+    .from('design_audits')
+    .select('severity, area')
+    .eq('resolved', false)
+
+  if (error) throw new Error(`getDesignDebtSummary: ${error.message}`)
+
+  const items = data ?? []
+  const byArea: Record<string, number> = {}
+  let critical = 0, warning = 0, info = 0
+
+  for (const item of items) {
+    if (item.severity === 'critical') critical++
+    else if (item.severity === 'warning') warning++
+    else info++
+    byArea[item.area] = (byArea[item.area] || 0) + 1
+  }
+
+  return { total: items.length, critical, warning, info, by_area: byArea }
+}
+
+export async function resolveDesignAudit(auditId: string): Promise<void> {
+  const { error } = await supabase()
+    .from('design_audits')
+    .update({ resolved: true, resolved_at: new Date().toISOString() })
+    .eq('id', auditId)
+
+  if (error) throw new Error(`resolveDesignAudit: ${error.message}`)
+}
+
 // ── Surveys ──
 
 export async function getSurveyResponses(surveySlug: string): Promise<{

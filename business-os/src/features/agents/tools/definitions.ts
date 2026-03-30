@@ -301,6 +301,58 @@ const archiveGoalsTool = tool({
   },
 })
 
+// ── CDO-specific ──
+
+const getDesignAuditsTool = tool({
+  description: 'Obtiene auditorías de diseño existentes, filtrable por producto y estado',
+  parameters: z.object({
+    product_id: z.string().optional().describe('Filtrar por producto'),
+    resolved: z.boolean().optional().describe('Filtrar por estado: true=resueltas, false=abiertas'),
+  }),
+  execute: async ({ product_id, resolved }) => {
+    const audits = await db.getDesignAudits(product_id, resolved)
+    return { audits, count: audits.length }
+  },
+})
+
+const saveDesignAuditTool = tool({
+  description: 'Registra un hallazgo de auditoría de diseño (branding, accesibilidad, UI, tokens, responsive)',
+  parameters: z.object({
+    product_id: z.string().optional().describe('Producto afectado (null para hallazgos transversales)'),
+    audit_type: z.enum(['branding', 'accessibility', 'design_system', 'responsive', 'performance', 'benchmark']).describe('Tipo de auditoría'),
+    area: z.string().describe('Área específica (logo, palette, contrast, tokens, components, typography, layout)'),
+    severity: z.enum(['critical', 'warning', 'info']).describe('Severidad: critical=rompe UX/accesibilidad, warning=inconsistencia, info=mejora'),
+    finding: z.string().describe('Descripción del hallazgo'),
+    recommendation: z.string().optional().describe('Recomendación concreta para resolver'),
+    score: z.number().optional().describe('Score de 1-10 para el área evaluada'),
+    metadata: z.record(z.unknown()).optional().describe('Datos adicionales (hex codes, contrast ratios, etc.)'),
+  }),
+  execute: async (params) => {
+    await db.saveDesignAudit(params)
+    return { saved: true }
+  },
+})
+
+const getDesignDebtSummaryTool = tool({
+  description: 'Obtiene resumen de deuda de diseño: total de issues abiertos por severidad y área',
+  parameters: z.object({}),
+  execute: async () => {
+    const summary = await db.getDesignDebtSummary()
+    return summary
+  },
+})
+
+const resolveDesignAuditTool = tool({
+  description: 'Marca una auditoría de diseño como resuelta',
+  parameters: z.object({
+    audit_id: z.string().describe('ID de la auditoría a resolver'),
+  }),
+  execute: async ({ audit_id }) => {
+    await db.resolveDesignAudit(audit_id)
+    return { resolved: true }
+  },
+})
+
 // ── Survey tools ──
 
 const getSurveySummaryTool = tool({
@@ -374,6 +426,18 @@ export function getToolsForAgent(slug: AgentSlug, agentSlugForReport: AgentSlug)
       get_latest_snapshots: getLatestSnapshotsTool,
       get_goals: getGoalsTool,
       get_survey_summary: getSurveySummaryTool,
+      save_report: saveReportWithSlug,
+    },
+
+    cdo: {
+      get_latest_snapshots: getLatestSnapshotsTool,
+      get_latest_reports: getLatestReportsTool,
+      get_design_audits: getDesignAuditsTool,
+      save_design_audit: saveDesignAuditTool,
+      get_design_debt_summary: getDesignDebtSummaryTool,
+      resolve_design_audit: resolveDesignAuditTool,
+      get_survey_summary: getSurveySummaryTool,
+      create_alert: createAlertTool,
       save_report: saveReportWithSlug,
     },
 
