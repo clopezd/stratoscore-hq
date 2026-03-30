@@ -9,7 +9,7 @@ import { IdeaConsole } from '@/features/agents/components/IdeaConsole'
 import { useAgentRunner } from '@/features/agents/hooks/useAgentRunner'
 import type { AgentSlug } from '@/features/agents/types'
 
-const STRATEGIC_AGENTS: AgentSlug[] = ['cfo', 'cto', 'cmo', 'cpo', 'ceo', 'strategist']
+const STRATEGIC_AGENTS: AgentSlug[] = ['cfo', 'cto', 'cmo', 'cpo', 'cdo', 'ceo', 'strategist']
 const OPERATIONAL_AGENTS: AgentSlug[] = ['collector', 'analyst', 'journalist', 'cleanup']
 
 export default function AgentsDashboardPage() {
@@ -31,7 +31,7 @@ export default function AgentsDashboardPage() {
               Centro de Agentes
             </h1>
             <p className="text-sm text-gray-500 dark:text-white/40 mt-1">
-              10 agentes autónomos operando tu portafolio
+              11 agentes autónomos operando tu portafolio
             </p>
           </div>
 
@@ -106,7 +106,7 @@ export default function AgentsDashboardPage() {
       {/* Schedule info */}
       <div className="bg-gray-50 dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.05] rounded-xl p-4 text-center">
         <p className="text-xs text-gray-500 dark:text-white/30">
-          ⏰ Pipeline diario automático a las <span className="text-gray-700 dark:text-white/50 font-medium">10:00am CT</span> · Domingos: Limpieza 2am + Estratega 11am
+          ⏰ Pipeline diario automático a las <span className="text-gray-700 dark:text-white/50 font-medium">10:00am CT</span> · Lunes: CDO 10:27am · Domingos: Limpieza 2am + Estratega 11am
         </p>
       </div>
 

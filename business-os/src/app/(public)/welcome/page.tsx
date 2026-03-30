@@ -200,6 +200,102 @@ export default function PublicLandingPage() {
         </div>
       </section>
 
+      {/* C-Suite de IA — Los 11 Agentes */}
+      <section className="py-32 bg-[#060E1A] relative overflow-hidden">
+        {/* Glow decorativo */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/5 blur-[200px] rounded-full -z-0"></div>
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-20">
+            <span className="text-cyan-500 font-black tracking-widest text-xs uppercase mb-4 block">Tu Equipo Ejecutivo de IA</span>
+            <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 italic uppercase">
+              11 AGENTES.<br/>
+              <span className="text-cyan-500">CERO NÓMINA.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-gray-400 text-lg">
+              Un C-Suite completo de inteligencia artificial que analiza, decide y ejecuta. Cada agente tiene su especialidad, sus herramientas y su personalidad.
+            </p>
+          </div>
+
+          {/* C-Suite Grid */}
+          <div className="mb-12">
+            <h3 className="text-xs font-black text-cyan-500/60 uppercase tracking-[0.3em] mb-6 text-center">Equipo Estratégico</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+              {[
+                { emoji: '💰', name: 'CFO', role: 'Finanzas', desc: 'Márgenes, burn rate, rentabilidad' },
+                { emoji: '⚙️', name: 'CTO', role: 'Tecnología', desc: 'Uptime, errores, infraestructura' },
+                { emoji: '📈', name: 'CMO', role: 'Growth', desc: 'Funnels, conversión, adquisición' },
+                { emoji: '🎯', name: 'CPO', role: 'Producto', desc: 'Engagement, features, prioridades' },
+                { emoji: '🎨', name: 'CDO', role: 'Diseño', desc: 'Branding, UX, accesibilidad' },
+                { emoji: '👔', name: 'CEO', role: 'Estrategia', desc: 'Sintetiza y decide acciones' },
+                { emoji: '🗺️', name: 'Estratega', role: 'Visión', desc: 'Proyecciones 30/60/90 días' },
+              ].map((agent, i) => (
+                <div
+                  key={i}
+                  className={`group relative p-5 rounded-2xl border transition-all duration-300 text-center ${
+                    agent.name === 'CDO'
+                      ? 'bg-cyan-500/10 border-cyan-500/30 hover:border-cyan-500/60 hover:shadow-[0_0_30px_rgba(0,242,254,0.15)]'
+                      : 'bg-white/[0.03] border-white/[0.06] hover:border-cyan-500/30 hover:bg-white/[0.06]'
+                  }`}
+                >
+                  <div className="text-3xl mb-3">{agent.emoji}</div>
+                  <div className="font-black text-sm text-white uppercase tracking-wider">{agent.name}</div>
+                  <div className="text-[10px] text-cyan-500 font-bold uppercase tracking-widest mt-1">{agent.role}</div>
+                  {/* Tooltip on hover */}
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-100 transition-opacity bg-black/90 backdrop-blur-sm border border-white/10 text-xs text-gray-300 px-3 py-2 rounded-lg whitespace-nowrap z-20 pointer-events-none">
+                    {agent.desc}
+                  </div>
+                  {agent.name === 'CDO' && (
+                    <div className="absolute -top-2 -right-2 bg-cyan-500 text-black text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      Nuevo
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Operational Grid */}
+          <div className="mb-16">
+            <h3 className="text-xs font-black text-blue-400/60 uppercase tracking-[0.3em] mb-6 text-center">Equipo Operacional</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+              {[
+                { emoji: '📡', name: 'Recolector', desc: 'Sincroniza métricas diarias' },
+                { emoji: '🔍', name: 'Analista', desc: 'Detecta anomalías y alertas' },
+                { emoji: '📓', name: 'Periodista', desc: 'Escribe el diario del negocio' },
+                { emoji: '🧹', name: 'Limpieza', desc: 'Mantiene la base de datos' },
+              ].map((agent, i) => (
+                <div
+                  key={i}
+                  className="group relative p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-blue-400/30 hover:bg-white/[0.06] transition-all duration-300 text-center"
+                >
+                  <div className="text-3xl mb-3">{agent.emoji}</div>
+                  <div className="font-black text-sm text-white uppercase tracking-wider">{agent.name}</div>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-100 transition-opacity bg-black/90 backdrop-blur-sm border border-white/10 text-xs text-gray-300 px-3 py-2 rounded-lg whitespace-nowrap z-20 pointer-events-none">
+                    {agent.desc}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pipeline visual */}
+          <div className="flex items-center justify-center gap-1 flex-wrap text-xs text-gray-600 font-mono">
+            <span className="text-gray-500">10:00</span>
+            {['📡', '🔍', '💰', '⚙️', '📈', '🎯', '🎨', '👔', '📓'].map((e, i) => (
+              <span key={i} className="flex items-center gap-1">
+                <span className="text-cyan-500/40">→</span>
+                <span className="text-lg">{e}</span>
+              </span>
+            ))}
+            <span className="text-gray-500 ml-1">10:35</span>
+          </div>
+          <p className="text-center text-gray-600 text-[10px] font-black uppercase tracking-widest mt-3">
+            Pipeline diario automático — 35 minutos de inteligencia ejecutiva
+          </p>
+        </div>
+      </section>
+
       {/* CTA Final */}
       <section className="py-40 relative overflow-hidden text-center bg-gradient-to-b from-[#0A1929] to-cyan-500/10">
         <div className="text-white/30 mb-10">
