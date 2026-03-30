@@ -4,7 +4,7 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ══════════════════════════════════════════════════════════════════════════
-   DESIGN TOKENS — fuente de verdad de toda la plataforma Videndum
+   DESIGN TOKENS — fuente de verdad de StratosCore Business OS
    Sigue el esquema: background · foreground · card · card-foreground · border
    ══════════════════════════════════════════════════════════════════════════ */
 
@@ -143,7 +143,9 @@
   --app-scrollbar:      rgba(255,255,255,0.10);
 }
 
-/* ══ Semantic utility classes (complementan las clases dark: de Tailwind) ══ */
+/* ══ StratosCore semantic utility classes ═════════════════════════════════ */
+/* Naming: .text-vid-*, .bg-vid-*, .border-vid are the platform utilities.
+   "vid" is a short prefix — NOT a reference to any client brand. */
 
 /* Texto */
 .text-vid-fg      { color: var(--foreground); }
