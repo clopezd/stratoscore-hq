@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
+import { StratoscoreLogo } from './StratoscoreLogo'
 
 export function PublicHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -25,16 +25,9 @@ export function PublicHeader() {
     <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-[#0A1929]/95 backdrop-blur-xl border-b border-cyan-500/30 py-2' : 'bg-transparent py-6'}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
 
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 cursor-pointer text-white">
-          <Image
-            src="/images/stratoscore-logo.png"
-            alt="StratosCore"
-            width={40}
-            height={40}
-            className="w-9 h-9 md:w-10 md:h-10 rounded-lg"
-          />
-          <span className="text-base md:text-lg font-bold tracking-wider uppercase">StratosCore</span>
+        {/* Logo — unified StratoscoreLogo component */}
+        <Link href="/" className="flex items-center cursor-pointer text-white">
+          <StratoscoreLogo variant="wordmark" width={180} />
         </Link>
 
         {/* Desktop Navigation */}
@@ -50,7 +43,6 @@ export function PublicHeader() {
             </a>
           ))}
 
-          {/* Botón Iniciar Sesión (discreto) */}
           <Link
             href="/login"
             className="text-xs font-bold text-gray-400 hover:text-white transition-all uppercase tracking-widest"
@@ -60,14 +52,19 @@ export function PublicHeader() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button className="md:hidden text-cyan-500" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+        <button
+          className="md:hidden text-cyan-500"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={isMenuOpen}
+        >
           {isMenuOpen ? <X /> : <Menu />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#0A1929] pt-32 px-10 md:hidden animate-fade-in">
+        <div className="fixed inset-0 z-40 bg-[#0A1929] pt-32 px-10 md:hidden animate-fade-in" role="dialog" aria-modal="true">
           <div className="flex flex-col gap-8">
             {navLinks.map((link) => (
               <a

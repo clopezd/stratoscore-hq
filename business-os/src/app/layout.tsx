@@ -4,11 +4,15 @@ import './globals.css'
 import { PWARegister } from '@/components/PWARegister'
 import { ThemeProvider } from '@/shared/providers/ThemeProvider'
 
-const spaceGrotesk = localFont({
-  src: '../fonts/SpaceGrotesk-Regular.woff2',
-  variable: '--font-grotesk',
+const satoshi = localFont({
+  src: [
+    { path: '../../public/fonts/Satoshi-Regular.woff2', weight: '400', style: 'normal' },
+    { path: '../../public/fonts/Satoshi-Medium.woff2', weight: '500', style: 'normal' },
+    { path: '../../public/fonts/Satoshi-Bold.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-satoshi',
   display: 'swap',
-  fallback: ['system-ui', 'sans-serif'],
+  fallback: ['system-ui', '-apple-system', 'sans-serif'],
 })
 
 export const metadata: Metadata = {
@@ -41,8 +45,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" className={spaceGrotesk.variable} suppressHydrationWarning>
-      <body style={{ fontFamily: 'var(--font-grotesk), system-ui, sans-serif' }}>
+    <html lang="es" className={satoshi.variable} suppressHydrationWarning>
+      <body style={{ fontFamily: 'var(--font-satoshi), system-ui, sans-serif' }}>
         <ThemeProvider>
           {children}
           <PWARegister />
