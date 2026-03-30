@@ -10,7 +10,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 //
 // ─────────────────────────────────────────────────────────────────────────
 
-const MAIN_HOSTNAMES = new Set(['stratoscore.app', 'www.stratoscore.app'])
+const MAIN_HOSTNAMES = new Set(['stratoscore.app', 'www.stratoscore.app', 'app.stratoscore.app'])
 
 const PUBLIC_PATHS = [
   '/',
