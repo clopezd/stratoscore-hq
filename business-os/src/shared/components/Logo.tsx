@@ -1,19 +1,12 @@
 /**
  * Logo — componente de imagen de marca unificado.
  *
- * Props:
- *   size     — ancho/alto en px (cuadrado, default 40)
- *   src      — URL externa del logo del tenant. Si no se pasa,
- *              usa el isotipo SVG de StratosCore.
- *   className — clases Tailwind adicionales
- *   alt      — texto alternativo
- *
- * Comportamiento:
- *   • src no definido  → StratoscoreLogo isotipo
- *   • src string URL   → <img> estándar (dominios externos no preconfigurables)
+ * Usa el cubo isométrico oficial del brandboard de StratosCore.
+ * Cuando hay un logo de tenant (multi-tenant), lo muestra en su lugar.
  */
 
-import { StratoscoreLogo } from './StratoscoreLogo'
+import Image from 'next/image'
+import logoSrc from '@/shared/assets/images/Logo.png'
 
 interface LogoProps {
   size?: number
@@ -37,5 +30,14 @@ export function Logo({ size = 40, src, className = '', alt = 'StratosCore' }: Lo
     )
   }
 
-  return <StratoscoreLogo variant="icon" width={size} className={className} />
+  return (
+    <Image
+      src={logoSrc}
+      alt={alt}
+      width={size}
+      height={size}
+      className={className}
+      priority
+    />
+  )
 }

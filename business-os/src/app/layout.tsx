@@ -20,9 +20,9 @@ export const metadata: Metadata = {
   description: 'Business OS con 11 agentes de IA autónomos. Automatización agéntica 360 para PYMES y Clínicas.',
   manifest: '/manifest.json',
   icons: {
-    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    icon: [{ url: '/favicon.png', type: 'image/png' }],
     apple: '/apple-touch-icon.png',
-    shortcut: '/favicon.svg',
+    shortcut: '/favicon.png',
   },
   appleWebApp: {
     capable: true,
