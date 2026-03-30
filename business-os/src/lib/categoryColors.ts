@@ -22,6 +22,9 @@ export const INCOME_CATEGORIES = [
   'Otros',
 ] as const
 
+// Categoría especial para transferencias
+export const TRANSFER_CATEGORY = 'Transferencia' as const
+
 export type ExpenseCategory = typeof EXPENSE_CATEGORIES[number]
 export type IncomeCategory = typeof INCOME_CATEGORIES[number]
 
@@ -45,6 +48,9 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Negocios': 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30',
   'Inversiones': 'bg-lime-500/20 text-lime-700 dark:text-lime-300 border-lime-500/30',
   'Rentas': 'bg-sky-500/20 text-sky-700 dark:text-sky-300 border-sky-500/30',
+
+  // Transferencias
+  'Transferencia': 'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-500/30',
 }
 
 export function getCategoryColor(category: string): string {
