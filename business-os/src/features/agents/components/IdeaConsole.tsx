@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { AGENTS } from '../config/agents'
 import type { AgentSlug } from '../types'
 
-const ALL_SLUGS: AgentSlug[] = ['cpo', 'cmo', 'cfo', 'cto', 'ceo', 'strategist', 'collector', 'analyst', 'journalist', 'cleanup']
+const ALL_SLUGS: AgentSlug[] = ['cpo', 'cmo', 'cfo', 'cto', 'cdo', 'ceo', 'strategist', 'collector', 'analyst', 'journalist', 'cleanup']
 
 interface IdeaConsoleProps {
   onResult: (slug: AgentSlug, report: string) => void
