@@ -46,8 +46,8 @@ self.addEventListener('push', (event) => {
   const title = payload.title ?? 'Mission Control'
   const options = {
     body: payload.body ?? '',
-    icon: payload.icon ?? '/icon.svg',
-    badge: '/icon.svg',
+    icon: payload.icon ?? '/icon-192.png',
+    badge: '/favicon.png',
     tag: payload.tag ?? 'mc-notification',
     data: { url: payload.url ?? '/', notificationId: payload.notificationId },
     requireInteraction: false,

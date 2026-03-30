@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     body: msgBody ?? '',
     url: url ?? '/',
     tag: tag ?? 'mc-notification',
-    icon: '/icon.svg',
+    icon: '/icon-192.png',
   })
 
   let sent = 0
