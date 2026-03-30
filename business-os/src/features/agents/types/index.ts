@@ -7,6 +7,7 @@ export type AgentSlug =
   | 'cto'
   | 'cmo'
   | 'cpo'
+  | 'cdo'
   | 'ceo'
   | 'strategist'
   | 'journalist'

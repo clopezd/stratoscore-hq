@@ -61,6 +61,16 @@ export const AGENTS: Record<AgentSlug, AgentConfig> = {
     reads: ['metrics_snapshots', 'goals'],
     writes: ['agent_reports'],
   },
+  cdo: {
+    slug: 'cdo',
+    name: 'CDO',
+    emoji: '🎨',
+    team: 'strategic',
+    schedule: '27 10 * * 1', // Lunes 10:27am (semanal, después del CPO)
+    description: 'Audita branding, diseño, accesibilidad y experiencia visual del portafolio',
+    reads: ['metrics_snapshots', 'agent_reports', 'design_audits'],
+    writes: ['agent_reports', 'design_audits', 'alerts'],
+  },
   ceo: {
     slug: 'ceo',
     name: 'CEO',
@@ -115,5 +125,5 @@ export const DAILY_EXECUTION_ORDER: AgentSlug[] = [
   'journalist',
 ]
 
-/** Agentes que corren solo los domingos */
-export const WEEKLY_AGENTS: AgentSlug[] = ['cleanup', 'strategist']
+/** Agentes que corren semanalmente */
+export const WEEKLY_AGENTS: AgentSlug[] = ['cleanup', 'strategist', 'cdo']
