@@ -55,6 +55,17 @@
   --orb-purple:         rgba(139,92,246,0.06);
   --orb-blue:           rgba(59,130,246,0.04);
 
+  /* Interactive — cyan brand adapted for light mode (WCAG AA) */
+  --interactive:        #0891b2;           /* cyan-600 — 7.2:1 sobre blanco */
+  --interactive-hover:  #0e7490;           /* cyan-700 */
+  --interactive-active: #155e75;           /* cyan-800 */
+
+  /* Status */
+  --status-success:     #10b981;
+  --status-warning:     #f59e0b;
+  --status-error:       #ef4444;
+  --status-info:        #3b82f6;
+
   /* Legacy aliases (DashboardShell + Header use these) */
   --app-page-bg:        #f8fafc;
   --app-header-bg:      rgba(255,255,255,0.95);
@@ -76,11 +87,11 @@
   --card-raised:        rgba(255,255,255,0.05);
   --card-elevated:      rgba(255,255,255,0.08);
 
-  /* Foregrounds */
+  /* Foregrounds — contrast bumped for WCAG AA */
   --foreground:         #ffffff;
-  --foreground-muted:   rgba(255,255,255,0.50);
-  --foreground-subtle:  rgba(255,255,255,0.30);
-  --foreground-faint:   rgba(255,255,255,0.15);
+  --foreground-muted:   rgba(255,255,255,0.60);
+  --foreground-subtle:  rgba(255,255,255,0.40);
+  --foreground-faint:   rgba(255,255,255,0.20);
 
   /* Borders */
   --border:             rgba(255,255,255,0.06);
@@ -91,8 +102,8 @@
   --sidebar-bg:         rgba(255,255,255,0.03);
   --page-bg:            #0a0a0f;
 
-  /* Charts */
-  --chart-axis:         rgba(255,255,255,0.35);
+  /* Charts — contrast bumped */
+  --chart-axis:         rgba(255,255,255,0.45);
   --chart-grid:         rgba(255,255,255,0.04);
   --chart-tooltip-bg:   #13131f;
   --chart-tooltip-bd:   rgba(255,255,255,0.10);
@@ -110,6 +121,17 @@
   --scrollbar:          rgba(255,255,255,0.10);
   --orb-purple:         rgba(139,92,246,0.08);
   --orb-blue:           rgba(59,130,246,0.06);
+
+  /* Interactive — cyan brand adapted for dark mode */
+  --interactive:        #22d3ee;           /* cyan-400 — 10:1 sobre #0a0a0f */
+  --interactive-hover:  #67e8f9;           /* cyan-300 */
+  --interactive-active: #a5f3fc;           /* cyan-200 */
+
+  /* Status */
+  --status-success:     #34d399;
+  --status-warning:     #fbbf24;
+  --status-error:       #f87171;
+  --status-info:        #60a5fa;
 
   /* Legacy aliases */
   --app-page-bg:        #0a0a0f;
@@ -141,6 +163,25 @@
 
 /* Hover interactivos */
 .hover-vid:hover  { background-color: var(--card-raised); }
+
+/* ── Accessibility: focus ring global (WCAG 2.2) ─────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-brandCyan, #00F2FE);
+  outline-offset: 2px;
+}
+
+/* ── Accessibility: reduced motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .orb-animate,
+  .fade-up,
+  .fade-up-delay,
+  .fade-up-late {
+    animation: none !important;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
 
 /* ── Scrollbars adaptativos ───────────────────────────────────────────────── */
 

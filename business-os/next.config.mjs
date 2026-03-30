@@ -24,9 +24,8 @@ const nextConfig = {
   // Reducir output tracing en WSL2
   // output: 'standalone', // Bug processChild.js en WSL2 - deshabilitado
 
-  // Skip TypeScript check en build (stubs de Finance OS)
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 
   // Allow images from Supabase Storage (generated images, avatars, etc.)

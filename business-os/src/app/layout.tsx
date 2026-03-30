@@ -12,18 +12,18 @@ const spaceGrotesk = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'Videndum — Sales Intelligence Platform',
-  description: 'Sales Operations · Forecast vs Revenue · Market Intelligence · Powered by Stratoscore',
+  title: 'StratosCore — Mission Control',
+  description: 'Business OS con 11 agentes de IA autónomos. Automatización agéntica 360 para PYMES y Clínicas.',
   manifest: '/manifest.json',
   icons: {
-    icon: [{ url: '/favicon.png', type: 'image/png' }],
-    apple: '/favicon.png',
-    shortcut: '/favicon.png',
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    apple: '/apple-touch-icon.png',
+    shortcut: '/favicon.svg',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Videndum',
+    title: 'StratosCore',
   },
 }
 
@@ -31,7 +31,7 @@ export const viewport: Viewport = {
   themeColor: '#001117',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
   viewportFit: 'cover',
 }
 
