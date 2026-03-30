@@ -4,26 +4,30 @@ import './globals.css'
 import { PWARegister } from '@/components/PWARegister'
 import { ThemeProvider } from '@/shared/providers/ThemeProvider'
 
-const spaceGrotesk = localFont({
-  src: '../fonts/SpaceGrotesk-Regular.woff2',
-  variable: '--font-grotesk',
+const satoshi = localFont({
+  src: [
+    { path: '../../public/fonts/Satoshi-Regular.woff2', weight: '400', style: 'normal' },
+    { path: '../../public/fonts/Satoshi-Medium.woff2', weight: '500', style: 'normal' },
+    { path: '../../public/fonts/Satoshi-Bold.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-satoshi',
   display: 'swap',
-  fallback: ['system-ui', 'sans-serif'],
+  fallback: ['system-ui', '-apple-system', 'sans-serif'],
 })
 
 export const metadata: Metadata = {
-  title: 'Videndum — Sales Intelligence Platform',
-  description: 'Sales Operations · Forecast vs Revenue · Market Intelligence · Powered by Stratoscore',
+  title: 'StratosCore — Mission Control',
+  description: 'Business OS con 11 agentes de IA autónomos. Automatización agéntica 360 para PYMES y Clínicas.',
   manifest: '/manifest.json',
   icons: {
-    icon: [{ url: '/favicon.png', type: 'image/png' }],
-    apple: '/favicon.png',
-    shortcut: '/favicon.png',
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    apple: '/apple-touch-icon.png',
+    shortcut: '/favicon.svg',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Videndum',
+    title: 'StratosCore',
   },
 }
 
@@ -31,7 +35,7 @@ export const viewport: Viewport = {
   themeColor: '#001117',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
   viewportFit: 'cover',
 }
 
@@ -41,8 +45,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" className={spaceGrotesk.variable} suppressHydrationWarning>
-      <body style={{ fontFamily: 'var(--font-grotesk), system-ui, sans-serif' }}>
+    <html lang="es" className={satoshi.variable} suppressHydrationWarning>
+      <body style={{ fontFamily: 'var(--font-satoshi), system-ui, sans-serif' }}>
         <ThemeProvider>
           {children}
           <PWARegister />

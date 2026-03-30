@@ -11,46 +11,7 @@ import {
   BrainCircuit,
   Target
 } from 'lucide-react';
-
-// --- LOGO REAL DE STRATOSCORE (chevrons cyan + wordmark) ---
-const StratoscoreBrandLogo = ({ className = "w-48 h-auto" }) => (
-  <svg viewBox="0 0 220 56" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Chevrons cyan (marca de acento) */}
-    <g>
-      {/* Chevron exterior */}
-      <polyline
-        points="4,10 18,28 4,46"
-        stroke="#00F2FE"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity="0.55"
-      />
-      {/* Chevron interior */}
-      <polyline
-        points="13,18 22,28 13,38"
-        stroke="#00F2FE"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-
-    {/* Wordmark */}
-    <text
-      x="34"
-      y="29"
-      dominantBaseline="middle"
-      fontFamily="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif"
-      fontWeight="700"
-      fontSize="22"
-      letterSpacing="1.5"
-      fill="currentColor"
-    >
-      STRATOSCORE
-    </text>
-  </svg>
-);
+import { StratoscoreLogo } from '@/shared/components/StratoscoreLogo';
 
 export default function PublicLandingPage() {
   return (
@@ -299,7 +260,7 @@ export default function PublicLandingPage() {
       {/* CTA Final */}
       <section className="py-40 relative overflow-hidden text-center bg-gradient-to-b from-[#0A1929] to-cyan-500/10">
         <div className="text-white/30 mb-10">
-          <StratoscoreBrandLogo className="w-48 h-auto mx-auto opacity-30 animate-pulse" />
+          <div className="opacity-30 animate-pulse mx-auto w-fit"><StratoscoreLogo variant="stacked" /></div>
         </div>
         <h2 className="text-6xl md:text-9xl font-black tracking-tighter mb-10 italic leading-none">STRATOSCORE</h2>
         <p className="text-xl md:text-2xl text-gray-300 mb-16 max-w-2xl mx-auto font-light italic">
@@ -315,7 +276,7 @@ export default function PublicLandingPage() {
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
           <div className="col-span-2">
             <div className="flex items-center mb-6 text-white">
-              <StratoscoreBrandLogo className="w-40 h-auto" />
+              <StratoscoreLogo variant="wordmark" width={180} />
             </div>
             <p className="text-gray-500 text-sm leading-relaxed max-w-sm">
               Agencia líder en automatización agéntica 360 para PYMES y Clínicas Médicas. Transformando la gestión en resultados reales y escalables.

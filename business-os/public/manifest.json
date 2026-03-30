@@ -1,22 +1,23 @@
 {
-  "name": "Mission Control",
-  "short_name": "Mission Control",
-  "description": "Real-time dashboard for AI agents",
+  "name": "StratosCore — Mission Control",
+  "short_name": "StratosCore",
+  "description": "Business OS con 11 agentes de IA autonomos. Automatizacion agentica 360.",
+  "id": "/",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0A0A0F",
-  "theme_color": "#0A0A0F",
+  "theme_color": "#001117",
   "orientation": "any",
-  "categories": ["productivity", "utilities"],
+  "categories": ["productivity", "business", "utilities"],
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/icon.svg",
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"
