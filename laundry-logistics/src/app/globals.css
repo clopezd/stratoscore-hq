@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+:root {
+  --brand-cyan: #00F2FE;
+  --brand-bg: #001117;
+  --brand-text: #E0EDE0;
+  --brand-muted: #8B949E;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+}
