@@ -53,6 +53,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/finanzas',  label: 'Finanzas',  icon: DollarSign, ownerOnly: true, exact: false },
   { href: '/activity',  label: 'Activity',  icon: Activity,  ownerOnly: true },
   { href: '/memories',  label: 'Memorias',  icon: Brain,     ownerOnly: true },
+  { href: '/posts',     label: 'Posts',     icon: PenLine,   ownerOnly: true },
   { href: '/videndum',  label: 'Videndum',  icon: BarChart2, ownerOnly: true, exact: false },
 ]
 
