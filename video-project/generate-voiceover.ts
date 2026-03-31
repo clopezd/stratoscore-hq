@@ -6,12 +6,67 @@ config();
 
 const API_KEY = process.env.ELEVENLABS_API_KEY;
 if (!API_KEY) {
-  console.error("ELEVENLABS_API_KEY no encontrada en .env");
+  console.error("❌ ELEVENLABS_API_KEY no encontrada en .env");
   process.exit(1);
 }
 
-// Voz en español — "Carlos" (español latino) o fallback a una multilingual
-const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || "pNInz6obpgDQGcFmaJgB";
+// ─── Paso 1: Buscar voz colombiana automáticamente ───────────────────────────
+
+interface Voice {
+  voice_id: string;
+  name: string;
+  labels?: Record<string, string>;
+}
+
+async function findColombianVoice(): Promise<string> {
+  // Si el usuario ya definió un voice ID, usarlo
+  if (process.env.ELEVENLABS_VOICE_ID) {
+    console.log(`🎤 Usando voz configurada: ${process.env.ELEVENLABS_VOICE_ID}`);
+    return process.env.ELEVENLABS_VOICE_ID;
+  }
+
+  console.log("🔍 Buscando voz colombiana en ElevenLabs...");
+
+  const response = await fetch("https://api.elevenlabs.io/v1/voices", {
+    headers: { "xi-api-key": API_KEY! },
+  });
+
+  if (!response.ok) {
+    console.log("⚠️  No se pudo listar voces, usando voz por defecto (Carlos)");
+    return "IKne3meq5aSn9XLyUdCD"; // "Carlos" - voz masculina multilingual
+  }
+
+  const data = (await response.json()) as { voices: Voice[] };
+  const voices = data.voices || [];
+
+  // Buscar voz colombiana
+  const colombian = voices.find((v) => {
+    const labels = JSON.stringify(v.labels || {}).toLowerCase();
+    return labels.includes("colomb");
+  });
+
+  if (colombian) {
+    console.log(`🇨🇴 Voz colombiana encontrada: "${colombian.name}" (${colombian.voice_id})`);
+    return colombian.voice_id;
+  }
+
+  // Buscar cualquier voz en español
+  const spanish = voices.find((v) => {
+    const labels = JSON.stringify(v.labels || {}).toLowerCase();
+    return labels.includes("spanish") || labels.includes("español");
+  });
+
+  if (spanish) {
+    console.log(`🇪🇸 Voz en español encontrada: "${spanish.name}" (${spanish.voice_id})`);
+    return spanish.voice_id;
+  }
+
+  // Fallback: voz multilingual que suena bien en español
+  console.log("⚠️  No se encontró voz colombiana, usando voz multilingual por defecto");
+  return "IKne3meq5aSn9XLyUdCD";
+}
+
+// ─── Paso 2: Escenas con narración ───────────────────────────────────────────
 
 const scenes = [
   {
@@ -36,33 +91,40 @@ const scenes = [
   },
 ];
 
+// ─── Paso 3: Generar audios ──────────────────────────────────────────────────
+
 const OUTPUT_DIR = join(process.cwd(), "public", "voiceover");
 
 async function generateVoiceover() {
   mkdirSync(OUTPUT_DIR, { recursive: true });
 
+  const voiceId = await findColombianVoice();
+
+  console.log(`\n🎬 Generando voiceover con voz: ${voiceId}\n`);
+
   for (const scene of scenes) {
     const outputPath = join(OUTPUT_DIR, `${scene.id}.mp3`);
 
     if (existsSync(outputPath)) {
-      console.log(`⏭️  ${scene.id} ya existe, saltando...`);
+      console.log(`⏭️  ${scene.id} ya existe, saltando... (borra el archivo para regenerar)`);
       continue;
     }
 
     console.log(`🎙️  Generando: ${scene.id}...`);
 
     const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
       {
         method: "POST",
         headers: {
-          "xi-api-key": API_KEY,
+          "xi-api-key": API_KEY!,
           "Content-Type": "application/json",
           Accept: "audio/mpeg",
         },
         body: JSON.stringify({
           text: scene.text,
           model_id: "eleven_multilingual_v2",
+          language_code: "es",
           voice_settings: {
             stability: 0.6,
             similarity_boost: 0.75,
@@ -80,11 +142,14 @@ async function generateVoiceover() {
 
     const audioBuffer = Buffer.from(await response.arrayBuffer());
     writeFileSync(outputPath, audioBuffer);
-    console.log(`✅ ${scene.id} → ${outputPath} (${(audioBuffer.length / 1024).toFixed(1)} KB)`);
+    console.log(
+      `✅ ${scene.id} → ${outputPath} (${(audioBuffer.length / 1024).toFixed(1)} KB)`
+    );
   }
 
-  console.log("\n🎬 Voiceover completo. Ahora ejecuta:");
-  console.log("   npx remotion studio");
+  console.log("\n🎬 ¡Voiceover completo!");
+  console.log("   Ahora renderiza el video:");
+  console.log("   npm run build");
 }
 
 generateVoiceover();
