@@ -111,6 +111,16 @@ export const AGENTS: Record<AgentSlug, AgentConfig> = {
     reads: ['collector_errors', 'agent_reports', 'alerts', 'daily_actions', 'goals'],
     writes: ['collector_errors', 'agent_reports', 'alerts', 'daily_actions', 'goals'],
   },
+  ghostwriter: {
+    slug: 'ghostwriter',
+    name: 'Ghost Writer',
+    emoji: '✍️',
+    team: 'strategic',
+    schedule: '0 12 * * 1,3,5', // Lunes, Miércoles, Viernes a las 12pm
+    description: 'Genera borradores de posts para LinkedIn con tu voz y tono personal',
+    reads: ['memories', 'agent_reports', 'journal_entries', 'metrics_snapshots'],
+    writes: ['agent_reports'],
+  },
 }
 
 /** Orden de ejecución diaria */

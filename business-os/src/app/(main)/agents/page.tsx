@@ -9,7 +9,7 @@ import { IdeaConsole } from '@/features/agents/components/IdeaConsole'
 import { useAgentRunner } from '@/features/agents/hooks/useAgentRunner'
 import type { AgentSlug } from '@/features/agents/types'
 
-const STRATEGIC_AGENTS: AgentSlug[] = ['cfo', 'cto', 'cmo', 'cpo', 'cdo', 'ceo', 'strategist']
+const STRATEGIC_AGENTS: AgentSlug[] = ['cfo', 'cto', 'cmo', 'cpo', 'cdo', 'ceo', 'strategist', 'ghostwriter']
 const OPERATIONAL_AGENTS: AgentSlug[] = ['collector', 'analyst', 'journalist', 'cleanup']
 
 export default function AgentsDashboardPage() {
