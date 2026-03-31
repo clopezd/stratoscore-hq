@@ -7,7 +7,7 @@ import {
   Shirt,
   Wind,
   Sparkles,
-  IroningSteam,
+  Layers,
   Star,
   MapPin,
   CalendarDays,
@@ -41,7 +41,7 @@ const SERVICE_TYPES = [
     id: 'iron_only',
     label: 'Solo planchado',
     desc: 'Planchado profesional sin lavado',
-    icon: Star,
+    icon: Layers,
     price: 'Desde $10.000',
   },
   {
