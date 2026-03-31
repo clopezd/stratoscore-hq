@@ -53,16 +53,9 @@ export default function PostsPage() {
     setGenerating(true)
     setError(null)
     try {
-      const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      const token = session?.access_token
-
       const res = await fetch('/api/agents/ghostwriter', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        headers: { 'Content-Type': 'application/json' },
       })
       const data = await res.json()
       if (res.ok && data.success) {
