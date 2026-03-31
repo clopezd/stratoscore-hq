@@ -1,88 +1,12 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-
-interface GogCalendarEvent {
-  id: string
-  summary: string
-  description?: string
-  start: { dateTime?: string; date?: string }
-  end: { dateTime?: string; date?: string }
-  location?: string
-}
-
-interface GogResponse {
-  events?: GogCalendarEvent[]
-}
-
-async function sshExec(command: string): Promise<string> {
-  const host = process.env.VPS_SSH_HOST
-  const username = process.env.VPS_SSH_USER
-  const password = process.env.VPS_SSH_PASSWORD
-
-  if (!host || !username || !password) {
-    return Promise.reject(new Error('VPS SSH credentials not configured'))
-  }
-
-  // Dynamic import keeps ssh2 (and its 'fs' dependency) out of the static bundle.
-  // Vercel/Turbopack won't try to resolve 'fs' at build time this way.
-  const { Client } = await import('ssh2')
-
-  return new Promise((resolve, reject) => {
-    const conn = new Client()
-    let output = ''
-    const timeout = setTimeout(() => {
-      conn.end()
-      reject(new Error('SSH timeout'))
-    }, 15000)
-
-    conn.on('ready', () => {
-      conn.exec(command, (err, stream) => {
-        if (err) {
-          clearTimeout(timeout)
-          conn.end()
-          reject(err)
-          return
-        }
-        stream.on('data', (data: Buffer) => {
-          output += data.toString()
-        })
-        stream.stderr.on('data', () => {
-          // ignore stderr
-        })
-        stream.on('close', () => {
-          clearTimeout(timeout)
-          conn.end()
-          resolve(output)
-        })
-      })
-    })
-    conn.on('error', (err) => {
-      clearTimeout(timeout)
-      reject(err)
-    })
-    conn.connect({ host, port: 22, username, password })
-  })
-}
-
-function parseGogEvents(gogEvents: GogCalendarEvent[]) {
-  return gogEvents.map((e) => ({
-    id: e.id,
-    title: e.summary,
-    description: e.description,
-    start: e.start.dateTime || e.start.date || '',
-    end: e.end.dateTime || e.end.date || '',
-    allDay: !e.start.dateTime,
-    account: 'business' as const,
-    color: '#3b82f6',
-    location: e.location,
-  }))
-}
 
 // Validate date string format (YYYY-MM-DD)
 function isValidDate(str: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(str)
 }
 
+// GET — fetch calendar events for date range
 export async function GET(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -91,28 +15,170 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url)
-  const from =
-    searchParams.get('from') || new Date().toISOString().split('T')[0]
-  const to =
-    searchParams.get('to') ||
-    new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]
+  const from = searchParams.get('from') || new Date().toISOString().split('T')[0]
+  const to = searchParams.get('to') || new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]
 
   if (!isValidDate(from) || !isValidDate(to)) {
     return NextResponse.json({ events: [] })
   }
 
-  try {
-    const safeFrom = from.replace(/[^0-9-]/g, '')
-    const safeTo = to.replace(/[^0-9-]/g, '')
-    const container = process.env.CALENDAR_DOCKER_CONTAINER ?? 'agent-server'
-    const account = process.env.CALENDAR_ACCOUNT ?? 'user@example.com'
-    const cmd = `docker exec ${container} gog calendar events --account=${account} --from=${safeFrom} --to=${safeTo} --json --max=50`
-    const raw = await sshExec(cmd)
-    const data: GogResponse = JSON.parse(raw)
-    const events = parseGogEvents(data.events || [])
-    return NextResponse.json({ events })
-  } catch (err) {
-    console.error('Calendar fetch failed:', err)
+  const { data, error } = await supabase
+    .from('calendar_events')
+    .select('*')
+    .eq('user_id', user.id)
+    .gte('start_time', `${from}T00:00:00`)
+    .lte('end_time', `${to}T23:59:59`)
+    .order('start_time', { ascending: true })
+
+  if (error) {
+    console.error('Calendar fetch error:', error)
     return NextResponse.json({ events: [] })
   }
+
+  // Map DB columns to frontend CalendarEvent interface
+  const events = (data || []).map((e) => ({
+    id: e.id,
+    title: e.title,
+    description: e.description,
+    start: e.start_time,
+    end: e.end_time,
+    allDay: e.all_day,
+    account: e.account,
+    color: e.color,
+    location: e.location,
+    taskId: e.task_id,
+  }))
+
+  return NextResponse.json({ events })
+}
+
+// POST — create a new event
+export async function POST(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const body = await req.json()
+  const { title, description, start, end, allDay, account, color, location } = body
+
+  if (!title || !start || !end) {
+    return NextResponse.json({ error: 'title, start, end required' }, { status: 400 })
+  }
+
+  const { data, error } = await supabase
+    .from('calendar_events')
+    .insert({
+      user_id: user.id,
+      title,
+      description: description || null,
+      start_time: start,
+      end_time: end,
+      all_day: allDay ?? false,
+      account: account || 'personal',
+      color: color || null,
+      location: location || null,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({
+    event: {
+      id: data.id,
+      title: data.title,
+      description: data.description,
+      start: data.start_time,
+      end: data.end_time,
+      allDay: data.all_day,
+      account: data.account,
+      color: data.color,
+      location: data.location,
+    },
+  })
+}
+
+// PATCH — update an event
+export async function PATCH(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const body = await req.json()
+  const { id, ...updates } = body
+
+  if (!id) {
+    return NextResponse.json({ error: 'id required' }, { status: 400 })
+  }
+
+  // Map frontend field names to DB columns
+  const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  if (updates.title !== undefined) dbUpdates.title = updates.title
+  if (updates.description !== undefined) dbUpdates.description = updates.description
+  if (updates.start !== undefined) dbUpdates.start_time = updates.start
+  if (updates.end !== undefined) dbUpdates.end_time = updates.end
+  if (updates.allDay !== undefined) dbUpdates.all_day = updates.allDay
+  if (updates.account !== undefined) dbUpdates.account = updates.account
+  if (updates.color !== undefined) dbUpdates.color = updates.color
+  if (updates.location !== undefined) dbUpdates.location = updates.location
+
+  const { data, error } = await supabase
+    .from('calendar_events')
+    .update(dbUpdates)
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .select()
+    .single()
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({
+    event: {
+      id: data.id,
+      title: data.title,
+      description: data.description,
+      start: data.start_time,
+      end: data.end_time,
+      allDay: data.all_day,
+      account: data.account,
+      color: data.color,
+      location: data.location,
+    },
+  })
+}
+
+// DELETE — remove an event
+export async function DELETE(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const body = await req.json()
+  const { id } = body
+
+  if (!id) {
+    return NextResponse.json({ error: 'id required' }, { status: 400 })
+  }
+
+  const { error } = await supabase
+    .from('calendar_events')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id)
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true })
 }

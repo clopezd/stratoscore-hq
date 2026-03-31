@@ -84,6 +84,50 @@ export function useCalendar() {
     fetchEvents()
   }, [fetchEvents])
 
+  const createEvent = useCallback(
+    async (event: Omit<CalendarEvent, 'id'>) => {
+      const res = await fetch('/api/calendar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(event),
+      })
+      const data = await res.json()
+      if (data.event) {
+        setEvents((prev) => [...prev, data.event])
+      }
+      return data.event
+    },
+    []
+  )
+
+  const updateEvent = useCallback(
+    async (id: string, updates: Partial<CalendarEvent>) => {
+      const res = await fetch('/api/calendar', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ...updates }),
+      })
+      const data = await res.json()
+      if (data.event) {
+        setEvents((prev) => prev.map((e) => (e.id === id ? data.event : e)))
+      }
+      return data.event
+    },
+    []
+  )
+
+  const deleteEvent = useCallback(
+    async (id: string) => {
+      await fetch('/api/calendar', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      })
+      setEvents((prev) => prev.filter((e) => e.id !== id))
+    },
+    []
+  )
+
   const goNext = useCallback(() => {
     setCurrentDate((prev) => {
       if (view === 'month') return addMonths(prev, 1)
@@ -104,7 +148,7 @@ export function useCalendar() {
     setCurrentDate(new Date())
   }, [])
 
-  // Merge Google Calendar events + task events
+  // Merge Supabase events + task events
   const allEvents = [...events, ...taskEvents]
 
   const filteredEvents =
@@ -124,5 +168,9 @@ export function useCalendar() {
     goNext,
     goPrev,
     goToday,
+    createEvent,
+    updateEvent,
+    deleteEvent,
+    refetch: fetchEvents,
   }
 }
