@@ -37,13 +37,13 @@ export function MissionControlDashboard() {
               icon="📊"
               label="My Tasks"
               count={data?.stats.totalTasks}
-              href="/dashboard"
+              href="/dashboard?view=list"
             />
             <QuickActionCard
               icon="📋"
               label="Board"
-              count={data?.stats.activeClients}
-              href="/dashboard"
+              count={data?.stats.totalTasks}
+              href="/dashboard?view=kanban"
             />
             <QuickActionCard
               icon="💰"

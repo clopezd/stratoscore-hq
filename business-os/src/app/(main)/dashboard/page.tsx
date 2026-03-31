@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { KanbanBoard, ListView } from '@/features/tasks/components'
 import { useTasks } from '@/features/tasks/hooks/useTasks'
 import { useLayoutStore } from '@/shared/stores/layout-store'
@@ -10,14 +10,23 @@ import { LayoutGrid, List } from 'lucide-react'
 
 export default function DashboardPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   useTasks()
   const selectedView = useLayoutStore((s) => s.selectedView)
   const setSelectedView = useLayoutStore((s) => s.setSelectedView)
+
+  // Apply view from URL query param
+  useEffect(() => {
+    const viewParam = searchParams.get('view')
+    if (viewParam === 'list' || viewParam === 'kanban') {
+      setSelectedView(viewParam)
+    }
+  }, [searchParams, setSelectedView])
   const { profile, isOwner, loading } = useAuth()
   const setFilter = useFiltersStore((s) => s.setFilter)
   const didAutoFilter = useRef(false)
 
-  // Owner default: redirect ONCE per session on initial app open
+  // Owner default: redirect ONCE per session on initial app open (desktop only)
   useEffect(() => {
     if (loading) return
     if (!isOwner) return
@@ -30,15 +39,14 @@ export default function DashboardPage() {
 
     const isMobile = window.matchMedia('(max-width: 767px)').matches
 
-    if (isMobile) {
-      // Mobile: always open chat on first load
-      router.replace('/chat')
-    } else {
-      // Desktop: restore last visited route, default to chat
+    if (!isMobile) {
+      // Desktop: restore last visited route, default to dashboard
       const lastRoute = localStorage.getItem('mc_lastRoute')
-      const target = lastRoute && lastRoute !== '/' ? lastRoute : '/chat'
-      router.replace(target)
+      if (lastRoute && lastRoute !== '/' && lastRoute !== '/dashboard') {
+        router.replace(lastRoute)
+      }
     }
+    // Mobile: stay on dashboard (show Board/Tasks)
   }, [loading, isOwner, router])
 
   // Auto-filter members to their own tasks on first load
