@@ -47,22 +47,31 @@ export default function PostsPage() {
     setDrafts((prev) => prev.filter((d) => d.id !== id))
   }
 
+  const [error, setError] = useState<string | null>(null)
+
   const generateNew = async () => {
     setGenerating(true)
+    setError(null)
     try {
-      const token = 'tumision_2026'
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
       const res = await fetch('/api/agents/ghostwriter', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       })
-      if (res.ok) {
+      const data = await res.json()
+      if (res.ok && data.success) {
         await fetchDrafts()
+      } else {
+        setError(data.error || `Error ${res.status}`)
       }
-    } catch {
-      // silently fail
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error de red')
     }
     setGenerating(false)
   }
@@ -124,6 +133,13 @@ export default function PostsPage() {
           </button>
         </div>
       </div>
+
+      {/* Error */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+          <p className="text-sm text-red-400">{error}</p>
+        </div>
+      )}
 
       {/* Loading */}
       {loading && (

@@ -3,17 +3,29 @@ import { runSingleAgent } from '@/features/agents/services/scheduler'
 import { AGENTS } from '@/features/agents/config/agents'
 import type { AgentSlug } from '@/features/agents/types'
 
-function authorize(req: NextRequest): boolean {
+async function authorize(req: NextRequest): Promise<boolean> {
   const auth = req.headers.get('authorization')
   const token = process.env.OPENCLAW_GATEWAY_TOKEN ?? 'tumision_2026'
-  return auth === `Bearer ${token}`
+
+  // Check gateway token first
+  if (auth === `Bearer ${token}`) return true
+
+  // Check Supabase session token
+  if (auth) {
+    const { createClient } = await import('@/lib/supabase/server')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) return true
+  }
+
+  return false
 }
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  if (!authorize(req)) {
+  if (!(await authorize(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
