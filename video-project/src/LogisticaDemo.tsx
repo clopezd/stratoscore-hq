@@ -6,7 +6,9 @@ import {
   interpolate,
   spring,
   Sequence,
+  staticFile,
 } from "remotion";
+import { Audio } from "@remotion/media";
 
 // ============ COLORES Y ESTILOS ============
 const COLORS = {
@@ -900,6 +902,31 @@ const OutroScene: React.FC = () => {
   );
 };
 
+// ============ VOICEOVER AUDIO FILES ============
+const VOICEOVER_FILES = [
+  "voiceover/scene-01-intro.mp3",
+  "voiceover/scene-02-dashboard.mp3",
+  "voiceover/scene-03-features.mp3",
+  "voiceover/scene-04-workflow.mp3",
+  "voiceover/scene-05-outro.mp3",
+];
+
+// Helper: renders Audio only if voiceover file exists
+const SceneAudio: React.FC<{ file: string }> = ({ file }) => {
+  try {
+    return (
+      <Audio
+        src={staticFile(file)}
+        volume={(f) =>
+          interpolate(f, [0, 10], [0, 1], { extrapolateRight: "clamp" })
+        }
+      />
+    );
+  } catch {
+    return null;
+  }
+};
+
 // ============ COMPOSICIÓN PRINCIPAL ============
 export const LogisticaDemo: React.FC = () => {
   const { fps } = useVideoConfig();
@@ -909,26 +936,31 @@ export const LogisticaDemo: React.FC = () => {
       {/* Escena 1: Intro - 3s */}
       <Sequence from={0} durationInFrames={3 * fps} premountFor={fps}>
         <IntroScene />
+        <SceneAudio file={VOICEOVER_FILES[0]} />
       </Sequence>
 
       {/* Escena 2: Dashboard - 5s */}
       <Sequence from={3 * fps} durationInFrames={5 * fps} premountFor={fps}>
         <DashboardScene />
+        <SceneAudio file={VOICEOVER_FILES[1]} />
       </Sequence>
 
       {/* Escena 3: Features - 4s */}
       <Sequence from={8 * fps} durationInFrames={4 * fps} premountFor={fps}>
         <FeaturesScene />
+        <SceneAudio file={VOICEOVER_FILES[2]} />
       </Sequence>
 
       {/* Escena 4: Workflow - 4s */}
       <Sequence from={12 * fps} durationInFrames={4 * fps} premountFor={fps}>
         <WorkflowScene />
+        <SceneAudio file={VOICEOVER_FILES[3]} />
       </Sequence>
 
       {/* Escena 5: Outro - 4s */}
       <Sequence from={16 * fps} durationInFrames={4 * fps} premountFor={fps}>
         <OutroScene />
+        <SceneAudio file={VOICEOVER_FILES[4]} />
       </Sequence>
     </AbsoluteFill>
   );
