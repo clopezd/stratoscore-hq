@@ -368,6 +368,17 @@ const getSurveySummaryTool = tool({
 
 // ── Tool sets per agent ──
 
+const getMemoriesTool = tool({
+  description: 'Obtiene las memorias del dueño (identidad, tono, contexto, vocabulario, ejemplos de posts, logros, aprendizajes)',
+  parameters: z.object({
+    category: z.string().optional().describe('Filtrar por categoría: identidad, tono, contexto, vocabulario, ejemplo_post, logro, proyecto, aprendizaje, contacto, otro'),
+  }),
+  execute: async ({ category }) => {
+    const memories = await db.getMemories(category)
+    return { memories, count: memories.length }
+  },
+})
+
 export function getToolsForAgent(slug: AgentSlug, agentSlugForReport: AgentSlug) {
   // Override saveReport to inject the correct agent_slug
   const saveReportWithSlug = tool({
@@ -474,6 +485,14 @@ export function getToolsForAgent(slug: AgentSlug, agentSlugForReport: AgentSlug)
       delete_old_records: deleteOldRecordsTool,
       archive_goals: archiveGoalsTool,
       create_alert: createAlertTool,
+    },
+
+    ghostwriter: {
+      get_memories: getMemoriesTool,
+      get_latest_reports: getLatestReportsTool,
+      get_journal_entries: getJournalEntriesTool,
+      get_latest_snapshots: getLatestSnapshotsTool,
+      save_report: saveReportWithSlug,
     },
   }
 

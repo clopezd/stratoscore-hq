@@ -630,3 +630,43 @@ export async function getSurveySummary(surveySlug: string): Promise<Record<strin
 
   return summary
 }
+
+// ── Memories ──
+
+export interface Memory {
+  id: string
+  category: string
+  content: string
+  source: string
+  active: boolean
+  created_at: string
+}
+
+export async function getMemories(category?: string): Promise<Memory[]> {
+  let query = supabase()
+    .from('memories')
+    .select('*')
+    .eq('active', true)
+    .order('category')
+    .order('created_at', { ascending: false })
+
+  if (category) {
+    query = query.eq('category', category)
+  }
+
+  const { data, error } = await query
+  if (error) throw new Error(`getMemories: ${error.message}`)
+  return (data ?? []) as Memory[]
+}
+
+export async function saveMemory(
+  category: string,
+  content: string,
+  source: string = 'agent'
+): Promise<void> {
+  const { error } = await supabase()
+    .from('memories')
+    .insert({ category, content, source })
+
+  if (error) throw new Error(`saveMemory: ${error.message}`)
+}
