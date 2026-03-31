@@ -5,7 +5,7 @@
   "scripts": {
     "start": "npx remotion studio",
     "build": "npx remotion render src/index.ts LogisticaDemo out/logistica-demo.mp4",
-    "voiceover": "node --strip-types generate-voiceover.ts",
+    "voiceover": "npx tsx generate-voiceover.ts",
     "upgrade": "npx remotion upgrade"
   },
   "dependencies": {
