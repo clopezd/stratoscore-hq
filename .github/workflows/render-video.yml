@@ -32,7 +32,7 @@ jobs:
         working-directory: video-project
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-        run: npm run voiceover
+        run: npx tsx generate-voiceover.ts
 
       - name: Render video
         working-directory: video-project
