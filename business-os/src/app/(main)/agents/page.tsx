@@ -31,7 +31,7 @@ export default function AgentsDashboardPage() {
               Centro de Agentes
             </h1>
             <p className="text-sm text-gray-500 dark:text-white/40 mt-1">
-              11 agentes autónomos operando tu portafolio
+              12 agentes autónomos operando tu portafolio
             </p>
           </div>
 
