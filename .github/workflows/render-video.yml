@@ -1,0 +1,66 @@
+name: Render Video con Voiceover
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to render from'
+        required: true
+        default: 'claude/setup-video-project-cYEzQ'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: video-project/package-lock.json
+
+      - name: Install dependencies
+        working-directory: video-project
+        run: npm ci
+
+      - name: Install Chrome & FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Generate voiceover (ElevenLabs)
+        working-directory: video-project
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: npm run voiceover
+
+      - name: Render video
+        working-directory: video-project
+        run: npx remotion render src/index.ts LogisticaDemo out/logistica-demo.mp4
+
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: logistica-demo
+          path: video-project/out/logistica-demo.mp4
+          retention-days: 30
+
+      - name: Create release with video
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: video-${{ github.run_number }}
+          name: "Video Demo Logística #${{ github.run_number }}"
+          body: |
+            Video demo del módulo de logística generado automáticamente.
+            - Voiceover en español colombiano (ElevenLabs)
+            - 1920x1080, 30fps
+          files: video-project/out/logistica-demo.mp4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
