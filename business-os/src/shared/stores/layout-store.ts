@@ -16,8 +16,10 @@ interface LayoutState {
   closeChatSessionsPanel: () => void
 }
 
+const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+
 export const useLayoutStore = create<LayoutState>((set) => ({
-  leftSidebarOpen: true,
+  leftSidebarOpen: !isMobile,
   rightSidebarOpen: false,
   selectedView: 'kanban',
   chatSessionsPanelOpen: false,
