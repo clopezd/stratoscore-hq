@@ -21,6 +21,7 @@ import {
   BarChart2,
   DollarSign,
   Cpu,
+  Brain,
 } from 'lucide-react'
 import { Logo } from '@/shared/components/Logo'
 import { VidendumLogo } from '@/shared/components/VidendumLogo'
@@ -51,6 +52,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/chat',      label: 'Chat',      icon: Bot,       ownerOnly: true },
   { href: '/finanzas',  label: 'Finanzas',  icon: DollarSign, ownerOnly: true, exact: false },
   { href: '/activity',  label: 'Activity',  icon: Activity,  ownerOnly: true },
+  { href: '/memories',  label: 'Memorias',  icon: Brain,     ownerOnly: true },
   { href: '/videndum',  label: 'Videndum',  icon: BarChart2, ownerOnly: true, exact: false },
 ]
 
