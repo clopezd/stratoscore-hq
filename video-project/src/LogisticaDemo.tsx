@@ -902,13 +902,240 @@ const OutroScene: React.FC = () => {
   );
 };
 
+// ============ ESCENA 6: INVENTARIO ============
+const InventarioScene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const titleSpring = spring({ frame, fps, config: { damping: 200 } });
+
+  const items = [
+    { name: "Detergente Industrial", stock: 85, unit: "L", status: "ok" },
+    { name: "Suavizante Premium", stock: 42, unit: "L", status: "ok" },
+    { name: "Bolsas de Entrega", stock: 156, unit: "uds", status: "ok" },
+    { name: "Perchas Lavandería", stock: 18, unit: "uds", status: "low" },
+    { name: "Etiquetas RFID", stock: 230, unit: "uds", status: "ok" },
+    { name: "Quitamanchas Pro", stock: 7, unit: "L", status: "critical" },
+  ];
+
+  return (
+    <AbsoluteFill
+      style={{
+        background: COLORS.grayLight,
+        padding: 60,
+        flexDirection: "column",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          marginBottom: 40,
+          opacity: titleSpring,
+        }}
+      >
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 12,
+            background: `linear-gradient(135deg, ${COLORS.success}, #4ade80)`,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: 24,
+          }}
+        >
+          📦
+        </div>
+        <div
+          style={{
+            fontSize: 36,
+            fontWeight: 800,
+            color: COLORS.primary,
+            fontFamily: "system-ui, sans-serif",
+          }}
+        >
+          Control de Inventario
+        </div>
+      </div>
+
+      {/* Stats row */}
+      <div style={{ display: "flex", gap: 20, marginBottom: 30 }}>
+        {[
+          { label: "Total Productos", value: "124", icon: "📋", color: COLORS.accent },
+          { label: "Stock Óptimo", value: "98", icon: "✅", color: COLORS.success },
+          { label: "Stock Bajo", value: "18", icon: "⚠️", color: COLORS.warning },
+          { label: "Crítico", value: "8", icon: "🔴", color: "#ef4444" },
+        ].map((s, i) => {
+          const cardSpring = spring({ frame, fps, delay: 5 + i * 5, config: { damping: 14 } });
+          return (
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                background: COLORS.white,
+                borderRadius: 14,
+                padding: 22,
+                transform: `scale(${cardSpring})`,
+                boxShadow: "0 4px 16px rgba(0,0,0,0.05)",
+                borderLeft: `4px solid ${s.color}`,
+              }}
+            >
+              <div style={{ fontSize: 26, marginBottom: 6 }}>{s.icon}</div>
+              <div style={{ fontSize: 36, fontWeight: 800, color: COLORS.primary, fontFamily: "system-ui, sans-serif" }}>
+                {Math.round(interpolate(frame, [8 + i * 5, 30 + i * 5], [0, parseInt(s.value)], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }))}
+              </div>
+              <div style={{ fontSize: 14, color: COLORS.gray, fontFamily: "system-ui, sans-serif" }}>{s.label}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Inventory table */}
+      <div
+        style={{
+          background: COLORS.white,
+          borderRadius: 16,
+          padding: 28,
+          flex: 1,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+          opacity: spring({ frame, fps, delay: 25, config: { damping: 200 } }),
+        }}
+      >
+        <div style={{ fontSize: 20, fontWeight: 600, color: COLORS.primary, fontFamily: "system-ui, sans-serif", marginBottom: 20 }}>
+          Inventario de Insumos
+        </div>
+        {/* Header */}
+        <div style={{ display: "flex", padding: "10px 0", borderBottom: `2px solid ${COLORS.grayLight}`, marginBottom: 8 }}>
+          <div style={{ flex: 3, fontSize: 14, fontWeight: 600, color: COLORS.gray, fontFamily: "system-ui, sans-serif" }}>PRODUCTO</div>
+          <div style={{ flex: 1, fontSize: 14, fontWeight: 600, color: COLORS.gray, fontFamily: "system-ui, sans-serif", textAlign: "center" }}>STOCK</div>
+          <div style={{ flex: 1, fontSize: 14, fontWeight: 600, color: COLORS.gray, fontFamily: "system-ui, sans-serif", textAlign: "center" }}>ESTADO</div>
+          <div style={{ flex: 2, fontSize: 14, fontWeight: 600, color: COLORS.gray, fontFamily: "system-ui, sans-serif" }}>NIVEL</div>
+        </div>
+        {items.map((item, i) => {
+          const rowOpacity = interpolate(frame, [30 + i * 4, 38 + i * 4], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+          const barWidth = interpolate(frame, [32 + i * 4, 45 + i * 4], [0, item.stock], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+          const barColor = item.status === "critical" ? "#ef4444" : item.status === "low" ? COLORS.warning : COLORS.success;
+          return (
+            <div key={i} style={{ display: "flex", alignItems: "center", padding: "12px 0", borderBottom: i < items.length - 1 ? `1px solid ${COLORS.grayLight}` : "none", opacity: rowOpacity }}>
+              <div style={{ flex: 3, fontSize: 16, fontWeight: 500, color: COLORS.primary, fontFamily: "system-ui, sans-serif" }}>{item.name}</div>
+              <div style={{ flex: 1, fontSize: 16, fontWeight: 700, color: COLORS.primary, fontFamily: "monospace", textAlign: "center" }}>{item.stock} {item.unit}</div>
+              <div style={{ flex: 1, textAlign: "center" }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: barColor, background: `${barColor}18`, padding: "3px 10px", borderRadius: 12, fontFamily: "system-ui, sans-serif" }}>
+                  {item.status === "critical" ? "Crítico" : item.status === "low" ? "Bajo" : "Óptimo"}
+                </span>
+              </div>
+              <div style={{ flex: 2, display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ flex: 1, height: 8, borderRadius: 4, background: COLORS.grayLight, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.min(barWidth, 100)}%`, height: "100%", borderRadius: 4, background: barColor }} />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ============ ESCENA 7: MÉTRICAS ============
+const MetricsScene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const titleSpring = spring({ frame, fps, config: { damping: 200 } });
+
+  const metrics = [
+    { label: "Tiempo Promedio de Entrega", value: "2.4h", change: "-12%", positive: true },
+    { label: "Satisfacción del Cliente", value: "4.8/5", change: "+0.3", positive: true },
+    { label: "Costo por Entrega", value: "$3.200", change: "-8%", positive: true },
+    { label: "Pedidos por Conductor", value: "18/día", change: "+15%", positive: true },
+  ];
+
+  return (
+    <AbsoluteFill
+      style={{
+        background: `linear-gradient(135deg, ${COLORS.gradient1} 0%, ${COLORS.gradient2} 100%)`,
+        padding: 80,
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 48,
+          fontWeight: 800,
+          color: COLORS.white,
+          fontFamily: "system-ui, sans-serif",
+          marginBottom: 12,
+          opacity: titleSpring,
+          transform: `translateY(${interpolate(titleSpring, [0, 1], [20, 0])}px)`,
+        }}
+      >
+        Métricas de Rendimiento
+      </div>
+      <div
+        style={{
+          width: 80,
+          height: 4,
+          background: COLORS.accent,
+          borderRadius: 2,
+          marginBottom: 50,
+          transform: `scaleX(${titleSpring})`,
+          transformOrigin: "left",
+        }}
+      />
+
+      <div style={{ display: "flex", gap: 28 }}>
+        {metrics.map((m, i) => {
+          const cardSpring = spring({ frame, fps, delay: 8 + i * 8, config: { damping: 14 } });
+          return (
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: 20,
+                padding: 36,
+                transform: `scale(${cardSpring}) translateY(${interpolate(cardSpring, [0, 1], [30, 0])}px)`,
+              }}
+            >
+              <div style={{ fontSize: 16, color: COLORS.gray, fontFamily: "system-ui, sans-serif", marginBottom: 16 }}>{m.label}</div>
+              <div style={{ fontSize: 48, fontWeight: 800, color: COLORS.white, fontFamily: "system-ui, sans-serif", marginBottom: 12 }}>{m.value}</div>
+              <div
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: m.positive ? COLORS.success : "#ef4444",
+                  fontFamily: "system-ui, sans-serif",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                {m.positive ? "↑" : "↓"} {m.change}
+                <span style={{ fontSize: 13, color: COLORS.gray, fontWeight: 400 }}>vs mes anterior</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 // ============ VOICEOVER AUDIO FILES ============
 const VOICEOVER_FILES = [
   "voiceover/scene-01-intro.mp3",
   "voiceover/scene-02-dashboard.mp3",
   "voiceover/scene-03-features.mp3",
   "voiceover/scene-04-workflow.mp3",
-  "voiceover/scene-05-outro.mp3",
+  "voiceover/scene-05-inventario.mp3",
+  "voiceover/scene-06-metrics.mp3",
+  "voiceover/scene-07-outro.mp3",
 ];
 
 // Helper: renders Audio only if voiceover file exists
@@ -927,40 +1154,52 @@ const SceneAudio: React.FC<{ file: string }> = ({ file }) => {
   }
 };
 
-// ============ COMPOSICIÓN PRINCIPAL ============
+// ============ COMPOSICIÓN PRINCIPAL — 30s ============
 export const LogisticaDemo: React.FC = () => {
   const { fps } = useVideoConfig();
 
   return (
     <AbsoluteFill>
-      {/* Escena 1: Intro - 3s */}
-      <Sequence from={0} durationInFrames={3 * fps} premountFor={fps}>
+      {/* Escena 1: Intro - 4s */}
+      <Sequence from={0} durationInFrames={4 * fps} premountFor={fps}>
         <IntroScene />
         <SceneAudio file={VOICEOVER_FILES[0]} />
       </Sequence>
 
       {/* Escena 2: Dashboard - 5s */}
-      <Sequence from={3 * fps} durationInFrames={5 * fps} premountFor={fps}>
+      <Sequence from={4 * fps} durationInFrames={5 * fps} premountFor={fps}>
         <DashboardScene />
         <SceneAudio file={VOICEOVER_FILES[1]} />
       </Sequence>
 
-      {/* Escena 3: Features - 4s */}
-      <Sequence from={8 * fps} durationInFrames={4 * fps} premountFor={fps}>
+      {/* Escena 3: Features - 5s */}
+      <Sequence from={9 * fps} durationInFrames={5 * fps} premountFor={fps}>
         <FeaturesScene />
         <SceneAudio file={VOICEOVER_FILES[2]} />
       </Sequence>
 
-      {/* Escena 4: Workflow - 4s */}
-      <Sequence from={12 * fps} durationInFrames={4 * fps} premountFor={fps}>
+      {/* Escena 4: Workflow - 5s */}
+      <Sequence from={14 * fps} durationInFrames={5 * fps} premountFor={fps}>
         <WorkflowScene />
         <SceneAudio file={VOICEOVER_FILES[3]} />
       </Sequence>
 
-      {/* Escena 5: Outro - 4s */}
-      <Sequence from={16 * fps} durationInFrames={4 * fps} premountFor={fps}>
-        <OutroScene />
+      {/* Escena 5: Inventario - 5s */}
+      <Sequence from={19 * fps} durationInFrames={5 * fps} premountFor={fps}>
+        <InventarioScene />
         <SceneAudio file={VOICEOVER_FILES[4]} />
+      </Sequence>
+
+      {/* Escena 6: Métricas - 3s */}
+      <Sequence from={24 * fps} durationInFrames={3 * fps} premountFor={fps}>
+        <MetricsScene />
+        <SceneAudio file={VOICEOVER_FILES[5]} />
+      </Sequence>
+
+      {/* Escena 7: Outro - 3s */}
+      <Sequence from={27 * fps} durationInFrames={3 * fps} premountFor={fps}>
+        <OutroScene />
+        <SceneAudio file={VOICEOVER_FILES[6]} />
       </Sequence>
     </AbsoluteFill>
   );

@@ -1,16 +1,16 @@
 import { config } from "dotenv";
-import { writeFileSync, mkdirSync, existsSync } from "fs";
+import { writeFileSync, mkdirSync, existsSync, rmSync } from "fs";
 import { join } from "path";
 
 config();
 
 const API_KEY = process.env.ELEVENLABS_API_KEY;
 if (!API_KEY) {
-  console.error("❌ ELEVENLABS_API_KEY no encontrada en .env");
+  console.error("ELEVENLABS_API_KEY no encontrada en .env");
   process.exit(1);
 }
 
-// ─── Paso 1: Buscar voz colombiana automáticamente ───────────────────────────
+// ─── Buscar voz colombiana de Medellín (paisa) ──────────────────────────────
 
 interface Voice {
   voice_id: string;
@@ -18,97 +18,109 @@ interface Voice {
   labels?: Record<string, string>;
 }
 
-async function findColombianVoice(): Promise<string> {
-  // Si el usuario ya definió un voice ID, usarlo
+async function findMedellinVoice(): Promise<string> {
   if (process.env.ELEVENLABS_VOICE_ID) {
     console.log(`🎤 Usando voz configurada: ${process.env.ELEVENLABS_VOICE_ID}`);
     return process.env.ELEVENLABS_VOICE_ID;
   }
 
-  console.log("🔍 Buscando voz colombiana en ElevenLabs...");
+  console.log("🔍 Buscando voz colombiana de Medellín en ElevenLabs...");
 
   const response = await fetch("https://api.elevenlabs.io/v1/voices", {
     headers: { "xi-api-key": API_KEY! },
   });
 
   if (!response.ok) {
-    console.log("⚠️  No se pudo listar voces, usando voz por defecto (Carlos)");
-    return "IKne3meq5aSn9XLyUdCD"; // "Carlos" - voz masculina multilingual
+    console.log("⚠️  No se pudo listar voces, usando voz por defecto");
+    return "IKne3meq5aSn9XLyUdCD";
   }
 
   const data = (await response.json()) as { voices: Voice[] };
   const voices = data.voices || [];
 
-  // Buscar voz colombiana
-  const colombian = voices.find((v) => {
-    const labels = JSON.stringify(v.labels || {}).toLowerCase();
-    return labels.includes("colomb");
+  // Prioridad 1: Medellín / Paisa
+  const paisa = voices.find((v) => {
+    const all = (v.name + " " + JSON.stringify(v.labels || {})).toLowerCase();
+    return all.includes("medell") || all.includes("paisa");
   });
+  if (paisa) {
+    console.log(`🇨🇴 Voz paisa encontrada: "${paisa.name}" (${paisa.voice_id})`);
+    return paisa.voice_id;
+  }
 
+  // Prioridad 2: Colombiana
+  const colombian = voices.find((v) => {
+    const all = (v.name + " " + JSON.stringify(v.labels || {})).toLowerCase();
+    return all.includes("colomb");
+  });
   if (colombian) {
-    console.log(`🇨🇴 Voz colombiana encontrada: "${colombian.name}" (${colombian.voice_id})`);
+    console.log(`🇨🇴 Voz colombiana: "${colombian.name}" (${colombian.voice_id})`);
     return colombian.voice_id;
   }
 
-  // Buscar cualquier voz en español
+  // Prioridad 3: Español
   const spanish = voices.find((v) => {
-    const labels = JSON.stringify(v.labels || {}).toLowerCase();
-    return labels.includes("spanish") || labels.includes("español");
+    const all = JSON.stringify(v.labels || {}).toLowerCase();
+    return all.includes("spanish") || all.includes("español");
   });
-
   if (spanish) {
-    console.log(`🇪🇸 Voz en español encontrada: "${spanish.name}" (${spanish.voice_id})`);
+    console.log(`🇪🇸 Voz español: "${spanish.name}" (${spanish.voice_id})`);
     return spanish.voice_id;
   }
 
-  // Fallback: voz multilingual que suena bien en español
-  console.log("⚠️  No se encontró voz colombiana, usando voz multilingual por defecto");
+  console.log("⚠️  No se encontró voz regional, usando multilingual por defecto");
   return "IKne3meq5aSn9XLyUdCD";
 }
 
-// ─── Paso 2: Escenas con narración ───────────────────────────────────────────
+// ─── 7 escenas — 30 segundos total ──────────────────────────────────────────
 
 const scenes = [
   {
     id: "scene-01-intro",
-    text: "StratosCore. Módulo de Logística para tu lavandería. Control total de recolección y entrega, en tiempo real.",
+    text: "StratosCore. Tu plataforma integral de logística e inventario para lavandería. Control total de recolección, entrega y stock, todo en tiempo real.",
   },
   {
     id: "scene-02-dashboard",
-    text: "Tu panel de logística muestra todo de un vistazo: pedidos del día, unidades en ruta, entregas completadas y pedidos pendientes. Con mapa de rutas en tiempo real y seguimiento de cada orden.",
+    text: "Tu panel de logística te muestra todo de un vistazo. Cuarenta y siete pedidos hoy, doce unidades en ruta, treinta y uno entregados y cuatro pendientes. Con mapa de rutas en tiempo real y seguimiento de cada orden.",
   },
   {
     id: "scene-03-features",
-    text: "Funcionalidades diseñadas para optimizar tu operación. Rutas inteligentes, tracking en vivo, analíticas de rendimiento, notificaciones automáticas, gestión completa de pedidos y asignación inteligente de conductores.",
+    text: "Funcionalidades diseñadas para optimizar tu operación. Rutas inteligentes con optimización automática. Tracking en vivo con GPS. Analíticas de rendimiento. Notificaciones automáticas al cliente. Gestión completa de pedidos y asignación inteligente de conductores.",
   },
   {
     id: "scene-04-workflow",
-    text: "El flujo es simple: el cliente solicita por app, WhatsApp o web. Se asigna un conductor para la recolección. La prenda se procesa en planta con tracking. Se entrega por ruta optimizada. Y el cliente recibe confirmación automática.",
+    text: "El flujo es muy sencillo. El cliente solicita por app, WhatsApp o la web. Se asigna un conductor para la recolección. La prenda se procesa en planta con tracking completo. Se entrega por ruta optimizada. Y el cliente recibe confirmación automática en cada paso.",
   },
   {
-    id: "scene-05-outro",
-    text: "Logística inteligente para tu lavandería. Automatiza tu operación con StratosCore. Visita lavandería punto stratoscore punto app.",
+    id: "scene-05-inventario",
+    text: "El módulo de inventario te permite controlar todos los insumos de tu operación. Detergentes, suavizantes, bolsas, perchas y etiquetas. Alertas automáticas cuando el stock está bajo o en nivel crítico, para que nunca te quedes sin lo que necesitas.",
+  },
+  {
+    id: "scene-06-metrics",
+    text: "Métricas que importan. Tiempo promedio de entrega de dos punto cuatro horas. Satisfacción del cliente de cuatro punto ocho sobre cinco. Y costo por entrega reducido en un ocho por ciento respecto al mes anterior.",
+  },
+  {
+    id: "scene-07-outro",
+    text: "Logística inteligente e inventario automatizado para tu lavandería. Optimiza tu operación con StratosCore. Visita lavandería punto stratoscore punto app.",
   },
 ];
 
-// ─── Paso 3: Generar audios ──────────────────────────────────────────────────
+// ─── Generar audios ──────────────────────────────────────────────────────────
 
 const OUTPUT_DIR = join(process.cwd(), "public", "voiceover");
 
 async function generateVoiceover() {
+  // Limpiar audios anteriores para regenerar
+  if (existsSync(OUTPUT_DIR)) {
+    rmSync(OUTPUT_DIR, { recursive: true });
+  }
   mkdirSync(OUTPUT_DIR, { recursive: true });
 
-  const voiceId = await findColombianVoice();
-
+  const voiceId = await findMedellinVoice();
   console.log(`\n🎬 Generando voiceover con voz: ${voiceId}\n`);
 
   for (const scene of scenes) {
     const outputPath = join(OUTPUT_DIR, `${scene.id}.mp3`);
-
-    if (existsSync(outputPath)) {
-      console.log(`⏭️  ${scene.id} ya existe, saltando... (borra el archivo para regenerar)`);
-      continue;
-    }
 
     console.log(`🎙️  Generando: ${scene.id}...`);
 
@@ -124,7 +136,7 @@ async function generateVoiceover() {
         body: JSON.stringify({
           text: scene.text,
           model_id: "eleven_multilingual_v2",
-          language_code: "es",
+          language_code: "es-CO",
           voice_settings: {
             stability: 0.6,
             similarity_boost: 0.75,
@@ -142,14 +154,10 @@ async function generateVoiceover() {
 
     const audioBuffer = Buffer.from(await response.arrayBuffer());
     writeFileSync(outputPath, audioBuffer);
-    console.log(
-      `✅ ${scene.id} → ${outputPath} (${(audioBuffer.length / 1024).toFixed(1)} KB)`
-    );
+    console.log(`✅ ${scene.id} (${(audioBuffer.length / 1024).toFixed(1)} KB)`);
   }
 
-  console.log("\n🎬 ¡Voiceover completo!");
-  console.log("   Ahora renderiza el video:");
-  console.log("   npm run build");
+  console.log("\n🎬 ¡Voiceover completo! 7 escenas generadas.");
 }
 
 generateVoiceover();
