@@ -13,7 +13,6 @@ export type AgentSlug =
   | 'journalist'
   | 'cleanup'
   | 'ghostwriter'
-  | 'mobility'
 
 export type AgentTeam = 'strategic' | 'operational'
 

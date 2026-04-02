@@ -121,16 +121,6 @@ export const AGENTS: Record<AgentSlug, AgentConfig> = {
     reads: ['memories', 'agent_reports', 'journal_entries', 'metrics_snapshots'],
     writes: ['agent_reports'],
   },
-  mobility: {
-    slug: 'mobility',
-    name: 'Mobility Manager',
-    emoji: '🦿',
-    team: 'operational',
-    schedule: '0 9 * * 1-6', // Lunes a Sábado 9:00am (horario del centro)
-    description: 'Gestiona leads, ocupación y seguimiento de pacientes de Mobility Group CR',
-    reads: ['leads_mobility', 'pacientes', 'citas', 'terapeutas', 'equipos'],
-    writes: ['leads_mobility', 'agent_reports', 'alerts', 'daily_actions'],
-  },
 }
 
 /** Orden de ejecución diaria */
@@ -141,7 +131,6 @@ export const DAILY_EXECUTION_ORDER: AgentSlug[] = [
   'cto',
   'cmo',
   'cpo',
-  'mobility',
   'ceo',
   'journalist',
 ]

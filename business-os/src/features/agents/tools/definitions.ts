@@ -366,99 +366,6 @@ const getSurveySummaryTool = tool({
   },
 })
 
-// ── Mobility-specific ──
-
-const getMobilityLeadsTool = tool({
-  description: 'Obtiene leads de Mobility Group CR, filtrable por estado (nuevo, contactado, evaluacion_agendada, convertido, descartado)',
-  parameters: z.object({
-    estado: z.string().optional().describe('Filtrar por estado del lead'),
-  }),
-  execute: async ({ estado }) => {
-    const leads = await db.getMobilityLeads(estado)
-    return { leads, count: leads.length }
-  },
-})
-
-const getMobilityLeadsByFuenteTool = tool({
-  description: 'Obtiene conteo de leads activos por fuente (web, teléfono, referido, google_ads, facebook)',
-  parameters: z.object({}),
-  execute: async () => {
-    const byFuente = await db.getMobilityLeadsByFuente()
-    return byFuente
-  },
-})
-
-const updateMobilityLeadTool = tool({
-  description: 'Actualiza el estado de un lead de Mobility',
-  parameters: z.object({
-    lead_id: z.string().describe('ID del lead'),
-    estado: z.enum(['nuevo', 'contactado', 'evaluacion_agendada', 'convertido', 'descartado']),
-    notas: z.string().optional().describe('Notas adicionales'),
-  }),
-  execute: async ({ lead_id, estado, notas }) => {
-    await db.updateMobilityLeadEstado(lead_id, estado, notas)
-    return { updated: true, lead_id, estado }
-  },
-})
-
-const getMobilityOcupacionTool = tool({
-  description: 'Obtiene ocupación diaria del centro (últimos N días) desde la vista ocupacion_diaria',
-  parameters: z.object({
-    days: z.number().default(7).describe('Días hacia atrás'),
-  }),
-  execute: async ({ days }) => {
-    const ocupacion = await db.getMobilityOcupacion(days)
-    return { ocupacion, days }
-  },
-})
-
-const getMobilityPacientesRenovacionTool = tool({
-  description: 'Obtiene pacientes con ≤5 sesiones restantes (oportunidad de renovación)',
-  parameters: z.object({}),
-  execute: async () => {
-    const pacientes = await db.getMobilityPacientesRenovacion()
-    return { pacientes, count: pacientes.length }
-  },
-})
-
-const getMobilityCitasHoyTool = tool({
-  description: 'Obtiene las citas de hoy con datos de paciente, terapeuta y equipo',
-  parameters: z.object({}),
-  execute: async () => {
-    const citas = await db.getMobilityCitasHoy()
-    return { citas, count: citas.length }
-  },
-})
-
-const getMobilityCitasSemanaTool = tool({
-  description: 'Obtiene todas las citas de la semana actual (lunes a sábado)',
-  parameters: z.object({}),
-  execute: async () => {
-    const citas = await db.getMobilityCitasSemana()
-    return { citas, count: citas.length }
-  },
-})
-
-const getMobilityPacientesSinCitaTool = tool({
-  description: 'Obtiene pacientes activos que NO tienen cita agendada en los próximos N días',
-  parameters: z.object({
-    days: z.number().default(7).describe('Ventana de días para buscar citas'),
-  }),
-  execute: async ({ days }) => {
-    const pacientes = await db.getMobilityPacientesSinCita(days)
-    return { pacientes, count: pacientes.length }
-  },
-})
-
-const getMobilityEquiposTool = tool({
-  description: 'Obtiene estado actual de los equipos (Lokomat, Armeo, etc.)',
-  parameters: z.object({}),
-  execute: async () => {
-    const equipos = await db.getMobilityEquiposEstado()
-    return { equipos, count: equipos.length }
-  },
-})
-
 // ── Tool sets per agent ──
 
 const getMemoriesTool = tool({
@@ -585,21 +492,6 @@ export function getToolsForAgent(slug: AgentSlug, agentSlugForReport: AgentSlug)
       get_latest_reports: getLatestReportsTool,
       get_journal_entries: getJournalEntriesTool,
       get_latest_snapshots: getLatestSnapshotsTool,
-      save_report: saveReportWithSlug,
-    },
-
-    mobility: {
-      get_mobility_leads: getMobilityLeadsTool,
-      get_mobility_leads_by_fuente: getMobilityLeadsByFuenteTool,
-      update_mobility_lead: updateMobilityLeadTool,
-      get_mobility_ocupacion: getMobilityOcupacionTool,
-      get_mobility_pacientes_renovacion: getMobilityPacientesRenovacionTool,
-      get_mobility_citas_hoy: getMobilityCitasHoyTool,
-      get_mobility_citas_semana: getMobilityCitasSemanaTool,
-      get_mobility_pacientes_sin_cita: getMobilityPacientesSinCitaTool,
-      get_mobility_equipos: getMobilityEquiposTool,
-      create_alert: createAlertTool,
-      save_daily_actions: saveDailyActionsTool,
       save_report: saveReportWithSlug,
     },
   }
