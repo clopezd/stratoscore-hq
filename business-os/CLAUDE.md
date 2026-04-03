@@ -115,30 +115,24 @@ business-os/
 ├── src/
 │   ├── app/
 │   │   ├── (main)/
-│   │   │   ├── cleanxpress/       # Cliente: Lavandería (PRODUCCIÓN)
-│   │   │   ├── logistica/         # Entregas Cleanxpress (parte del mismo cliente)
 │   │   │   ├── videndum/          # Cliente: Planificación & Analytics
-│   │   │   ├── mobility/          # Cliente: Terapia física + WhatsApp
 │   │   │   ├── finanzas/          # Finanzas personales Carlos
 │   │   │   ├── confirma/          # Cliente: INACTIVO
 │   │   │   └── medcare/           # Cliente: INACTIVO
 │   │   └── api/
-│   │       ├── videndum/          # APIs Videndum
-│   │       ├── mobility/          # APIs Mobility (+ agentes)
-│   │       ├── logistica/         # APIs entregas Cleanxpress
-│   │       ├── finance/           # APIs finanzas personales
-│   │       └── consultant/        # AI Consultant compartido
+│   │       ├── videndum/          # APIs Videndum (20 endpoints)
+│   │       ├── mobility/          # APIs Mobility
+│   │       ├── bidhunter/         # APIs Bidhunter (13 endpoints)
+│   │       └── finance/           # APIs finanzas personales
 │   ├── features/
-│   │   ├── videndum/              # Features Videndum
-│   │   ├── mobility/              # Features Mobility
-│   │   ├── bidhunter/             # Features Bidhunter (API only)
-│   │   ├── logistica/             # Features entregas Cleanxpress
+│   │   ├── videndum/              # Features Videndum (components, hooks, services, docs, scripts)
+│   │   ├── mobility/              # Features Mobility (agents, components, services, whatsapp)
+│   │   ├── bidhunter/             # Features Bidhunter (agents, components, services)
 │   │   ├── finances/              # Features finanzas personales
-│   │   ├── consultant/            # AI Consultant (OpenRouter)
+│   │   ├── _archived/             # Clientes inactivos (medcare, confirma)
 │   │   └── mission-control/       # Dashboard ejecutivo
 │   └── lib/
-│       ├── supabase/              # Cliente Supabase
-│       └── whatsapp.ts            # Twilio WhatsApp integration
+│       └── supabase/              # Cliente Supabase (Stratoscore-HQ)
 └── .claude/
     ├── skills/                    # 18 skills especializados
     ├── memory/                    # Memoria persistente del proyecto
@@ -149,12 +143,13 @@ business-os/
 
 | Cliente | Módulo | Features | Estado |
 |---------|--------|----------|--------|
-| **Cleanxpress** | `/cleanxpress` + `/logistica` | Lavandería + entregas de bolsas procesadas | ✅ Producción |
 | **Videndum** | `/videndum` | Planificación producción, ML forecast, análisis varianza, radar competitivo | 🔨 En desarrollo |
 | **Mobility** | `/mobility` | Calendario terapeutas, pacientes, evaluaciones, WhatsApp bot, 3 agentes IA | 🔨 En desarrollo |
 | **Bidhunter** | API only | Scraping oportunidades, scoring, reportes semanales, KPIs | 🔨 En desarrollo |
-| **MedCare** | `/medcare` | MVP imagenología (mamógrafo + ultrasonido) | ⏸️ Inactivo |
-| **Confirma** | `/confirma` | Análisis de riesgo, tablas relacionales | ⏸️ Inactivo |
+| **MedCare** | `/medcare` | MVP imagenología (mamógrafo + ultrasonido) | ⏸️ Inactivo (`_archived/`) |
+| **Confirma** | `/confirma` | Análisis de riesgo, tablas relacionales | ⏸️ Inactivo (`_archived/`) |
+
+**Nota:** Cleanxpress (lavandería) es un proyecto separado con su propio Supabase. NO vive en Business OS.
 
 ---
 

@@ -91,12 +91,13 @@ cd agent-server && npx tsx src/schedule-cli.ts list
 
 | Cliente | Estado | Notas |
 |---------|--------|-------|
-| **Cleanxpress** | ✅ Producción | Lavandería + logística entregas |
 | **Videndum** | 🔨 Desarrollo | Planificación, forecasting, analytics |
 | **Mobility** | 🔨 Desarrollo | Terapia física, WhatsApp, agentes IA |
 | **Bidhunter** | 🔨 Desarrollo | Scraping oportunidades, scoring |
 | **MedCare** | ⏸️ Inactivo | MVP imagenología |
 | **Confirma** | ⏸️ Inactivo | Análisis de riesgo |
+
+**Nota:** Cleanxpress (lavandería) es un proyecto separado con su propio Supabase (`noxdpibbmaujvhvhobef.supabase.co`). NO vive en Business OS.
 
 ### Bugs conocidos
 

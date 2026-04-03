@@ -9,7 +9,6 @@ const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
   '/cron': ['owner'],
   '/calendar': ['owner', 'admin'],
   '/videndum': ['owner'],
-  '/cleanxpress': ['owner'],
   '/draw': ['owner', 'admin'],
   '/settings': ['owner', 'admin', 'member'],
   '/team': ['owner', 'admin', 'member'],

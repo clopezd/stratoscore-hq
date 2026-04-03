@@ -130,15 +130,6 @@ export async function GET() {
         created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
       },
       {
-        id: 2,
-        client_id: 'cleanxpress',
-        client_name: 'C&C Clean Xpress',
-        action: '12 órdenes completadas',
-        severity: 'success',
-        icon: '✅',
-        created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-      },
-      {
         id: 3,
         client_id: 'mobility',
         client_name: 'Mobility',
@@ -155,15 +146,6 @@ export async function GET() {
         severity: 'info',
         icon: '📈',
         created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: 5,
-        client_id: 'cleanxpress',
-        client_name: 'C&C Clean Xpress',
-        action: '8 órdenes pendientes',
-        severity: 'warning',
-        icon: '⏳',
-        created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
       },
     ]
 

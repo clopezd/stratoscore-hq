@@ -21,7 +21,6 @@ import {
   BarChart2,
   DollarSign,
   Cpu,
-  Truck,
   ScanLine,
   Crosshair,
   Accessibility,
@@ -60,7 +59,6 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/finanzas',  label: 'Finanzas',        icon: DollarSign, ownerOnly: true, exact: false, section: 'principal' },
 
   // Clientes
-  { href: '/cleanxpress', label: 'CleanXpress', icon: Truck,         ownerOnly: true, exact: false, section: 'clientes' },
   { href: '/videndum',    label: 'Videndum',    icon: BarChart2,     ownerOnly: true, exact: false, section: 'clientes' },
   { href: '/mobility',    label: 'Mobility',    icon: Accessibility, ownerOnly: true, exact: false, section: 'clientes' },
   { href: '/bidhunter',   label: 'BidHunter',   icon: Crosshair,     ownerOnly: true, exact: false, section: 'clientes' },
