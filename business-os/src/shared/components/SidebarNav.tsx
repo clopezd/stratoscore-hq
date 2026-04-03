@@ -21,7 +21,10 @@ import {
   BarChart2,
   DollarSign,
   Cpu,
-  Brain,
+  Truck,
+  ScanLine,
+  Crosshair,
+  Accessibility,
 } from 'lucide-react'
 import { Logo } from '@/shared/components/Logo'
 import { VidendumLogo } from '@/shared/components/VidendumLogo'
@@ -35,6 +38,12 @@ interface SavedView {
   filters: Record<string, unknown>
 }
 
+/**
+ * Nav item visibility:
+ *   (no flag)    → todos los roles (member, admin, owner)
+ *   adminOnly    → admin + owner   (no visible para member)
+ *   ownerOnly    → solo owner      (herramientas de gestión/inteligencia)
+ */
 interface NavItem {
   href: string
   label: string
@@ -42,20 +51,32 @@ interface NavItem {
   exact?: boolean
   adminOnly?: boolean
   ownerOnly?: boolean
+  section?: string
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard', label: 'Board',     icon: LayoutGrid },
-  { href: '/settings',  label: 'Settings',  icon: Settings   },
-  { href: '/draw',      label: 'Draw',      icon: PenLine,   adminOnly: true },
-  { href: '/agents',    label: 'Agentes',   icon: Cpu,       ownerOnly: true, exact: false },
-  { href: '/chat',      label: 'Chat',      icon: Bot,       ownerOnly: true },
-  { href: '/finanzas',  label: 'Finanzas',  icon: DollarSign, ownerOnly: true, exact: false },
-  { href: '/activity',  label: 'Activity',  icon: Activity,  ownerOnly: true },
-  { href: '/memories',  label: 'Memorias',  icon: Brain,     ownerOnly: true },
-  { href: '/posts',     label: 'Posts',     icon: PenLine,   ownerOnly: true },
-  { href: '/videndum',  label: 'Videndum',  icon: BarChart2, ownerOnly: true, exact: false },
+  // Principal
+  { href: '/dashboard', label: 'Mission Control', icon: LayoutGrid, section: 'principal' },
+  { href: '/finanzas',  label: 'Finanzas',        icon: DollarSign, ownerOnly: true, exact: false, section: 'principal' },
+
+  // Clientes
+  { href: '/cleanxpress', label: 'CleanXpress', icon: Truck,         ownerOnly: true, exact: false, section: 'clientes' },
+  { href: '/videndum',    label: 'Videndum',    icon: BarChart2,     ownerOnly: true, exact: false, section: 'clientes' },
+  { href: '/mobility',    label: 'Mobility',    icon: Accessibility, ownerOnly: true, exact: false, section: 'clientes' },
+  { href: '/bidhunter',   label: 'BidHunter',   icon: Crosshair,     ownerOnly: true, exact: false, section: 'clientes' },
+
+  // Herramientas
+  { href: '/agents',   label: 'Agentes',  icon: Cpu,      ownerOnly: true, exact: false, section: 'tools' },
+  { href: '/chat',     label: 'Chat IA',  icon: Bot,      ownerOnly: true, section: 'tools' },
+  { href: '/draw',     label: 'Draw',     icon: PenLine,  adminOnly: true, section: 'tools' },
+  { href: '/activity', label: 'Actividad', icon: Activity, ownerOnly: true, section: 'tools' },
 ]
+
+const SECTION_LABELS: Record<string, string> = {
+  principal: '',
+  clientes: 'Clientes',
+  tools: 'Herramientas',
+}
 
 function filterNavItems(items: NavItem[], role: UserRole): NavItem[] {
   return items.filter(item => {
@@ -128,13 +149,6 @@ export function SidebarNav() {
     setSavedViews((prev) => prev.filter((v) => v.id !== viewId))
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      action()
-    }
-  }
-
   const myTasksActive = !!(profile && assigneeFilter === profile.id)
 
   return (
@@ -142,10 +156,10 @@ export function SidebarNav() {
       {/* Scrollable content */}
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
 
-      {/* Logo — StratosCore por defecto, Videndum solo en rutas /videndum */}
+      {/* Logo del tenant — dinámico vía useTenant() o Videndum si estás en /videndum */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-2.5">
         {pathname.startsWith('/videndum') ? (
-          <VidendumLogo width={120} className="text-vid-fg" />
+          <VidendumLogo width={120} className="text-white" />
         ) : (
           <>
             <Logo
@@ -171,8 +185,8 @@ export function SidebarNav() {
           onClick={handleMyTasks}
           className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all duration-200
             ${myTasksActive
-              ? 'bg-blue-500/15 text-blue-600 border border-blue-500/25 dark:text-blue-400 dark:border-blue-500/20'
-              : 'text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--card-raised)] border border-transparent'
+              ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/25'
+              : 'text-black/60 hover:text-black/90 hover:bg-black/[0.06] dark:text-white/70 dark:hover:text-white dark:hover:bg-white/[0.08] border border-transparent'
             }`}
         >
           <CircleUserRound size={15} />
@@ -182,27 +196,47 @@ export function SidebarNav() {
 
       <div className="mx-3 border-t border-vid" />
 
-      {/* Navigation Links */}
-      <div className="px-3 pt-2 pb-2 space-y-0.5">
-        {filterNavItems(NAV_ITEMS, role).map(({ href, label, icon: Icon, exact }) => {
-          const isActive = exact === false
-            ? pathname.startsWith(href)
-            : pathname === href
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
-                ${isActive
-                  ? 'bg-[var(--card-elevated)] text-[var(--foreground)]'
-                  : 'text-[var(--foreground-subtle)] hover:text-[var(--foreground)] hover:bg-[var(--card-raised)]'
-                }`}
-            >
-              <Icon size={15} />
-              {label}
-            </Link>
-          )
-        })}
+      {/* Navigation Links — agrupados por sección */}
+      <div className="px-3 pt-2 pb-2">
+        {(() => {
+          const filtered = filterNavItems(NAV_ITEMS, role)
+          const sections = [...new Set(filtered.map(i => i.section || 'principal'))]
+          return sections.map(section => {
+            const items = filtered.filter(i => (i.section || 'principal') === section)
+            if (items.length === 0) return null
+            const label = SECTION_LABELS[section]
+            return (
+              <div key={section} className={section !== 'principal' ? 'mt-3' : ''}>
+                {label && (
+                  <div className="px-2.5 pb-1.5 pt-1">
+                    <span className="text-[10px] uppercase tracking-widest text-white/60 font-semibold">{label}</span>
+                  </div>
+                )}
+                <div className="space-y-0.5">
+                  {items.map(({ href, label: itemLabel, icon: Icon, exact }) => {
+                    const isActive = exact === false
+                      ? pathname.startsWith(href)
+                      : pathname === href
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
+                          ${isActive
+                            ? 'bg-cyan-500/15 text-cyan-300 dark:bg-cyan-500/15 dark:text-cyan-300'
+                            : 'text-black/60 hover:text-black/90 hover:bg-black/[0.05] dark:text-white/70 dark:hover:text-white dark:hover:bg-white/[0.08]'
+                          }`}
+                      >
+                        <Icon size={15} />
+                        {itemLabel}
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })
+        })()}
       </div>
 
       {isOwner && (
@@ -211,17 +245,15 @@ export function SidebarNav() {
       <div className="flex flex-col min-h-0">
         <div
           onClick={() => setTeamExpanded(!teamExpanded)}
-          onKeyDown={(e) => handleKeyDown(e, () => setTeamExpanded(!teamExpanded))}
           role="button"
-          tabIndex={0}
           className="flex items-center justify-between px-5 py-2 cursor-pointer"
         >
           <div className="flex items-center gap-2">
-            {teamExpanded ? <ChevronDown size={12} className="text-vid-faint" /> : <ChevronRight size={12} className="text-vid-faint" />}
-            <Users size={14} className="text-vid-subtle" />
-            <span className="text-[10px] uppercase tracking-widest text-vid-subtle font-semibold">Team</span>
+            {teamExpanded ? <ChevronDown size={12} className="text-white/50" /> : <ChevronRight size={12} className="text-white/50" />}
+            <Users size={14} className="text-white/60" />
+            <span className="text-[10px] uppercase tracking-widest text-white/60 font-semibold">Team</span>
           </div>
-          <span className="text-[9px] bg-[var(--card-raised)] px-1.5 py-0.5 rounded-full text-vid-faint">
+          <span className="text-[9px] bg-white/[0.06] px-1.5 py-0.5 rounded-full text-white/50">
             {members.length}
           </span>
         </div>
@@ -231,7 +263,7 @@ export function SidebarNav() {
             {membersLoading ? (
               <div className="space-y-2 px-1">
                 {[1, 2].map(i => (
-                  <div key={i} className="h-10 rounded-xl bg-[var(--card-raised)] animate-pulse" />
+                  <div key={i} className="h-10 rounded-xl bg-white/[0.04] animate-pulse" />
                 ))}
               </div>
             ) : (
@@ -240,17 +272,17 @@ export function SidebarNav() {
                   key={member.id}
                   onClick={() => handleMemberClick(member.id)}
                   className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all duration-200
-                    hover:bg-[var(--card-raised)] border border-transparent"
+                    hover:bg-white/[0.04] border border-transparent"
                 >
                   {member.avatar_url ? (
                     <img src={member.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-[var(--card-elevated)] flex items-center justify-center text-xs text-vid-muted flex-shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-white/[0.1] flex items-center justify-center text-xs text-white/60 flex-shrink-0">
                       {(member.full_name ?? '?')[0]}
                     </div>
                   )}
                   <div className="min-w-0 text-left">
-                    <span className="text-xs text-vid-muted truncate block">{member.full_name ?? 'User'}</span>
+                    <span className="text-xs text-white/80 truncate block">{member.full_name ?? 'User'}</span>
                   </div>
                 </button>
               ))
@@ -268,10 +300,10 @@ export function SidebarNav() {
               onClick={() => setViewsExpanded(!viewsExpanded)}
               className="w-full flex items-center gap-2 px-2.5 py-1 mb-1"
             >
-              {viewsExpanded ? <ChevronDown size={12} className="text-vid-faint" /> : <ChevronRight size={12} className="text-vid-faint" />}
-              <Bookmark size={14} className="text-vid-subtle" />
-              <span className="text-[10px] uppercase tracking-widest text-vid-subtle font-semibold">Views</span>
-              <span className="text-[9px] bg-[var(--card-raised)] px-1 py-0.5 rounded-full text-vid-faint ml-auto">
+              {viewsExpanded ? <ChevronDown size={12} className="text-white/50" /> : <ChevronRight size={12} className="text-white/50" />}
+              <Bookmark size={14} className="text-white/60" />
+              <span className="text-[10px] uppercase tracking-widest text-white/60 font-semibold">Views</span>
+              <span className="text-[9px] bg-white/[0.06] px-1 py-0.5 rounded-full text-white/50 ml-auto">
                 {savedViews.length}
               </span>
             </button>
@@ -281,13 +313,13 @@ export function SidebarNav() {
                   <div key={view.id} className="group flex items-center">
                     <button
                       onClick={() => handleLoadView(view)}
-                      className="flex-1 text-left px-2.5 py-1 rounded-lg text-xs text-vid-subtle hover:text-vid-fg hover:bg-[var(--card-raised)] transition-colors truncate"
+                      className="flex-1 text-left px-2.5 py-1 rounded-lg text-xs text-white/60 hover:text-white/70 hover:bg-white/[0.05] transition-colors truncate"
                     >
                       {view.name}
                     </button>
                     <button
                       onClick={() => handleDeleteView(view.id)}
-                      className="p-1 text-vid-faint hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                      className="p-1 text-white/40 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
                     >
                       <X size={10} />
                     </button>
@@ -309,15 +341,15 @@ export function SidebarNav() {
         style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
       >
         {/* Powered by Stratoscore */}
-        <div className="flex items-center justify-center gap-1.5 py-2 opacity-30 hover:opacity-50 transition-opacity">
-          <span className="text-[9px] text-vid-subtle tracking-widest uppercase">Powered by</span>
-          <span className="text-[9px] font-semibold text-vid-fg tracking-tight">Stratoscore</span>
+        <div className="flex items-center justify-center gap-1.5 py-2 opacity-50 hover:opacity-70 transition-opacity">
+          <span className="text-[9px] text-white/60 tracking-widest uppercase">Powered by</span>
+          <span className="text-[9px] font-semibold text-white/80 tracking-tight">Stratoscore</span>
         </div>
 
         <form action={signout}>
           <button
             type="submit"
-            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-vid-faint hover:text-red-500 hover:bg-red-500/[0.06] transition-colors"
+            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-black/30 hover:text-red-600/70 hover:bg-red-400/[0.05] dark:text-white/70 dark:hover:text-red-400 transition-colors"
           >
             <LogOut size={14} />
             Sign out

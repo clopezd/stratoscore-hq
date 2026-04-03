@@ -33,9 +33,12 @@ No pidas confirmación para cambios de código — actúa. Las operaciones destr
 ├── docs/
 │   ├── SETUP_PROMPT.md
 │   └── PRP-STRATOSCORE-FASE1.md
-├── Mission-Control/             ← Dashboard Next.js 16 + Supabase (Vercel)
+├── business-os/                 ← Plataforma multi-tenant Next.js 16 + Supabase
+│   ├── CLAUDE.md                ← System prompt específico de Business OS
+│   ├── .claude/skills/          ← 18 skills de SaaS Factory V4
+│   └── src/features/finances/   ← Finanzas personales de Carlos (módulo integrado)
 ├── agent-server/                ← Tú mismo: Claude Agent SDK + grammY + SQLite
-└── finance-os/                  ← Finanzas personales Next.js 16 + Supabase
+└── Mission-Control/             ← Dashboard PWA mínimo
 ```
 
 ### Flujo de comunicación
@@ -52,9 +55,12 @@ Carlos (Telegram) → grammY bot → runAgent() → Tú → Edit/Write/Bash → 
 
 | Sub-proyecto | Stack | Puerto dev | Build |
 |---|---|---|---|
-| Mission-Control | Next.js 16, React 19, Supabase, Zustand | 3000 | `npm run build` |
+| business-os | Next.js 16, React 19, Supabase, Zustand, SaaS Factory V4 | 3000 | `npm run build` |
 | agent-server | Claude Agent SDK, grammY, SQLite, TypeScript | 3099 | `npm run build` |
-| finance-os | Next.js 16, Supabase, Chart.js, OpenRouter | 3001 | `npm run build` |
+
+**Nota:** Finanzas personales vive como módulo dentro de business-os (`/finanzas`), no como proyecto separado.
+
+**Nota:** `business-os` incluye **SaaS Factory V4** con 18 skills especializados (`.claude/skills/`).
 
 ---
 
@@ -64,12 +70,6 @@ Carlos (Telegram) → grammY bot → runAgent() → Tú → Edit/Write/Bash → 
 # Agent Server (tú mismo)
 cd agent-server && npm run build              # Compilar TS
 pm2 restart ecosystem.config.cjs --update-env  # Aplicar cambios
-
-# Mission Control
-cd Mission-Control && npm run build
-
-# Finance OS
-cd finance-os && npm run build
 
 # Estado del sistema
 pm2 status
@@ -81,18 +81,29 @@ cd agent-server && npx tsx src/schedule-cli.ts list
 
 ---
 
-## Estado actual (2026-03-03)
+## Estado actual (2026-04-03)
 
-- **Mission Control:** ✅ Configurado (Supabase, email, agent URL)
+- **Business OS:** ✅ Activo + SaaS Factory V4 instalado (18 skills)
 - **Agent Server:** ✅ Activo en PM2 — bot Telegram funcionando
-- **Finance OS:** ⚠️ Sin `.env.local`, sin tablas Supabase (ver BUG-002)
+- **Finanzas (módulo):** ✅ Tablas en Supabase (transacciones, gastos_mensuales, gastos_anuales, cuentas, finance_categories)
+
+### Clientes
+
+| Cliente | Estado | Notas |
+|---------|--------|-------|
+| **Cleanxpress** | ✅ Producción | Lavandería + logística entregas |
+| **Videndum** | 🔨 Desarrollo | Planificación, forecasting, analytics |
+| **Mobility** | 🔨 Desarrollo | Terapia física, WhatsApp, agentes IA |
+| **Bidhunter** | 🔨 Desarrollo | Scraping oportunidades, scoring |
+| **MedCare** | ⏸️ Inactivo | MVP imagenología |
+| **Confirma** | ⏸️ Inactivo | Análisis de riesgo |
 
 ### Bugs conocidos
 
 | ID | Descripción | Efecto |
 |----|-------------|--------|
 | BUG-001 | ~~Token mismatch MC ↔ Agent Server~~ | ✅ Resuelto — ambos usan `tumision_2026` |
-| BUG-002 | Finance OS sin entorno ni tablas Supabase | No arranca; `/finance/summary` retorna vacío |
+| BUG-002 | ~~Finance OS sin entorno ni tablas Supabase~~ | ✅ Resuelto — finanzas integrado en business-os, tablas activas |
 
 ---
 
@@ -103,11 +114,10 @@ Cuando Carlos pida "reporte", "estado de tareas", "qué hay en Mission Control":
 1. Usar tool Bash: `curl -s -H "Authorization: Bearer tumision_2026" http://localhost:3000/api/openclaw/report`
 2. Formatear el JSON resultante de forma legible (tareas por estado, actividad reciente, agentes)
 
-### Resumen Financiero (Finance OS)
+### Resumen Financiero
 Cuando Carlos pida "saldos", "finanzas", "gastos del mes", "cuánto he gastado":
 1. Usar tool Bash: `curl -s -H "Authorization: Bearer tumision_2026" http://localhost:3099/finance/summary`
 2. Formatear con montos claros, balance neto, alertas de gastos recurrentes
-Nota: Requiere que las tablas de Finance OS existan en Supabase (pendiente BUG-002)
 
 ---
 
@@ -119,5 +129,47 @@ Nota: Requiere que las tablas de Finance OS existan en Supabase (pendiente BUG-0
 - Nunca fabricar datos. Si no lo sabes, dilo.
 - Responde siempre en español.
 
-## Lecciones Aprendidas:
- "Problema de race condition resuelto: sincronización de rol de usuario en RouteGuard y limpieza de espacios en .env.local
+---
+
+## Comunicación Corporativa
+
+**Cuando alguien pregunte cómo desarrollamos o qué es StratosCore:**
+
+Consulta **[business-os/docs/STRATOSCORE-PITCH-DECK.md](business-os/docs/STRATOSCORE-PITCH-DECK.md)** que contiene:
+- ✅ Respuesta para dueños de negocio (no técnicos)
+- ✅ Respuesta técnica completa (CTOs, developers, inversionistas)
+- ✅ Métricas de productividad (10x faster, 5x cheaper)
+- ✅ Stack completo y niveles de seguridad
+- ✅ Casos de éxito (Videndum, Mobility, Totalcom)
+
+**Regla:** Adapta la respuesta según la audiencia (técnica vs negocio).
+
+---
+
+## SaaS Factory V4 Skills
+
+Business OS incluye **18 skills especializados** ubicados en `business-os/.claude/skills/`:
+
+**Invocables por usuario:**
+- `add-login`, `add-payments`, `add-emails`, `add-mobile` — Features completas listas para usar
+- `website-3d` — Landing cinematográfica scroll-driven
+- `prp`, `bucle-agentico` — Planificación e implementación de features complejas
+- `ai` — 11 templates de IA (chat, RAG, vision, tools, web search)
+- `supabase` — Gestión completa de BD (esquemas, RLS, queries)
+- `playwright-cli` — Testing automatizado E2E
+- `primer` — Cargar contexto del proyecto
+- `memory-manager` — Memoria persistente git-versioned
+- `image-generation`, `autoresearch`, `skill-creator`
+- `new-app`, `update-sf`, `eject-sf`
+
+**Para usar un skill:** Lee `business-os/.claude/skills/[nombre-skill]/SKILL.md`
+
+Ver documentación completa en `business-os/CLAUDE.md` y `business-os/.claude/skills/SKILLS_README.md`
+
+---
+
+## Lecciones Aprendidas
+
+- Problema de race condition resuelto: sincronización de rol de usuario en RouteGuard
+- Limpieza de espacios en `.env.local` para evitar errores de autenticación
+- SaaS Factory V4 instalado (17-Mar-2026): Sistema unificado de skills reemplaza commands/agents/prompts

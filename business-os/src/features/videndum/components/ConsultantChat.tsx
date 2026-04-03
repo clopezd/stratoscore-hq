@@ -4,8 +4,8 @@ import { useRef, useEffect, useState, KeyboardEvent } from 'react'
 import { BrainCircuit, Send, Square, Trash2, BarChart2, TrendingUp, Radar, RefreshCw, CheckCircle2, Download } from 'lucide-react'
 import { useConsultantChat } from '../hooks/useConsultantChat'
 import { MarkdownMessage } from '@/features/chat/components/MarkdownMessage'
-import type { ToolCall } from '../types'
-import type { DecisionMatrixData } from '@/features/videndum/types'
+import type { ToolCall } from '../types/consultant'
+import type { DecisionMatrixData } from '../types'
 
 // ── PDF export ──────────────────────────────────────────────────────────────────
 
@@ -26,7 +26,7 @@ async function downloadMessagePDF(question: string, answer: string) {
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(9)
   doc.setTextColor(255, 255, 255)
-  doc.text('VIDENDUM — Consultor Estratégico IA', marginL, 9)
+  doc.text('VIDENDUM — VIDEO 18 IA', marginL, 9)
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(7.5)
   doc.text(new Date().toLocaleString('es-CO'), pageW - marginR, 9, { align: 'right' })
@@ -38,7 +38,7 @@ async function downloadMessagePDF(question: string, answer: string) {
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(9)
     doc.setTextColor(255, 255, 255)
-    doc.text('VIDENDUM — Consultor Estratégico IA', marginL, 9)
+    doc.text('VIDENDUM — VIDEO 18 IA', marginL, 9)
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(7.5)
     doc.text(new Date().toLocaleString('es-CO'), pageW - marginR, 9, { align: 'right' })
@@ -169,9 +169,12 @@ async function downloadMessagePDF(question: string, answer: string) {
 // ── Tool badge ─────────────────────────────────────────────────────────────────
 
 const TOOL_META: Record<string, { label: string; icon: typeof BarChart2; color: string }> = {
-  get_analytics:    { label: 'Analytics',    icon: BarChart2,  color: 'text-blue-400' },
-  get_variance:     { label: 'Varianza',     icon: TrendingUp, color: 'text-amber-400' },
-  get_intelligence: { label: 'Inteligencia', icon: Radar,      color: 'text-indigo-400' },
+  get_analytics:           { label: 'Analytics',    icon: BarChart2,  color: 'text-blue-400' },
+  get_variance:            { label: 'Varianza',     icon: TrendingUp, color: 'text-amber-400' },
+  get_intelligence:        { label: 'Inteligencia', icon: Radar,      color: 'text-indigo-400' },
+  get_ml_forecast:         { label: 'ML Forecast',  icon: TrendingUp, color: 'text-green-400' },
+  get_competitor_threats:  { label: 'Competencia',  icon: Radar,      color: 'text-red-400' },
+  get_planning_adjustments:{ label: 'Planning',     icon: BarChart2,  color: 'text-violet-400' },
 }
 
 function ToolBadge({ call }: { call: ToolCall }) {
@@ -193,10 +196,10 @@ function ToolBadge({ call }: { call: ToolCall }) {
 // ── Suggested prompts ──────────────────────────────────────────────────────────
 
 const SUGGESTED = [
-  '¿Cuál es el estado actual del pipeline y qué SKUs tienen mayor order book?',
-  '¿Qué productos están más por debajo de su forecast? ¿Por qué?',
-  '¿Cuáles son los principales riesgos competitivos del portfolio hoy?',
-  '¿Cuál es el Book-to-Bill del último mes y qué señal nos da?',
+  '¿Qué competidores están robando cuota en Manfrotto y por qué falla el DPRO?',
+  '¿Cuál es el forecast ML para las próximas 4 semanas vs. forecast UK?',
+  '¿Qué SKUs tienen mayor desviación negativa y cuál es la amenaza competitiva?',
+  '¿Cuál es el historial de ajustes CR→UK y qué accuracy han tenido?',
 ]
 
 // ── Main component ─────────────────────────────────────────────────────────────
@@ -258,7 +261,8 @@ export function ConsultantChat({ radarContext, triggerMessage }: ConsultantChatP
       <div className="px-4 py-3 border-b border-vid flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <BrainCircuit size={13} className="text-violet-400" />
-          <p className="text-xs font-medium text-vid-muted">Consultor Estratégico</p>
+          <p className="text-xs font-medium text-vid-muted">VIDEO 18</p>
+          <span className="text-[9px] text-violet-400/60 font-mono">v1.0</span>
           {radarContext ? (
             <span className="inline-flex items-center gap-1 text-[9px] text-violet-300/70 bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 rounded-full ml-1">
               <CheckCircle2 size={8} />
@@ -285,10 +289,19 @@ export function ConsultantChat({ radarContext, triggerMessage }: ConsultantChatP
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-0">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
-            <BrainCircuit size={28} className="text-vid-faint" />
-            <p className="text-[11px] text-vid-faint text-center">
-              Consulta datos en tiempo real del portfolio Videndum
-            </p>
+            <div className="relative">
+              <BrainCircuit size={32} className="text-violet-400" />
+              <div className="absolute -bottom-1 -right-1 bg-violet-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full">
+                V18
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-semibold text-white mb-1">VIDEO 18</p>
+              <p className="text-[10px] text-violet-400/80 mb-2">Asistente legendario · 50k+ profesionales confían</p>
+              <p className="text-[11px] text-vid-faint">
+                Consulta datos en tiempo real del portfolio Videndum
+              </p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
               {SUGGESTED.map((s, i) => (
                 <button

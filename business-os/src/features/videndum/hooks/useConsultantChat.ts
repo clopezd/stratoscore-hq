@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import type { ConsultantMessage, ToolCall } from '../types'
+import type { ConsultantMessage, ToolCall } from '../types/consultant'
 
 type SSEEvent =
   | { type: 'text_delta'; text: string }

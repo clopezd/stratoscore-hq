@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Microscope } from 'lucide-react'
 import { DecisionMatrix } from './DecisionMatrix'
-import { ConsultantChat } from '@/features/consultant/components/ConsultantChat'
+import { ConsultantChat } from './ConsultantChat'
 import { ForecastAccuracy } from './ForecastAccuracy'
 import { TimeSeriesChart } from './TimeSeriesChart'
 import type { DecisionMatrixData } from '../types'
