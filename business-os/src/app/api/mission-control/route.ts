@@ -1,36 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-
-interface Client {
-  id: string
-  name: string
-  tagline: string
-  logo_url: string | null
-  status: 'active' | 'paused' | 'archived'
-  dashboard_url: string
-  primary_metric_label: string | null
-  primary_metric_value: string | null
-  secondary_metric_label: string | null
-  secondary_metric_value: string | null
-  alerts_count: number
-  tasks_count: number
-  last_activity_action: string | null
-  last_activity_timestamp: string | null
-  brand_color: string
-}
-
-interface ActivityItem {
-  id: number
-  client_id: string
-  client_name: string
-  action: string
-  severity: 'info' | 'warning' | 'success' | 'error'
-  icon: string
-  created_at: string
-}
 
 export async function GET() {
   const supabase = await createClient()
@@ -41,125 +14,38 @@ export async function GET() {
   }
 
   try {
-    // Obtener tasks de la tabla principal
-    const { data: tasks, error: tasksError } = await supabase
-      .from('tasks')
+    const service = createServiceClient()
+
+    // Leer clientes de Supabase (fuente de verdad)
+    const { data: clients, error: clientsError } = await service
+      .from('clients')
       .select('*')
+      .neq('id', '.template')
+      .order('name')
 
-    // Clientes del portafolio con estados reales
-    const clients: Client[] = [
-      {
-        id: 'cleanxpress',
-        name: 'C&C Clean Xpress',
-        tagline: 'Lavandería Industrial',
-        logo_url: null,
-        status: 'active',
-        dashboard_url: 'https://lavanderia.stratoscore.app/logistica',
-        primary_metric_label: 'ESTADO',
-        primary_metric_value: 'En producción',
-        secondary_metric_label: 'Pendientes',
-        secondary_metric_value: '8',
-        alerts_count: 1,
-        tasks_count: 5,
-        last_activity_action: '12 órdenes completadas',
-        last_activity_timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-        brand_color: '#06b6d4',
-      },
-      {
-        id: 'videndum',
-        name: 'Videndum',
-        tagline: 'Sales Intelligence Platform',
-        logo_url: '/assets/videndum-logo.png',
-        status: 'active',
-        dashboard_url: '/videndum',
-        primary_metric_label: 'ESTADO',
-        primary_metric_value: 'En desarrollo',
-        secondary_metric_label: null,
-        secondary_metric_value: null,
-        alerts_count: 2,
-        tasks_count: tasks?.filter(t => t.status !== 'done').length || 8,
-        last_activity_action: 'Nuevo forecast ML generado',
-        last_activity_timestamp: new Date().toISOString(),
-        brand_color: '#7c3aed',
-      },
-      {
-        id: 'mobility',
-        name: 'Mobility',
-        tagline: 'Centro de Rehabilitación',
-        logo_url: 'https://mobilitygroup.co/wp-content/uploads/2022/11/LOGOS-MOBILITY-e1669820172138.png',
-        status: 'active',
-        dashboard_url: '/mobility',
-        primary_metric_label: 'ESTADO',
-        primary_metric_value: 'En desarrollo',
-        secondary_metric_label: null,
-        secondary_metric_value: null,
-        alerts_count: 0,
-        tasks_count: 12,
-        last_activity_action: '3 evaluaciones completadas',
-        last_activity_timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-        brand_color: '#4472B8',
-      },
-      {
-        id: 'totalcom',
-        name: 'Totalcom',
-        tagline: 'API Integration Project',
-        logo_url: null,
-        status: 'paused',
-        dashboard_url: '/totalcom',
-        primary_metric_label: 'ESTADO',
-        primary_metric_value: 'Idea / Propuesta',
-        secondary_metric_label: null,
-        secondary_metric_value: null,
-        alerts_count: 0,
-        tasks_count: 3,
-        last_activity_action: 'Propuesta enviada',
-        last_activity_timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-        brand_color: '#3b82f6',
-      },
-    ]
+    if (clientsError) {
+      return NextResponse.json({ error: clientsError.message }, { status: 500 })
+    }
 
-    // Actividades hardcoded
-    const activities: ActivityItem[] = [
-      {
-        id: 1,
-        client_id: 'videndum',
-        client_name: 'Videndum',
-        action: 'Nuevo forecast ML generado',
-        severity: 'info',
-        icon: '📊',
-        created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: 3,
-        client_id: 'mobility',
-        client_name: 'Mobility',
-        action: '3 evaluaciones completadas',
-        severity: 'success',
-        icon: '✅',
-        created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: 4,
-        client_id: 'videndum',
-        client_name: 'Videndum',
-        action: 'Nuevo forecast ML generado',
-        severity: 'info',
-        icon: '📈',
-        created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-      },
-    ]
+    // Leer actividad reciente
+    const { data: activities } = await service
+      .from('activity_feed')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10)
 
     // Calcular stats globales
+    const clientList = clients || []
     const stats = {
-      totalClients: clients.length,
-      activeClients: clients.filter(c => c.status === 'active').length,
-      totalTasks: clients.reduce((sum, c) => sum + (c.tasks_count || 0), 0),
-      totalAlerts: clients.reduce((sum, c) => sum + (c.alerts_count || 0), 0),
+      totalClients: clientList.length,
+      activeClients: clientList.filter((c: any) => c.status === 'active').length,
+      totalTasks: clientList.reduce((sum: number, c: any) => sum + (c.tasks_count || 0), 0),
+      totalAlerts: clientList.reduce((sum: number, c: any) => sum + (c.alerts_count || 0), 0),
     }
 
     return NextResponse.json({
-      clients,
-      activities,
+      clients: clientList,
+      activities: activities || [],
       stats,
     })
   } catch (e) {
@@ -168,5 +54,51 @@ export async function GET() {
       { error: e instanceof Error ? e.message : 'Error desconocido' },
       { status: 500 }
     )
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await req.json()
+    const { id, name, tagline, status, dashboard_url, brand_color, logo_url } = body
+
+    if (!name) {
+      return NextResponse.json({ error: 'name es requerido' }, { status: 400 })
+    }
+
+    const clientId = id || name.toLowerCase().replace(/[^a-z0-9]/g, '-')
+
+    const service = createServiceClient()
+    const { data, error } = await service
+      .from('clients')
+      .upsert({
+        id: clientId,
+        name,
+        tagline: tagline || `Proyecto ${name}`,
+        status: status || 'active',
+        dashboard_url: dashboard_url || `/${clientId}`,
+        brand_color: brand_color || '#3b82f6',
+        logo_url: logo_url || null,
+        alerts_count: 0,
+        tasks_count: 0,
+        updated_at: new Date().toISOString(),
+      })
+      .select()
+      .single()
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json(data, { status: 201 })
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 500 })
   }
 }
