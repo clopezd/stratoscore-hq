@@ -1,0 +1,26 @@
+fecha,descripcion,tipo,categoria,monto,referencia
+2026-01-05,Venta de mercadería general,ingreso,Ventas,2500000,FAC-001
+2026-01-08,Servicio de consultoría,ingreso,Servicios,1800000,FAC-002
+2026-01-10,Alquiler de local comercial,gasto,Alquiler,450000,REC-001
+2026-01-12,Salarios enero,gasto,Salarios,1200000,PLN-001
+2026-01-12,Cargas sociales CCSS enero,gasto,Cargas Sociales,312000,CCSS-001
+2026-01-15,Venta de productos electrónicos,ingreso,Ventas,3200000,FAC-003
+2026-01-15,Servicios públicos (ICE),gasto,Servicios Públicos,85000,ICE-001
+2026-01-18,Compra de inventario,gasto,Inventario,1500000,OC-001
+2026-01-20,Servicio de transporte,ingreso,Servicios,950000,FAC-004
+2026-01-22,Internet y teléfono,gasto,Telecomunicaciones,65000,KOLBI-001
+2026-01-25,Venta al detalle,ingreso,Ventas,1750000,FAC-005
+2026-01-28,Mantenimiento equipo,gasto,Mantenimiento,180000,REC-002
+2026-02-03,Venta de servicios profesionales,ingreso,Servicios,2100000,FAC-006
+2026-02-05,Alquiler de local febrero,gasto,Alquiler,450000,REC-003
+2026-02-08,Suministros de oficina,gasto,Suministros,45000,REC-004
+2026-02-10,Salarios febrero,gasto,Salarios,1200000,PLN-002
+2026-02-10,Cargas sociales CCSS febrero,gasto,Cargas Sociales,312000,CCSS-002
+2026-02-15,Venta de mercadería,ingreso,Ventas,2800000,FAC-007
+2026-02-18,Póliza INS,gasto,Seguros,125000,INS-001
+2026-02-20,Honorarios contador,gasto,Honorarios,200000,REC-005
+2026-02-25,Servicio de asesoría,ingreso,Servicios,1400000,FAC-008
+2026-03-01,Venta productos marzo,ingreso,Ventas,3100000,FAC-009
+2026-03-05,Alquiler marzo,gasto,Alquiler,450000,REC-006
+2026-03-08,Publicidad digital,gasto,Publicidad,175000,META-001
+2026-03-10,Salarios marzo,gasto,Salarios,1200000,PLN-003
