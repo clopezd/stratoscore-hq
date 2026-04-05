@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutGrid, Upload, ListTree } from 'lucide-react'
+import { LayoutGrid, Upload, ListTree, FileText } from 'lucide-react'
 
 const TABS = [
   {
@@ -25,6 +25,13 @@ const TABS = [
     icon: ListTree,
     exact: false,
     tooltip: 'Plan de cuentas contable estándar CR',
+  },
+  {
+    href: '/contacr/reportes',
+    label: 'Reportes',
+    icon: FileText,
+    exact: false,
+    tooltip: 'Estado de resultados y balance general',
   },
 ] as const
 
