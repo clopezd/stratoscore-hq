@@ -78,6 +78,8 @@ export interface RiskEntry {
   risk_type: 'OBSOLESCENCIA' | 'COMPETENCIA_CHINA' | 'SUSTITUCIÓN_IP' | 'DEMANDA_LATENTE' | 'GOING_CONCERN'
   severity: 'CRÍTICA' | 'ALTA' | 'MEDIA' | 'BAJA'
   competitor_threat: string | null
+  competitor_advantage?: string      // ventaja estructural del competidor (precio/lead_time/región/canal)
+  forecast_impact?: string           // por qué el DPRO falla en predecir este riesgo — CRÍTICO para gerente de planta
   evidence: string
   immediate_action: 'LIQUIDAR' | 'PROVISIONAR' | 'VIGILAR' | 'MANTENER'
 }

@@ -22,18 +22,36 @@ export const maxDuration = 120
 
 // ── DB helper ─────────────────────────────────────────────────────────────────
 
-const MGMT_URL = 'https://api.supabase.com/v1/projects/csiiulvqzkgijxbgdqcv/database/query'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 
-async function mgmtSql<T = Record<string, unknown>>(query: string): Promise<T[]> {
-  const token = process.env.SUPABASE_MGMT_TOKEN
-  if (!token) throw new Error('SUPABASE_MGMT_TOKEN no configurado')
-  const res = await fetch(MGMT_URL, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
+/**
+ * Ejecuta queries SQL usando Service Role Key con REST API de Supabase.
+ * Usa el endpoint /rest/v1/rpc para ejecutar funciones de postgres.
+ * Requiere SUPABASE_SERVICE_ROLE_KEY en .env.local
+ */
+async function execSql<T = Record<string, unknown>>(query: string): Promise<T[]> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY no configurados')
+  }
+
+  // Cliente admin con Service Role Key (bypassa RLS, acceso total)
+  const adminClient = createAdminClient(supabaseUrl, serviceRoleKey, {
+    db: { schema: 'public' },
+    auth: { persistSession: false, autoRefreshToken: false }
   })
-  const data = await res.json()
-  if (!res.ok || data.message) throw new Error(data.message ?? `HTTP ${res.status}`)
+
+  // Usar cliente admin para ejecutar query directo via postgREST
+  // Como postgREST no soporta SQL arbitrario, usamos fetch directo al PostgREST con una función helper
+  const { data, error } = await adminClient.rpc('exec_raw_sql', { query_text: query })
+
+  if (error) {
+    console.error('[execSql] Error ejecutando query:', error)
+    throw new Error(`SQL error: ${error.message}`)
+  }
+
   return data as T[]
 }
 
@@ -55,7 +73,10 @@ Reglas de respuesta:
 Tools disponibles:
 - get_analytics: B2B mensual, pipeline activo (order book + oportunidades ponderadas), KPIs del año en curso.
 - get_variance: Desviación real vs forecast por SKU. Identifica qué está sobre o bajo el plan.
-- get_intelligence: Declive de revenue por SKU (2022→2024), pipeline top 10 y contexto de mercado. Para riesgo competitivo, obsolescencia, posicionamiento.`
+- get_intelligence: Declive de revenue por SKU (2022→2024), pipeline top 10 y contexto de mercado. Para riesgo competitivo, obsolescencia, posicionamiento.
+- get_ml_forecast: Predicciones ML (Prophet) de las próximas semanas, comparado con forecast UK y demanda histórica. Para planning y early warnings.
+- get_competitor_threats: Análisis de amenazas competitivas específicas (Cartoni, Miller, Libec, Neewer, etc.) por SKU y segmento. Explica por qué el DPRO falla.
+- get_planning_adjustments: Historial de ajustes colaborativos UK ↔ CR (propuestas, aprobaciones, razones). Para auditoría y aprendizaje.`
 
 // ── Tool implementations ──────────────────────────────────────────────────────
 
@@ -69,7 +90,7 @@ const TOOL_SCHEMA: Record<string, { description: string; parameters: ReturnType<
     execute: async () => {
       console.log('[consultant] get_analytics — querying DB...')
       const [rawMonthly, rawPipeline, kpiRows] = await Promise.all([
-        mgmtSql<{ year: string; month: string; revenue_qty: string; order_intake_qty: string; book_to_bill: string | null }>(`
+        execSql<{ year: string; month: string; revenue_qty: string; order_intake_qty: string; book_to_bill: string | null }>(`
           SELECT year, month,
             ROUND(SUM(revenue_qty)::numeric, 0) AS revenue_qty,
             ROUND(SUM(order_intake_qty)::numeric, 0) AS order_intake_qty,
@@ -81,7 +102,7 @@ const TOOL_SCHEMA: Record<string, { description: string; parameters: ReturnType<
             AND year = (SELECT MAX(year) FROM public.videndum_full_context WHERE month IS NOT NULL)
           GROUP BY year, month ORDER BY month
         `),
-        mgmtSql<{ part_number: string; catalog_type: string | null; order_book_qty: string; opportunities_qty: string; opp_unfactored_qty: string }>(`
+        execSql<{ part_number: string; catalog_type: string | null; order_book_qty: string; opportunities_qty: string; opp_unfactored_qty: string }>(`
           SELECT part_number, catalog_type,
             ROUND(SUM(order_book_qty)::numeric, 0) AS order_book_qty,
             ROUND(SUM(opportunities_qty)::numeric, 1) AS opportunities_qty,
@@ -92,7 +113,7 @@ const TOOL_SCHEMA: Record<string, { description: string; parameters: ReturnType<
           HAVING SUM(order_book_qty) + SUM(opportunities_qty) > 0
           ORDER BY SUM(order_book_qty) + SUM(opportunities_qty) DESC LIMIT 20
         `),
-        mgmtSql<{ b2b_last: string | null; month_last: string; year_last: string; total_ob: string; total_rev: string; total_skus: string }>(`
+        execSql<{ b2b_last: string | null; month_last: string; year_last: string; total_ob: string; total_rev: string; total_skus: string }>(`
           SELECT
             (SELECT ROUND((SUM(order_intake_qty)/NULLIF(SUM(revenue_qty),0))::numeric,3)
              FROM public.videndum_full_context
@@ -137,7 +158,7 @@ const TOOL_SCHEMA: Record<string, { description: string; parameters: ReturnType<
     parameters: z.object({}),
     execute: async () => {
       console.log('[consultant] get_variance — querying DB...')
-      const varSql = (order: 'ASC' | 'DESC') => mgmtSql<{
+      const varSql = (order: 'ASC' | 'DESC') => execSql<{
         part_number: string; catalog_type: string | null
         actual_qty: string; forecast_qty: string; variance_pct: string; matched_months: string
       }>(`
@@ -169,7 +190,7 @@ const TOOL_SCHEMA: Record<string, { description: string; parameters: ReturnType<
     execute: async () => {
       console.log('[consultant] get_intelligence — querying DB...')
       const [revTrend, healthyPipeline, kpiSnap] = await Promise.all([
-        mgmtSql<{ part_number: string; catalog_type: string | null; rev_2022: string; rev_2023: string; rev_2024: string }>(`
+        execSql<{ part_number: string; catalog_type: string | null; rev_2022: string; rev_2023: string; rev_2024: string }>(`
           SELECT part_number, catalog_type,
             ROUND(SUM(CASE WHEN year=2022 THEN quantity ELSE 0 END)::numeric,0) AS rev_2022,
             ROUND(SUM(CASE WHEN year=2023 THEN quantity ELSE 0 END)::numeric,0) AS rev_2023,
@@ -183,7 +204,7 @@ const TOOL_SCHEMA: Record<string, { description: string; parameters: ReturnType<
                   SUM(CASE WHEN year=2022 THEN quantity ELSE 0 END) ELSE 0 END) ASC
           LIMIT 15
         `),
-        mgmtSql<{ part_number: string; catalog_type: string | null; order_book_qty: string; opportunities_qty: string }>(`
+        execSql<{ part_number: string; catalog_type: string | null; order_book_qty: string; opportunities_qty: string }>(`
           SELECT part_number, catalog_type,
             ROUND(SUM(order_book_qty)::numeric,0) AS order_book_qty,
             ROUND(SUM(opportunities_qty)::numeric,1) AS opportunities_qty
@@ -192,7 +213,7 @@ const TOOL_SCHEMA: Record<string, { description: string; parameters: ReturnType<
           GROUP BY part_number, catalog_type
           ORDER BY SUM(order_book_qty) DESC LIMIT 10
         `),
-        mgmtSql<{ b2b_last: string | null; month_last: string; year_last: string; total_ob: string; total_rev_2024: string; total_skus_2024: string }>(`
+        execSql<{ b2b_last: string | null; month_last: string; year_last: string; total_ob: string; total_rev_2024: string; total_skus_2024: string }>(`
           SELECT
             (SELECT ROUND((SUM(order_intake_qty)/NULLIF(SUM(revenue_qty),0))::numeric,3)
              FROM public.videndum_full_context
@@ -245,6 +266,149 @@ const TOOL_SCHEMA: Record<string, { description: string; parameters: ReturnType<
           tailwinds: ['IP Workflows SMPTE 2110 (17.6% CAGR)', 'Streaming demand', 'REMI/5G broadcast'],
           headwinds: ['Competencia china ICC', 'IA generativa de video', 'Aranceles US 2025'],
         },
+      }
+    },
+  },
+
+  get_ml_forecast: {
+    description: 'Obtiene predicciones ML (Prophet) de las próximas 4-8 semanas, comparadas con forecast UK (si existe) y demanda histórica. Ideal para planning, early warnings y detectar desviaciones forecast.',
+    parameters: z.object({ sku: z.string().optional().describe('SKU específico. Si se omite, devuelve top SKUs con mayor forecast.') }),
+    execute: async (args: { sku?: string }) => {
+      console.log('[consultant] get_ml_forecast — sku:', args.sku ?? 'ALL')
+      const rows = await execSql<{
+        sku: string; week: string; week_start_date: string
+        ml_prediction: string; ml_confidence_low: string; ml_confidence_high: string
+        uk_forecast: string | null; real_demand: string | null
+        trend_factor: string | null; seasonality_factor: string | null; competition_factor: string | null
+      }>(args.sku
+        ? `SELECT sku, week, week_start_date, ml_prediction, ml_confidence_low, ml_confidence_high,
+             uk_forecast, real_demand, trend_factor, seasonality_factor, competition_factor
+           FROM public.v_forecast_comparison
+           WHERE sku = '${args.sku.replace(/'/g, "''")}'
+           ORDER BY week_start_date ASC LIMIT 8`
+        : `SELECT sku, week, week_start_date, ml_prediction, ml_confidence_low, ml_confidence_high,
+             uk_forecast, real_demand, trend_factor, seasonality_factor, competition_factor
+           FROM public.v_forecast_comparison
+           WHERE week_start_date >= CURRENT_DATE
+           ORDER BY ml_prediction DESC LIMIT 20`
+      )
+      console.log('[consultant] get_ml_forecast — OK, rows:', rows.length)
+      return {
+        source: 'get_ml_forecast',
+        forecasts: rows.map(r => ({
+          sku: r.sku, week: r.week, week_start_date: r.week_start_date,
+          ml_prediction: Number(r.ml_prediction),
+          ml_confidence_band: [Number(r.ml_confidence_low), Number(r.ml_confidence_high)],
+          uk_forecast: r.uk_forecast ? Number(r.uk_forecast) : null,
+          real_demand: r.real_demand ? Number(r.real_demand) : null,
+          deviation_uk_vs_ml_pct: r.uk_forecast && Number(r.uk_forecast) > 0
+            ? Math.round((Number(r.uk_forecast) - Number(r.ml_prediction)) / Number(r.ml_prediction) * 100)
+            : null,
+          factors: {
+            trend: r.trend_factor ? Number(r.trend_factor) : null,
+            seasonality: r.seasonality_factor ? Number(r.seasonality_factor) : null,
+            competition: r.competition_factor ? Number(r.competition_factor) : null,
+          },
+        })),
+      }
+    },
+  },
+
+  get_competitor_threats: {
+    description: 'Análisis de amenazas competitivas por SKU o segmento (Cartoni, Miller, Camgear, Libec, Neewer, DJI, SmallRig). Incluye ventaja competitiva y razón específica por la que el DPRO falla en forecast.',
+    parameters: z.object({ segment: z.string().optional().describe('Segmento: Manfrotto|Sachtler|Vinten|Teradek|Litepanels. Si se omite, devuelve top amenazas globales.') }),
+    execute: async (args: { segment?: string }) => {
+      console.log('[consultant] get_competitor_threats — segment:', args.segment ?? 'ALL')
+
+      // Mapa de competidores conocidos por segmento (hardcoded, basado en docs)
+      const competitorMap: Record<string, { name: string; impact: string; advantage: string; dpro_fail_reason: string; vs: string[] }[]> = {
+        Manfrotto: [
+          { name: 'Libec', impact: 'ALTO', advantage: 'Precios 20-30% más bajos, manufactura japonesa (percepción calidad)', dpro_fail_reason: 'DPRO proyecta ventas Manfrotto pro basándose en histórico pre-2023. Libec entró agresivamente en APAC en 2024, robando 40% de deals mid-tier. Pipeline se estanca pero CRM no captura "perdido a Libec" como razón.', vs: ['MT055XPRO3', 'MVH502AH', 'MVK502AM'] },
+          { name: 'Neewer', impact: 'CRÍTICO', advantage: 'Precios 60-80% más bajos, distribución Amazon/AliExpress (canal directo consumidor)', dpro_fail_reason: 'DPRO proyecta ventas Manfrotto ICC basándose en órdenes B2B de distribuidores tradicionales. Neewer vende directo a consumidor vía Amazon, un canal completamente ciego para CRM de Videndum. Cuando DPRO ve "pipeline sano" de distribuidores, realidad es que distribuidores bajan órdenes Manfrotto porque sus clientes finales compran Neewer directo online. Forecast falla porque mide síntoma (distribuidores compran menos) pero no causa (Neewer roba venta retail).', vs: ['MKCOMPACTADV-BK', 'MTPIXI-B', 'MKBFRA4-BH'] },
+        ],
+        Sachtler: [
+          { name: 'Cartoni', impact: 'ALTO', advantage: 'Calidad similar, precios 10-20% más bajos, lead times EU (manufactura Italia)', dpro_fail_reason: 'Cartoni compite en calidad similar pero 10-20% más barato. Clientes posponen órdenes Sachtler esperando mejores términos o evaluar Cartoni. DPRO no captura este "pipeline estancado por pricing competitivo".', vs: ['FSB8', 'FSB10', 'VIDEO18S2'] },
+          { name: 'DJI', impact: 'CRÍTICO', advantage: 'Ronin gimbals (estabilización electrónica) vs heads mecánicos, ecosistema integrado, precio competitivo', dpro_fail_reason: 'DJI ofrece estabilización electrónica que reemplaza cabezales fluidos mecánicos en segmento run-and-gun. DPRO proyecta ventas Sachtler entry/mid basándose en demanda histórica de heads mecánicos, pero mercado migra a gimbals. Forecast falla porque no captura cambio tecnológico (mecánico → electrónico).', vs: ['FSB6', 'ACTIV8', 'FLOWTECH75'] },
+        ],
+        Vinten: [
+          { name: 'Miller', impact: 'ALTO', advantage: 'Dominio APAC, ciclos venta 30% más rápidos, precios competitivos', dpro_fail_reason: 'Miller domina mercados donde Videndum proyecta growth (APAC, Latam). Run rate colapsa cuando deal "seguro" cierra con Miller. DPRO no tiene visibilidad de velocidad de cierre de Miller (30% más rápida que Vinten en estos mercados).', vs: ['VISION-100', 'VISION-250', 'FUSION'] },
+          { name: 'Camgear', impact: 'MEDIO', advantage: 'Precios mid-tier atractivos, lead times 40% menores (manufactura EU)', dpro_fail_reason: 'Camgear roba deals mid-tier que caen entre "Manfrotto pro" y "Sachtler entry". DPRO no captura esta erosión de cuota en segmento mid porque agrupa todo Vinten mid-range sin distinguir pricing tiers.', vs: ['VISION-BLUE3', 'VECTOR-430', 'QUARTZ'] },
+        ],
+        Teradek: [
+          { name: 'Hollyland', impact: 'CRÍTICO', advantage: 'Precios 20-30% del precio Teradek, suficiente para broadcast entry/mid', dpro_fail_reason: 'Hollyland comprime precios en segmento wireless entry/mid. DPRO proyecta ventas Teradek basándose en "broadcast requiere reliability" pero realidad es que clientes entry/mid priorizan precio. Forecast falla porque asume sticky premium que ya no aplica en tier bajo.', vs: ['BOLT-4K-750', 'BOLT-6-750', 'SERV-PRO'] },
+        ],
+        Litepanels: [
+          { name: 'Aputure', impact: 'CRÍTICO', advantage: 'Innovación LED rápida, precios 30-40% más bajos, ecosistema integrado (control inalámbrico)', dpro_fail_reason: 'Aputure innova más rápido en LED (nuevo modelo cada 4-6 meses) vs. Litepanels (ciclo 18-24 meses). DPRO proyecta ventas Litepanels basándose en histórico pero mercado migra a Aputure por features modernas (app control, mesh wireless). Forecast falla porque no captura velocidad innovación competidor.', vs: ['ASTRA-6X', 'GEMINI-2X1', '1X1-LS'] },
+          { name: 'Neewer', impact: 'ALTO', advantage: 'Precios 70-85% más bajos, distribución Amazon/AliExpress', dpro_fail_reason: 'Neewer ofrece LED entry/mid a precios disruptivos. DPRO proyecta ventas Litepanels ICC basándose en órdenes B2B pero Neewer vende directo a consumidor (canal ciego). Similar a impacto Neewer en Manfrotto.', vs: ['CROMA2', 'MICROPRO2', 'SOLA-6'] },
+        ],
+        GLOBAL: [
+          { name: 'DJI', impact: 'CRÍTICO', advantage: 'Ecosistema integrado cámara+gimbal+accesorios, innovación rápida, precios competitivos', dpro_fail_reason: 'DJI compite transversalmente (gimbals vs Sachtler, wireless video vs Teradek, accesorios vs Manfrotto). DPRO no captura erosión ecosistema porque mide por segmento individual, no flujo cliente completo.', vs: ['Sachtler heads', 'Manfrotto gimbals', 'Teradek wireless'] },
+          { name: 'SmallRig', impact: 'ALTO', advantage: 'Innovación accesorios cine rápida, precios 40-60% más bajos, community-driven (feedback usuarios)', dpro_fail_reason: 'SmallRig innova en accesorios cine (rigs, cages, mounts) más rápido que Wooden Camera. DPRO proyecta ventas Wooden Camera basándose en sticky B2B broadcast pero mercado cine indie migra a SmallRig. Forecast falla porque asume loyalty que ya no existe en segment indie.', vs: ['Wooden Camera rigs', 'SmallHD mounts', 'Manfrotto quick-release'] },
+          { name: 'Neewer', impact: 'CRÍTICO', advantage: 'Distribución directa Amazon/AliExpress (canal ciego para CRM tradicional), precios disruptivos', dpro_fail_reason: 'Neewer es amenaza transversal en segmento ICC/prosumer (Manfrotto, JOBY, Lowepro, Litepanels). DPRO mide pipeline B2B tradicional pero Neewer opera en canal retail online donde Videndum no tiene visibilidad. Mayor blind spot del forecast actual.', vs: ['Manfrotto ICC', 'JOBY', 'Lowepro bags', 'Litepanels entry'] },
+        ],
+      }
+
+      const threats = args.segment && competitorMap[args.segment]
+        ? competitorMap[args.segment]
+        : competitorMap.GLOBAL
+
+      console.log('[consultant] get_competitor_threats — OK, threats:', threats.length)
+      return {
+        source: 'get_competitor_threats',
+        segment: args.segment ?? 'GLOBAL',
+        threats: threats.map(t => ({
+          competitor: t.name,
+          impact_level: t.impact,
+          structural_advantage: t.advantage,
+          dpro_fail_reason: t.dpro_fail_reason,
+          affected_skus_sample: t.vs.slice(0, 3),
+        })),
+      }
+    },
+  },
+
+  get_planning_adjustments: {
+    description: 'Historial de ajustes colaborativos UK ↔ CR en planning semanal (propuestas encargada CR, respuestas UK, razones, accuracy real vs forecast). Para auditoría, aprendizaje y detectar patrones de desviación.',
+    parameters: z.object({ limit: z.number().optional().describe('Número de registros recientes a devolver. Default: 10.') }),
+    execute: async (args: { limit?: number }) => {
+      const limit = args.limit ?? 10
+      console.log('[consultant] get_planning_adjustments — limit:', limit)
+      const rows = await execSql<{
+        sku: string; week: string; uk_original: string; ml_prediction: string; cr_proposal: string
+        cr_reason: string | null; uk_response: string | null; uk_reason: string | null
+        final_approved: string; real_demand: string | null; accuracy_pct: string | null
+        created_at: string
+      }>(`
+        SELECT sku, week, uk_original, ml_prediction, cr_proposal, cr_reason, uk_response, uk_reason,
+               final_approved, real_demand, accuracy_pct, created_at
+        FROM public.planning_adjustments
+        ORDER BY created_at DESC LIMIT ${limit}
+      `)
+      console.log('[consultant] get_planning_adjustments — OK, rows:', rows.length)
+      return {
+        source: 'get_planning_adjustments',
+        adjustments: rows.map(r => ({
+          sku: r.sku, week: r.week,
+          uk_original: Number(r.uk_original), ml_prediction: Number(r.ml_prediction), cr_proposal: Number(r.cr_proposal),
+          cr_reason: r.cr_reason,
+          uk_response: r.uk_response, // 'approved' | 'rejected' | 'negotiated'
+          uk_reason: r.uk_reason,
+          final_approved: Number(r.final_approved),
+          real_demand: r.real_demand ? Number(r.real_demand) : null,
+          accuracy_pct: r.accuracy_pct ? Number(r.accuracy_pct) : null,
+          created_at: r.created_at,
+        })),
+        summary: rows.length > 0 ? {
+          avg_deviation_uk_to_final_pct: Math.round(
+            rows.reduce((sum, r) => sum + Math.abs((Number(r.final_approved) - Number(r.uk_original)) / Number(r.uk_original) * 100), 0) / rows.length
+          ),
+          avg_accuracy_pct: rows.filter(r => r.accuracy_pct).length > 0
+            ? Math.round(rows.reduce((sum, r) => sum + (Number(r.accuracy_pct) || 0), 0) / rows.filter(r => r.accuracy_pct).length)
+            : null,
+          total_approvals: rows.filter(r => r.uk_response === 'approved').length,
+          total_rejections: rows.filter(r => r.uk_response === 'rejected').length,
+          total_negotiations: rows.filter(r => r.uk_response === 'negotiated').length,
+        } : null,
       }
     },
   },
@@ -361,9 +525,12 @@ export async function POST(req: Request) {
             parameters: def.parameters,
             execute: async (_args: unknown, { toolCallId }: { toolCallId: string }) => {
               emit({ type: 'tool_start', toolName, toolId: toolCallId })
-              console.log(`[consultant] executing tool: ${toolName}`)
+              console.log(`[consultant] executing tool: ${toolName}`, _args)
               try {
-                const result = await def.execute()
+                // Normalizar args: si es undefined/null, pasar objeto vacío
+                const normalizedArgs = _args && typeof _args === 'object' ? _args : {}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const result = await def.execute(normalizedArgs as any)
                 console.log(`[consultant] tool ${toolName} OK`)
                 emit({ type: 'tool_done', toolId: toolCallId })
                 return result

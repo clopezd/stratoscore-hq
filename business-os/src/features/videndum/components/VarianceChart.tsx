@@ -102,8 +102,20 @@ export function VarianceChart() {
   useEffect(() => {
     fetch('/api/videndum/variance')
       .then(r => r.json())
-      .then(d => { setData(d); setLoading(false) })
-      .catch(() => setLoading(false))
+      .then(d => {
+        // Validar que la respuesta tenga la estructura esperada
+        if (d && typeof d === 'object' && Array.isArray(d.negative) && Array.isArray(d.positive)) {
+          setData(d)
+        } else {
+          console.error('[VarianceChart] Invalid data structure:', d)
+          setData(null)
+        }
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('[VarianceChart] Fetch error:', err)
+        setLoading(false)
+      })
   }, [])
 
   const periodLabel = data?.period
@@ -146,10 +158,17 @@ export function VarianceChart() {
         <div className="h-48 animate-pulse bg-vid-raised rounded-lg" />
       )}
 
-      {!loading && data && (
+      {!loading && data && data.negative && data.positive && (
         tab === 'negative'
           ? <HBar data={data.negative} title="Top 10 — real muy por debajo del plan" emptyColor="#f59e0b" />
           : <HBar data={data.positive} title="Top 10 — real muy por encima del plan" emptyColor="#22c55e" />
+      )}
+
+      {/* Error state */}
+      {!loading && !data && (
+        <div className="h-48 flex items-center justify-center text-vid-subtle text-xs">
+          No se pudieron cargar los datos de varianza. Verifica la consola.
+        </div>
       )}
 
       {/* Leyenda colores */}

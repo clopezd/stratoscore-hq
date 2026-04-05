@@ -47,7 +47,7 @@ export async function runDueTasks(): Promise<void> {
 export function initScheduler(): void {
   seedDefaultTasks()
 
-  // Poll every 60 seconds
+  // Poll every 60 seconds for scheduled tasks
   schedulerInterval = setInterval(() => {
     runDueTasks().catch((err) => logger.error({ err }, 'scheduler poll error'))
   }, 60_000)
@@ -94,6 +94,46 @@ Keep it concise and actionable.`,
 - Report any errors from recent logs
 
 Format: Markdown with clear status indicators.`,
+    },
+    {
+      id: 'bidhunter-weekly-report',
+      chat_id: DM,
+      thread_id: null,
+      schedule: '0 7 * * *', // Daily 7 AM
+      prompt: `Generate and send the BidHunter daily pipeline report by calling:
+curl -s -X POST http://localhost:3000/api/bidhunter/weekly-report
+
+Then format the response for Telegram: pipeline value, bids sent, won/lost, win rate, top opportunities, and expiring deadlines.`,
+    },
+    {
+      id: 'csuite-daily-pipeline',
+      chat_id: DM,
+      thread_id: null,
+      schedule: '0 7 * * *', // Daily 7 AM
+      prompt: `Execute the C-Suite daily agent pipeline by calling:
+curl -s -X POST -H "Authorization: Bearer tumision_2026" -H "Content-Type: application/json" -d '{"type":"daily"}' http://localhost:3000/api/agents/pipeline
+
+Report the results: how many agents ran successfully, any failures, and the CEO's daily actions. Keep it concise.`,
+    },
+    {
+      id: 'csuite-weekly-pipeline',
+      chat_id: DM,
+      thread_id: null,
+      schedule: '0 11 * * 0', // Sundays 11 AM
+      prompt: `Execute the C-Suite weekly agent pipeline by calling:
+curl -s -X POST -H "Authorization: Bearer tumision_2026" -H "Content-Type: application/json" -d '{"type":"weekly"}' http://localhost:3000/api/agents/pipeline
+
+Report the results: Cleanup summary, Strategist projections, and CDO audit highlights.`,
+    },
+    {
+      id: 'csuite-ghostwriter',
+      chat_id: DM,
+      thread_id: null,
+      schedule: '0 12 * * 1,3,5', // Mon/Wed/Fri 12 PM
+      prompt: `Execute the Ghost Writer agent by calling:
+curl -s -X POST -H "Authorization: Bearer tumision_2026" -H "Content-Type: application/json" http://localhost:3000/api/agents/ghostwriter
+
+Send the LinkedIn post drafts to Carlos for review.`,
     },
   ]
 

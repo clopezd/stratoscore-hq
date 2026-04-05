@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 'use client'
 import { useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -89,4 +90,10 @@ export default function DashboardPage() {
       </div>
     </div>
   )
+=======
+import { MissionControlDashboard } from '@/features/mission-control/components/MissionControlDashboard'
+
+export default function MissionControlPage() {
+  return <MissionControlDashboard />
+>>>>>>> Stashed changes
 }

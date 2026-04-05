@@ -5,6 +5,7 @@ import { getTerapeutas } from '../services/terapeutasService'
 import type { Terapeuta } from '../types/database'
 import { NuevoTerapeutaModal } from './NuevoTerapeutaModal'
 import { EditarTerapeutaModal } from './EditarTerapeutaModal'
+import { NavegacionMobility } from './NavegacionMobility'
 
 export function ListaTerapeutas() {
   const [terapeutas, setTerapeutas] = useState<Terapeuta[]>([])
@@ -34,6 +35,8 @@ export function ListaTerapeutas() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      <NavegacionMobility />
+
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>

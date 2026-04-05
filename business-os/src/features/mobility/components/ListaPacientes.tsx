@@ -6,6 +6,7 @@ import type { Paciente } from '../types/database'
 import { NuevoPacienteModal } from './NuevoPacienteModal'
 import { EditarPacienteModal } from './EditarPacienteModal'
 import { ImportarPacientesModal } from './ImportarPacientesModal'
+import { NavegacionMobility } from './NavegacionMobility'
 
 export function ListaPacientes() {
   const [pacientes, setPacientes] = useState<Paciente[]>([])
@@ -36,6 +37,8 @@ export function ListaPacientes() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      <NavegacionMobility />
+
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>

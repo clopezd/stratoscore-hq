@@ -1,19 +1,35 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import type { VarianceRow } from '@/features/videndum/types'
 
-const MGMT_URL   = 'https://api.supabase.com/v1/projects/csiiulvqzkgijxbgdqcv/database/query'
-const MGMT_TOKEN = process.env.SUPABASE_MGMT_TOKEN
-
+/**
+ * Ejecuta queries SQL usando Service Role Key con REST API de Supabase.
+ * Usa el endpoint /rest/v1/rpc para ejecutar funciones de postgres.
+ * Requiere SUPABASE_SERVICE_ROLE_KEY en .env.local
+ */
 async function sql<T = Record<string, unknown>>(query: string): Promise<T[]> {
-  if (!MGMT_TOKEN) throw new Error('SUPABASE_MGMT_TOKEN no configurado')
-  const res = await fetch(MGMT_URL, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${MGMT_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY no configurados')
+  }
+
+  // Cliente admin con Service Role Key (bypassa RLS, acceso total)
+  const adminClient = createAdminClient(supabaseUrl, serviceRoleKey, {
+    db: { schema: 'public' },
+    auth: { persistSession: false, autoRefreshToken: false }
   })
-  const data = await res.json()
-  if (data.message) throw new Error(data.message)
+
+  // Usar cliente admin para ejecutar query directo via postgREST
+  const { data, error } = await adminClient.rpc('exec_raw_sql', { query_text: query })
+
+  if (error) {
+    console.error('[variance] Error ejecutando query:', error)
+    throw new Error(`SQL error: ${error.message}`)
+  }
+
   return data as T[]
 }
 

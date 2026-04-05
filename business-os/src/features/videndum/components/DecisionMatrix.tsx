@@ -66,35 +66,65 @@ function RiskMatrix({ rows }: { rows: RiskEntry[] }) {
       {rows.map((r, i) => (
         <div
           key={i}
-          className="bg-white/[0.02] border border-white/[0.05] rounded-lg p-3 flex flex-col sm:flex-row sm:items-start gap-3"
+          className="bg-white/[0.02] border border-white/[0.05] rounded-lg p-3 flex flex-col gap-2"
         >
-          {/* Izquierda */}
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-1.5 mb-1">
-              {r.part_number && (
-                <span className="font-mono text-[11px] text-white/70 bg-white/[0.05] px-1.5 py-0.5 rounded">
-                  {r.part_number}
+          {/* Header: part number + badges */}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                {r.part_number && (
+                  <span className="font-mono text-[11px] text-white/70 bg-white/[0.05] px-1.5 py-0.5 rounded">
+                    {r.part_number}
+                  </span>
+                )}
+                <span className="text-[11px] text-white/50">{r.segment}</span>
+                <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${severityBadge(r.severity)}`}>
+                  {r.severity}
                 </span>
-              )}
-              <span className="text-[11px] text-white/50">{r.segment}</span>
-              <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${severityBadge(r.severity)}`}>
-                {r.severity}
-              </span>
-              <span className="text-[9px] text-white/25 bg-white/[0.03] px-1.5 py-0.5 rounded-full">
-                {riskTypeLabel(r.risk_type)}
+                <span className="text-[9px] text-white/25 bg-white/[0.03] px-1.5 py-0.5 rounded-full">
+                  {riskTypeLabel(r.risk_type)}
+                </span>
+              </div>
+              <p className="text-[11px] text-white/45 leading-relaxed">{r.evidence}</p>
+            </div>
+            {/* Acción */}
+            <div className="shrink-0">
+              <span className={`text-[10px] font-bold px-2 py-1 rounded border ${actionBadge(r.immediate_action)}`}>
+                {r.immediate_action}
               </span>
             </div>
-            <p className="text-[11px] text-white/45 leading-relaxed">{r.evidence}</p>
-            {r.competitor_threat && (
-              <p className="text-[10px] text-orange-400/60 mt-0.5">⚔ {r.competitor_threat}</p>
-            )}
           </div>
-          {/* Derecha: acción */}
-          <div className="shrink-0">
-            <span className={`text-[10px] font-bold px-2 py-1 rounded border ${actionBadge(r.immediate_action)}`}>
-              {r.immediate_action}
-            </span>
-          </div>
+
+          {/* NUEVO: Bloque de inteligencia competitiva */}
+          {(r.competitor_threat || r.competitor_advantage || r.forecast_impact) && (
+            <div className="border-t border-white/[0.06] pt-2 space-y-1.5">
+              {r.competitor_threat && (
+                <div className="flex items-start gap-1.5">
+                  <span className="text-[9px] text-orange-400/80 mt-0.5">⚔</span>
+                  <div className="flex-1">
+                    <span className="text-[10px] font-medium text-orange-400/90">
+                      {r.competitor_threat}
+                    </span>
+                    {r.competitor_advantage && (
+                      <span className="text-[10px] text-orange-300/60 ml-1.5">
+                        · {r.competitor_advantage}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+              {r.forecast_impact && (
+                <div className="bg-red-500/[0.08] border border-red-500/20 rounded px-2 py-1.5">
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-[9px] text-red-400 font-bold mt-0.5">DPRO FAIL</span>
+                    <p className="text-[10px] text-red-300/90 leading-relaxed flex-1">
+                      {r.forecast_impact}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ))}
     </div>

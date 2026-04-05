@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { getUserProfile } from '@/lib/supabase/user-profile'
 import { DashboardShell } from './dashboard-shell'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -14,5 +15,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect(`/login${next}`)
   }
 
-  return <DashboardShell>{children}</DashboardShell>
+  // Obtener perfil del usuario - manejar errores gracefully
+  let userProfile = null
+  try {
+    userProfile = await getUserProfile()
+  } catch (error) {
+    console.error('Error loading user profile in layout:', error)
+    // Continuar sin perfil - el DashboardShell puede manejarlo
+  }
+
+  return <DashboardShell userProfile={userProfile}>{children}</DashboardShell>
 }

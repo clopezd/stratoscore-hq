@@ -36,7 +36,7 @@ export function Header() {
           onClick={toggleLeftSidebar}
           className="p-2 rounded-lg transition-colors
             text-black/40 hover:text-black/70 hover:bg-black/[0.06]
-            dark:text-white/50 dark:hover:text-white/80 dark:hover:bg-white/[0.08]"
+            dark:text-white/70 dark:hover:text-white/80 dark:hover:bg-white/[0.08]"
         >
           <PanelLeft size={18} />
         </button>
@@ -65,7 +65,7 @@ export function Header() {
               </button>
               <div className="select-none pointer-events-none">
                 <p className="text-sm font-semibold text-white leading-none">Assistant</p>
-                <p className="text-[10px] text-white/40 mt-0.5">Agent</p>
+                <p className="text-[10px] text-white/60 mt-0.5">Agent</p>
               </div>
             </div>
             {avatarOpen && <AvatarLightbox src="/avatar.png" alt="Assistant" onClose={() => setAvatarOpen(false)} />}
@@ -106,7 +106,7 @@ export function Header() {
           onClick={() => useSearchStore.getState().toggle()}
           className="p-2 rounded-lg transition-colors
             text-black/40 hover:text-black/70 hover:bg-black/[0.06]
-            dark:text-white/50 dark:hover:text-white/80 dark:hover:bg-white/[0.08]"
+            dark:text-white/70 dark:hover:text-white/80 dark:hover:bg-white/[0.08]"
         >
           <Search size={18} />
         </button>

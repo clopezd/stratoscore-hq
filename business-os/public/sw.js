@@ -22,8 +22,19 @@ self.addEventListener('fetch', (event) => {
   if (event.request.mode !== 'navigate') return
 
   event.respondWith(
-    fetch(event.request).catch(() =>
-      // Offline fallback: if network fails, try cache, then basic offline page
+    fetch(event.request).then((response) => {
+      // Si es redirect (login, etc), dejarlo pasar
+      if (response.status >= 300 && response.status < 400) {
+        return response
+      }
+      // Si es 401/403, dejarlo pasar (el layout hará redirect a login)
+      if (response.status === 401 || response.status === 403) {
+        return response
+      }
+      // Cualquier otra respuesta exitosa o error del servidor
+      return response
+    }).catch(() =>
+      // Offline fallback: SOLO cuando hay error de red real (no 401/403)
       caches.match(event.request).then((cached) => cached || new Response(
         '<html><body style="background:#0a0a0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui"><div style="text-align:center"><h2>Offline</h2><p>Check your connection and try again.</p></div></body></html>',
         { headers: { 'Content-Type': 'text/html' } }

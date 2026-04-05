@@ -16,8 +16,8 @@ const satoshi = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'StratosCore — Mission Control',
-  description: 'Business OS con 11 agentes de IA autónomos. Automatización agéntica 360 para PYMES y Clínicas.',
+  title: 'StratosCore — Business OS',
+  description: 'Business Operations Platform — Powered by StratosCore',
   manifest: '/manifest.json',
   icons: {
     icon: [{ url: '/favicon.png', type: 'image/png' }],

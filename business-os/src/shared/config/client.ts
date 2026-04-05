@@ -6,7 +6,14 @@
  * tenant específico configurado.
  */
 
+<<<<<<< Updated upstream
 export { StratoscoreLogo as ClientLogo } from '@/shared/components/StratoscoreLogo'
 
 export const CLIENT_NAME     = 'StratosCore'
 export const CLIENT_SUBTITLE = 'Business OS'
+=======
+export { Logo as ClientLogo } from '@/shared/components/Logo'
+
+export const CLIENT_NAME     = 'StratosCore'
+export const CLIENT_SUBTITLE = 'Business Operating System'
+>>>>>>> Stashed changes

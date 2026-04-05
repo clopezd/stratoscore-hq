@@ -23,12 +23,51 @@ export async function login(formData: FormData) {
     return { error: error.message }
   }
 
-  // Redirigir a la ruta original si viene de middleware, o a Mission Control por defecto
+  // Si viene un 'next' en el formulario, respetarlo
   const next = (formData.get('next') as string | null)?.trim()
-  const destination = next?.startsWith('/') ? next : '/'
+  if (next?.startsWith('/')) {
+    revalidatePath('/', 'layout')
+    redirect(next)
+  }
 
+  // Si no hay 'next', obtener perfil y redirigir según rol
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('role, business_unit')
+      .eq('user_id', user.id)
+      .single()
+
+    if (profile) {
+      // Admin → Mission Control (/dashboard)
+      if (profile.role === 'admin') {
+        revalidatePath('/', 'layout')
+        redirect('/dashboard')
+      }
+
+      // Cliente → Su business unit
+      switch (profile.business_unit) {
+        case 'videndum':
+          revalidatePath('/', 'layout')
+          redirect('/videndum')
+        case 'mobility':
+          revalidatePath('/', 'layout')
+          redirect('/mobility')
+        case 'confirma':
+          revalidatePath('/', 'layout')
+          redirect('/confirma')
+        case 'finance':
+          revalidatePath('/', 'layout')
+          redirect('/finanzas')
+      }
+    }
+  }
+
+  // Fallback: redirigir a dashboard
   revalidatePath('/', 'layout')
-  redirect(destination)
+  redirect('/dashboard')
 }
 
 export async function signup(formData: FormData) {

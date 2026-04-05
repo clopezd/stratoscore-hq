@@ -163,12 +163,84 @@ ${pipelineTable}
 - Production Solutions (32%): Broadcast/News — riesgo MEDIO, SDI legacy bajo presión IP
 - Creative Solutions (21%): Cine/Cinema — mejor posicionada, CAGR ~6%
 
-### Competidores amenazantes
-1. Cartoni (Italia): fluid heads y soportes profesionales broadcast/cine → vs. Sachtler, Vinten, O'Connor | IMPACTO ALTO
-2. Miller (Australia): fluid heads y tripods broadcast, fuerte en Asia-Pacífico y mercados de costo-eficiencia → vs. Sachtler, Vinten | IMPACTO ALTO
-3. Camgear (Europa): soportes broadcast precio competitivo, distribución EMEA → vs. Vinten, Sachtler entry-mid range | IMPACTO MEDIO-ALTO
-4. Libec (Japón): tripods y fluid heads prosumer/profesional, presencia sólida Asia → vs. Manfrotto, Sachtler low range | IMPACTO MEDIO-ALTO
-5. Neewer (China): accesorios y soportes bajo costo, penetración agresiva en ICC y semi-profesional → vs. Manfrotto, JOBY, Lowepro | IMPACTO ALTO
+### COMPETIDORES DIRECTOS (intel actualizada 2026-03-13)
+
+#### 1. Cartoni (Italia 🇮🇹) — Fundada 1935, Roma
+**Productos en conflicto:**
+- Cabezales fluidos profesionales → vs. Sachtler, Vinten, O'Connor
+- Pedestales de estudio → vs. Vinten
+- Trípodes fibra de carbono → vs. Sachtler, Manfrotto pro
+**Ventajas competitivas:**
+- 88+ años manufactura italiana de precisión
+- Precios competitivos vs. Sachtler/Vinten (10-20% más bajos en segmento mid-tier)
+- Fuerte presencia EMEA y mercados emergentes
+**NIVEL DE AMENAZA: ALTO en broadcast/cine profesional**
+**Por qué el DPRO falla predicciones contra Cartoni:**
+- Cartoni compite en calidad percibida similar pero precio inferior → clientes posponen órdenes Sachtler/Vinten esperando mejores términos
+- Órdenes que el DPRO proyectaba como "cerradas" migran a Cartoni en fase final de negociación
+
+#### 2. Miller (Australia 🇦🇺)
+**Productos en conflicto:**
+- Cabezales fluidos → vs. Sachtler, Vinten, O'Connor
+- Trípodes profesionales → vs. Sachtler, Manfrotto
+- Sistemas soporte ENG/broadcast → vs. Vinten
+**Ventajas competitivas:**
+- Especialización exclusiva en sistemas de soporte (no diversificado → más ágil)
+- Reputación sólida en ENG (Electronic News Gathering)
+- Diseño robusto condiciones extremas (aventura, documental, news field)
+**NIVEL DE AMENAZA: ALTO en broadcast profesional, ESPECIALMENTE Asia-Pacífico**
+**Por qué el DPRO falla predicciones contra Miller:**
+- Miller domina mercados donde Videndum proyecta growth (APAC, Latam) → run rate semanal colapsa cuando deal forecast "seguro" cierra con Miller
+- Ciclos de venta Miller 30% más rápidos que Sachtler en mid-market → pipeline de Videndum se estanca
+
+#### 3. Camgear (Francia 🇫🇷)
+**Productos en conflicto:**
+- Cabezales fluidos → vs. Sachtler, Vinten, O'Connor
+- Pedestales → vs. Vinten
+- Sistemas trípode profesionales → vs. Sachtler
+**Ventajas competitivas:**
+- Presencia consolidada EMEA (ventaja logística vs. Videndum UK post-Brexit)
+- Relación calidad-precio agresiva (15-25% más barato que Sachtler mid-range)
+- Innovación en sistemas arrastre fluido (patents recientes 2023-2024)
+**NIVEL DE AMENAZA: MEDIO-ALTO en Europa**
+**Por qué el DPRO falla predicciones contra Camgear:**
+- Camgear roba deals mid-tier que Videndum clasifica como "Manfrotto pro" o "Sachtler entry" → caen entre dos sillas
+- Lead times Camgear 40% menores (manufactura EU vs. supply chain Videndum UK+Asia) → urgencias cierran con ellos
+
+#### 4. Libec (Japón 🇯🇵)
+**Productos en conflicto:**
+- Cabezales fluidos → vs. Sachtler, Vinten, Manfrotto
+- Trípodes profesionales → vs. Manfrotto, Sachtler
+- Sistemas soporte mid-range → vs. Manfrotto pro
+**Ventajas competitivas:**
+- Manufactura japonesa de precisión (calidad percibida superior a Manfrotto, precio inferior a Sachtler)
+- Precios 20-30% más accesibles que Sachtler/Vinten
+- Fuerte presencia Asia-Pacífico (mercado creciente, Videndum débil ahí)
+- Excelente relación calidad-precio en segmento mid-market (sweet spot Manfrotto/Sachtler low-end)
+**NIVEL DE AMENAZA: MEDIO en mid-market, ALTO en APAC**
+**Por qué el DPRO falla predicciones contra Libec:**
+- Libec comprime margen en segmento mid-market donde Videndum tiene MAYOR volumen forecast → pequeña pérdida cuota = gran miss en revenue absoluto
+- Corporate video y prosumer (segmentos growth post-COVID) prefieren Libec → DPRO sobreestima Manfrotto pro
+
+#### 5. Neewer (China 🇨🇳)
+**Productos en conflicto:**
+- Trípodes entry/mid-level → vs. Manfrotto entry
+- Iluminación LED → vs. Litepanels, Quasar Science
+- Accesorios cámara → vs. Manfrotto, JOBY
+- Bags y soportes → vs. Lowepro, Manfrotto
+**Ventajas competitivas:**
+- Precios 60-80% más bajos que Videndum (disrupción estructural)
+- Amplia distribución online (Amazon, AliExpress → alcance global instant)
+- Catálogo 1000+ SKUs (vs. ~300 Manfrotto ICC) → one-stop-shop prosumer
+- Velocidad iteración producto (4-6 meses lanzamiento vs. 18-24 Videndum)
+**Debilidades:**
+- Calidad inferior a premium (pero suficiente para 80% use cases ICC)
+- Brand awareness limitado profesional (irrelevante en ICC/prosumer)
+**NIVEL DE AMENAZA: ALTO en consumer/prosumer (ICC), CRÍTICO para Manfrotto/JOBY/Lowepro**
+**Por qué el DPRO falla predicciones contra Neewer:**
+- Neewer NO aparece en pipeline forecast tradicional B2B → ventas retail Manfrotto/JOBY colapsan sin "competidor visible" en CRM
+- Velocidad de Neewer (lanzar producto clon en 6 meses) hace que forecast anual de Videndum sea obsoleto a mitad de año
+- Amazon/ecommerce = canal ciego para DPRO (Videndum mide B2B distributors, Neewer vende directo online)
 
 ### Tendencias tecnológicas
 TAILWINDS: IP Workflows SMPTE 2110 (17.6% CAGR hasta 2031), streaming demand, REMI/5G, robótica broadcast, recovery post-huelga SAG-AFTRA
@@ -179,14 +251,31 @@ HEADWINDS: Competencia china ICC, IA generativa video (Sora/Runway), smartphones
 - RIESGO MEDIO: Litepanels, Anton/Bauer legacy batteries
 - ALTO RIESGO: Manfrotto/JOBY/Lowepro ICC mid-market, Colorama/Savage fondos, hardware SDI legacy
 
-## INSTRUCCIÓN
+## INSTRUCCIÓN PRINCIPAL
 
-Genera una Matriz de Decisión ejecutiva respondiendo estas 3 preguntas:
-1. ¿Qué productos están en riesgo por movimientos de competencia o tendencias de mercado?
-2. ¿Qué oportunidades está ignorando Videndum que competidores explotan?
-3. ¿Cuál es la acción financiera recomendada por producto/segmento?
+Genera una Matriz de Decisión ejecutiva que el GERENTE DE PLANTA pueda usar para entender:
 
-Devuelve ÚNICAMENTE un objeto JSON válido, sin markdown ni texto adicional:
+### 1. ¿Por qué el DPRO (Demand Planning) FALLA en predicciones y run rate semanal?
+**CRÍTICO:** Para cada riesgo competitivo, explica:
+- ¿Qué competidor específico (Cartoni/Miller/Camgear/Libec/Neewer) está robando deals forecast como "cerrados"?
+- ¿Qué ventaja estructural del competidor (precio, lead time, región) hace que el pipeline se estanque?
+- ¿Por qué los datos históricos del DPRO NO capturan esta amenaza? (ej: Neewer vende online, no aparece en CRM B2B)
+
+### 2. ¿Qué productos están en riesgo por competidores directos?
+Usa los datos de declive 2022→2024 y correlaciona con los 5 competidores directos:
+- Cartoni → amenaza Sachtler, Vinten, O'Connor (broadcast/cine premium)
+- Miller → amenaza Sachtler, Vinten (broadcast profesional, APAC)
+- Camgear → amenaza Vinten, Sachtler mid-range (EMEA)
+- Libec → amenaza Manfrotto pro, Sachtler entry (mid-market, APAC)
+- Neewer → amenaza Manfrotto, JOBY, Lowepro, Litepanels (ICC/prosumer)
+
+### 3. ¿Qué oportunidades explotan los competidores que Videndum ignora?
+
+### 4. ¿Cuál es la acción recomendada por producto/segmento?
+
+---
+
+**FORMATO DE SALIDA:** Devuelve ÚNICAMENTE un objeto JSON válido, sin markdown ni texto adicional:
 
 {
   "snapshot_date": "YYYY-MM-DD",
@@ -197,7 +286,9 @@ Devuelve ÚNICAMENTE un objeto JSON válido, sin markdown ni texto adicional:
       "segment": "string (marca/categoría)",
       "risk_type": "OBSOLESCENCIA" | "COMPETENCIA_CHINA" | "SUSTITUCIÓN_IP" | "DEMANDA_LATENTE" | "GOING_CONCERN",
       "severity": "CRÍTICA" | "ALTA" | "MEDIA" | "BAJA",
-      "competitor_threat": "nombre competidor o null",
+      "competitor_threat": "nombre competidor específico (Cartoni/Miller/Camgear/Libec/Neewer) o null",
+      "competitor_advantage": "ventaja estructural del competidor (precio/lead_time/región/canal) — máximo 1 frase",
+      "forecast_impact": "por qué el DPRO falla en predecir este riesgo — máximo 2 frases — CRÍTICO para gerente de planta",
       "evidence": "dato concreto de la DB o mercado",
       "immediate_action": "LIQUIDAR" | "PROVISIONAR" | "VIGILAR" | "MANTENER"
     }

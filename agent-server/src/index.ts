@@ -10,9 +10,24 @@ import { runDecaySweep } from './memory.js'
 import { createBot, createSender } from './bot.js'
 import { startMCServer } from './server.js'
 import { logger } from './logger.js'
+import type { Bot } from 'grammy'
+
+// ─── Global error handlers ───────────────────────────────────────────────────
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error({ reason, promise }, 'unhandled promise rejection')
+  // No matar el proceso — solo loguear
+  // El agente debe seguir funcionando incluso si una promesa falla
+})
+
+process.on('uncaughtException', (error, origin) => {
+  logger.fatal({ error, origin }, 'uncaught exception')
+  // En excepciones no capturadas, es más seguro salir y dejar que PM2 reinicie
+  releaseLock()
+  process.exit(1)
+})
 
 const PID_FILE = join(STORE_DIR, 'agent-server.pid')
-const __filename = fileURLToPath(import.meta.url)
 
 // ─── Lock ────────────────────────────────────────────────────────────────────
 
@@ -51,10 +66,9 @@ async function main(): Promise<void> {
   console.log('╚═══════════════════════════════════╝')
   console.log()
 
-  // Validar variables críticas
+  // Validar variables críticas (Telegram es opcional)
   if (!TELEGRAM_BOT_TOKEN) {
-    logger.error('TELEGRAM_BOT_TOKEN is not set. Check your .env file.')
-    process.exit(1)
+    logger.warn('TELEGRAM_BOT_TOKEN is not set. Telegram bot disabled.')
   }
 
   // Adquirir lock (singleton)
@@ -78,9 +92,16 @@ async function main(): Promise<void> {
   // Limpiar uploads viejos al arrancar
   cleanupOldUploads()
 
-  // Crear bot
-  const bot = createBot()
-  const sender = createSender(bot)
+  // Crear bot (solo si hay token)
+  let bot: Bot | undefined
+  let sender: ((chatId: string, text: string, threadId?: number) => Promise<void>) | undefined
+  if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== 'optional') {
+    bot = createBot()
+    sender = createSender(bot)
+    logger.info('Telegram bot initialized')
+  } else {
+    logger.info('Telegram bot disabled - running without bot')
+  }
 
   // Iniciar scheduler (seedea tareas default si no existen)
   initScheduler()
@@ -93,10 +114,12 @@ async function main(): Promise<void> {
     clearInterval(decayInterval)
     releaseLock()
 
-    try {
-      await bot.stop()
-    } catch {
-      // ignorar errores al detener el bot
+    if (bot) {
+      try {
+        await bot.stop()
+      } catch {
+        // ignorar errores al detener el bot
+      }
     }
 
     logger.info('goodbye')
@@ -106,14 +129,19 @@ async function main(): Promise<void> {
   process.once('SIGINT', () => shutdown('SIGINT'))
   process.once('SIGTERM', () => shutdown('SIGTERM'))
 
-  // Iniciar polling de Telegram
-  logger.info('starting bot...')
-  await bot.start({
-    onStart: (info) => {
-      logger.info({ username: info.username }, 'bot online')
-      console.log(`\n✓ Bot @${info.username} is online. Send a message on Telegram!\n`)
-    },
-  })
+  // Iniciar polling de Telegram (solo si el bot está habilitado)
+  if (bot) {
+    logger.info('starting bot...')
+    await bot.start({
+      onStart: (info) => {
+        logger.info({ username: info.username }, 'bot online')
+        console.log(`\n✓ Bot @${info.username} is online. Send a message on Telegram!\n`)
+      },
+    })
+  } else {
+    logger.info('Telegram bot disabled - server running in API-only mode')
+    console.log('\n✓ Agent Server running (Telegram disabled)\n')
+  }
 }
 
 main().catch((err) => {

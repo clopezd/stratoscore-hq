@@ -2,7 +2,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { Header } from '@/shared/components/Header'
-import { AuthenticatedHeader } from '@/shared/components/AuthenticatedHeader'
 import { SearchDialog } from '@/features/search/components'
 import { SidebarNav } from '@/shared/components/SidebarNav'
 import { useLayoutStore } from '@/shared/stores/layout-store'
@@ -17,11 +16,10 @@ interface DashboardShellProps {
   userProfile: UserProfile | null
 }
 
-export function DashboardShell({ children, userProfile }: DashboardShellProps) {
+export function DashboardShell({ children }: DashboardShellProps) {
   const { leftSidebarOpen, closeLeftSidebar } = useLayoutStore()
   const [helpOpen, setHelpOpen] = useState(false)
   const pathname = usePathname()
-  const isDashboard = pathname === '/dashboard'
 
   // Persist last visited route for cross-session restore (desktop)
   useEffect(() => {
@@ -110,26 +108,21 @@ export function DashboardShell({ children, userProfile }: DashboardShellProps) {
       <div className="fixed top-[-30%] left-[-15%] w-[50%] h-[50%] rounded-full blur-[150px] pointer-events-none" style={{ backgroundColor: 'var(--app-orb-purple)' }} />
       <div className="fixed bottom-[-30%] right-[-15%] w-[45%] h-[45%] rounded-full blur-[150px] pointer-events-none" style={{ backgroundColor: 'var(--app-orb-blue)' }} />
 
-      {/* Header condicional */}
-      {isDashboard && userProfile ? (
-        <AuthenticatedHeader userProfile={{ email: userProfile.email, role: userProfile.role, full_name: userProfile.full_name }} />
-      ) : !isDashboard ? (
-        <Header />
-      ) : null}
+      {/* Header */}
+      <Header />
 
       {/* Body */}
       <div className="flex-1 flex md:overflow-hidden relative md:min-h-0">
         {/* Mobile overlay */}
-        {!isDashboard && leftSidebarOpen && (
+        {leftSidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 z-30 md:hidden"
             onClick={closeLeftSidebar}
           />
         )}
 
-        {/* Left Sidebar (oculto en Dashboard) */}
-        {!isDashboard && (
-          <aside
+        {/* Left Sidebar */}
+        <aside
             className={`
               ${leftSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
               fixed md:relative z-40 md:z-0
@@ -153,7 +146,6 @@ export function DashboardShell({ children, userProfile }: DashboardShellProps) {
 
             <SidebarNav />
           </aside>
-        )}
 
         {/* Main Content — mobile: natural flow (body scrolls), desktop: overflow scroll */}
         <main className="flex-1 md:overflow-y-auto min-w-0">

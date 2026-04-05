@@ -1,12 +1,13 @@
 /**
  * POST /api/videndum/ingest
  * Acepta un archivo .xlsx o .csv (multipart/form-data).
- * Parsea la hoja 'Forecast Production' y hace UPSERT en public.planning_forecasts.
- * Devuelve un resumen JSON con las filas procesadas.
+ * Detecta automáticamente si es Forecast o Ventas Reales según el nombre de la hoja.
+ * - Forecast → guarda en public.planning_forecasts
+ * - Ventas Reales → guarda en public.videndum_records (metric_type = 'revenue')
  *
  * Body (FormData):
  *   file        — archivo xlsx o csv
- *   sheet_name  — (opcional) nombre de hoja; default "Forecast Production"
+ *   sheet_name  — (opcional) nombre de hoja; detecta automáticamente
  *   tenant_id   — (opcional) default "videndum"
  */
 import { NextResponse } from 'next/server'
@@ -44,6 +45,8 @@ const MONTH_MAP: Record<string, number> = {
   ene: 1, feb: 2, mar: 3, abr: 4, may: 5, jun: 6,
   jul: 7, ago: 8, sep: 9, oct: 10, nov: 11, dic: 12,
   jan: 1, apr: 4, aug: 8, sep2: 9, oct2: 10, nov2: 11, dec: 12,
+  january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+  july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
 }
 
 // ── Excel parser ───────────────────────────────────────────────────────────────
@@ -101,6 +104,64 @@ function parseForecastSheet(ws: XLSX.WorkSheet): { rows: ForecastRow[]; skipped:
   return { rows, skipped }
 }
 
+// ── Parser alternativo: "September 2025", "October 2025" en fila 0 ─────────────
+
+function parseVentasSheet(ws: XLSX.WorkSheet): { rows: ForecastRow[]; skipped: number } {
+  const data = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, defval: null })
+
+  // Row 0 = header: [SKU, "September 2025", "October 2025", ...]
+  const row0 = (data[0] ?? []) as unknown[]
+
+  // Construir mapa columna → { year, month }
+  const colMap: Record<number, { year: number; month: number }> = {}
+
+  for (let c = 1; c < row0.length; c++) {
+    const cellValue = String(row0[c] ?? '').trim()
+    if (!cellValue) continue
+
+    // Intentar parsear "September 2025", "October 2025", etc.
+    const match = cellValue.match(/(\w+)\s+(\d{4})/)
+    if (match) {
+      const monthName = match[1].toLowerCase()
+      const year = parseInt(match[2])
+
+      // Buscar mes en MONTH_MAP
+      let monthNum: number | undefined
+      for (const [key, value] of Object.entries(MONTH_MAP)) {
+        if (monthName.startsWith(key)) {
+          monthNum = value
+          break
+        }
+      }
+
+      if (monthNum && year >= 2000 && year <= 2040) {
+        colMap[c] = { year, month: monthNum }
+      }
+    }
+  }
+
+  const rows: ForecastRow[] = []
+  let skipped = 0
+
+  // Datos desde fila 1
+  for (let r = 1; r < data.length; r++) {
+    const row = data[r] as unknown[]
+    const raw = row?.[0]
+    const partNumber = raw !== null && raw !== undefined ? String(raw).trim() : ''
+    if (!partNumber) { skipped++; continue }
+
+    for (const [colStr, { year, month }] of Object.entries(colMap)) {
+      const val = row[parseInt(colStr)]
+      if (val === null || val === undefined || val === '') continue
+      const qty = parseFloat(String(val).replace(/,/g, '.')) // Convertir comas a puntos
+      if (isNaN(qty) || qty === 0) continue
+      rows.push({ part_number: partNumber, year, month, quantity: qty })
+    }
+  }
+
+  return { rows, skipped }
+}
+
 // ── CSV parser (simple format: part_number,year,month,quantity) ───────────────
 
 function parseCsvFlat(text: string): { rows: ForecastRow[]; skipped: number } {
@@ -126,11 +187,11 @@ function parseCsvFlat(text: string): { rows: ForecastRow[]; skipped: number } {
   return { rows, skipped }
 }
 
-// ── Upsert batches ─────────────────────────────────────────────────────────────
+// ── Upsert batches — Forecast ─────────────────────────────────────────────────
 
 const BATCH = 400
 
-async function upsertBatches(rows: ForecastRow[], tenantId: string): Promise<{ inserted: number; errors: number }> {
+async function upsertForecastBatches(rows: ForecastRow[], tenantId: string): Promise<{ inserted: number; errors: number }> {
   let inserted = 0
   let errors = 0
 
@@ -151,7 +212,67 @@ async function upsertBatches(rows: ForecastRow[], tenantId: string): Promise<{ i
       await mgmtSql(sql)
       inserted += batch.length
     } catch (e) {
-      console.error(`[ingest] batch ${i}-${i + batch.length} error:`, e instanceof Error ? e.message : e)
+      console.error(`[ingest] forecast batch ${i}-${i + batch.length} error:`, e instanceof Error ? e.message : e)
+      errors += batch.length
+    }
+  }
+
+  return { inserted, errors }
+}
+
+// ── Upsert batches — Ventas Reales ────────────────────────────────────────────
+
+async function upsertVentasRealesSupabase(rows: ForecastRow[], tenantId: string): Promise<{ inserted: number; errors: number }> {
+  let inserted = 0
+  let errors = 0
+
+  // Usar Supabase client directo
+  const supabase = await createClient()
+
+  // Procesar en batches
+  for (let i = 0; i < rows.length; i += BATCH) {
+    const batch = rows.slice(i, i + BATCH)
+
+    try {
+      // Preparar datos para upsert
+      const records = batch.map(r => ({
+        tenant_id: tenantId,
+        part_number: r.part_number,
+        metric_type: 'revenue',
+        catalog_type: null,
+        year: r.year,
+        month: r.month,
+        quantity: r.quantity,
+        source_sheet: 'Ingesta Manual'
+      }))
+
+      // Primero eliminar registros existentes para este batch
+      const deletePromises = batch.map(r =>
+        supabase
+          .from('videndum_records')
+          .delete()
+          .eq('tenant_id', tenantId)
+          .eq('part_number', r.part_number)
+          .eq('metric_type', 'revenue')
+          .eq('year', r.year)
+          .eq('month', r.month)
+      )
+      await Promise.all(deletePromises)
+
+      // Luego insertar nuevos
+      const { error: insertError } = await supabase
+        .from('videndum_records')
+        .insert(records)
+
+      if (insertError) {
+        console.error(`[ingest] ventas batch ${i}-${i + batch.length} error:`, insertError.message)
+        errors += batch.length
+      } else {
+        inserted += batch.length
+      }
+    } catch (e) {
+      const errMsg = e instanceof Error ? e.message : String(e)
+      console.error(`[ingest] ventas batch ${i}-${i + batch.length} exception:`, errMsg)
       errors += batch.length
     }
   }
@@ -201,13 +322,56 @@ export async function POST(req: Request) {
       const text = buffer.toString('utf-8')
       ;({ rows, skipped } = parseCsvFlat(text))
     } else {
-      // XLSX — intentar la hoja solicitada; si no existe, tomar la primera
+      // XLSX — detectar automáticamente la hoja
       const wb = XLSX.read(buffer, { type: 'buffer' })
-      const ws = wb.Sheets[sheetName] ?? wb.Sheets[wb.SheetNames[0]]
-      usedSheet = wb.Sheets[sheetName] ? sheetName : wb.SheetNames[0]
+
+      console.log(`[ingest] Hojas disponibles: ${wb.SheetNames.join(', ')}`)
+
+      // Buscar hoja de forecast o ventas
+      const forecastSheets = ['Forecast Production', 'Forecast', 'forecast production', 'forecast']
+      const ventasSheets = ['Ventas', 'ventas', 'Sales', 'sales', 'Ventas Reales', 'ventas reales']
+
+      let ws: XLSX.WorkSheet | undefined
+
+      // Prioridad: buscar exacto, luego primero disponible
+      for (const name of forecastSheets) {
+        if (wb.Sheets[name]) {
+          ws = wb.Sheets[name]
+          usedSheet = name
+          console.log(`[ingest] Usando hoja de FORECAST: ${name}`)
+          break
+        }
+      }
+
+      if (!ws) {
+        for (const name of ventasSheets) {
+          if (wb.Sheets[name]) {
+            ws = wb.Sheets[name]
+            usedSheet = name
+            console.log(`[ingest] Usando hoja de VENTAS: ${name}`)
+            break
+          }
+        }
+      }
+
+      // Si no encontró, usar la primera hoja
+      if (!ws) {
+        ws = wb.Sheets[wb.SheetNames[0]]
+        usedSheet = wb.SheetNames[0]
+        console.log(`[ingest] Usando primera hoja disponible: ${usedSheet}`)
+      }
 
       if (!ws) throw new Error('El archivo no contiene hojas válidas')
-      ;({ rows, skipped } = parseForecastSheet(ws))
+
+      // Decidir qué parser usar según el tipo detectado
+      const isVentasSheet = ventasSheets.includes(usedSheet)
+      if (isVentasSheet) {
+        console.log(`[ingest] Usando parser de VENTAS (formato: "September 2025")`)
+        ;({ rows, skipped } = parseVentasSheet(ws))
+      } else {
+        console.log(`[ingest] Usando parser de FORECAST (formato: año/mes separados)`)
+        ;({ rows, skipped } = parseForecastSheet(ws))
+      }
     }
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Error al parsear el archivo'
@@ -224,11 +388,20 @@ export async function POST(req: Request) {
   const years = [...new Set(rows.map(r => r.year))].sort()
   const parts = new Set(rows.map(r => r.part_number)).size
 
-  console.log(`[ingest] parsed ${rows.length} rows — years: ${years.join(', ')}, parts: ${parts}`)
+  // Detectar tipo de archivo según la hoja usada
+  const ventasSheets = ['Ventas', 'ventas', 'Sales', 'sales', 'Ventas Reales', 'ventas reales']
+  const isVentasReales = ventasSheets.includes(usedSheet)
 
-  const { inserted, errors } = await upsertBatches(rows, tenantId)
+  console.log(`[ingest] parsed ${rows.length} rows — type: ${isVentasReales ? 'VENTAS REALES' : 'FORECAST'}, years: ${years.join(', ')}, parts: ${parts}`)
 
-  console.log(`[ingest] done — inserted/updated: ${inserted}, errors: ${errors}`)
+  // Guardar en la tabla correcta
+  const { inserted, errors } = isVentasReales
+    ? await upsertVentasRealesSupabase(rows, tenantId)
+    : await upsertForecastBatches(rows, tenantId)
+
+  const targetTable = isVentasReales ? 'videndum_records (revenue)' : 'planning_forecasts'
+
+  console.log(`[ingest] done — inserted/updated: ${inserted}, errors: ${errors}, target: ${targetTable}`)
 
   return NextResponse.json({
     ok: true,
@@ -240,6 +413,6 @@ export async function POST(req: Request) {
     skipped,
     years,
     unique_parts: parts,
-    message: `${inserted.toLocaleString()} registros guardados en planning_forecasts (${years[0]}–${years[years.length - 1]}, ${parts} part numbers)`,
+    message: `${inserted.toLocaleString()} registros guardados en ${targetTable} (${years[0]}–${years[years.length - 1]}, ${parts} part numbers)`,
   })
 }

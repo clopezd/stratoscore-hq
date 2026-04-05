@@ -5,6 +5,7 @@ import { getCitasSemana } from '../services/citasService'
 import type { CitaConRelaciones } from '../types/database'
 import { NuevaCitaModal } from './NuevaCitaModal'
 import { GestionarCitaModal } from './GestionarCitaModal'
+import { NavegacionMobility } from './NavegacionMobility'
 
 export function CalendarioSemanal() {
   const [citas, setCitas] = useState<CitaConRelaciones[]>([])
@@ -65,6 +66,8 @@ export function CalendarioSemanal() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      <NavegacionMobility />
+
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>

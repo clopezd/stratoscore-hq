@@ -12,7 +12,9 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (loading) return
-    if (!canAccessRoute(pathname, role)) {
+    const allowed = canAccessRoute(pathname, role)
+    if (!allowed) {
+      console.warn(`[RouteGuard] Blocked ${pathname} — role="${role}", redirecting to /dashboard`)
       router.replace('/dashboard')
     }
   }, [pathname, role, loading, router])
