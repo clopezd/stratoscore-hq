@@ -26,12 +26,16 @@ import { getSession, setSession, clearSession, listTasks, getTask, updateTaskSta
 import { computeNextRun, runDueTasks } from './scheduler.js'
 import { buildMemoryContext, saveConversationTurn } from './memory.js'
 import { logger } from './logger.js'
-import { getFinanceSummary } from './finance-client.js'
+import { getFinanceSummary, createTransaction, createGastoMensual, createGastoAnual, getGastosMensuales, getGastosAnuales } from './finance-client.js'
+import express from 'express'
+import agentsRouter from './agents-api.js'
+import publicChatRouter from './public-chat-api.js'
 
 const env = readEnvFile(['OPENCLAW_GATEWAY_TOKEN', 'MC_SERVER_PORT', 'MISSION_CONTROL_ORIGIN'])
 const MC_TOKEN = env['OPENCLAW_GATEWAY_TOKEN'] ?? ''
 const PORT = parseInt(env['MC_SERVER_PORT'] ?? '3099', 10)
 const ALLOWED_ORIGIN = env['MISSION_CONTROL_ORIGIN'] ?? 'http://localhost:3000'
+const PUBLIC_ALLOWED_ORIGINS = ['https://www.stratoscore.app', 'https://stratoscore.app', 'http://localhost:3000']
 
 if (!MC_TOKEN) {
   console.error('FATAL: OPENCLAW_GATEWAY_TOKEN is not set. Server will reject all requests.')
@@ -70,6 +74,42 @@ function readBody(req: IncomingMessage): Promise<string> {
   })
 }
 
+// ─── Agent API handler (Express) ─────────────────────────────────────────────
+
+const agentApp = express()
+agentApp.use(express.json())
+agentApp.use('/agents', agentsRouter)
+
+async function handleAgentAPI(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  return new Promise((resolve) => {
+    agentApp(req as any, res as any, () => resolve())
+  })
+}
+
+// ─── Public Chat API handler (Express, NO auth) ──────────────────────────────
+
+const publicChatApp = express()
+publicChatApp.use(express.json())
+
+// CORS middleware para public chat
+publicChatApp.use((req, res, next) => {
+  const origin = req.headers.origin
+  if (origin && PUBLIC_ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+  }
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  next()
+})
+
+publicChatApp.use('/chat', publicChatRouter)
+
+async function handlePublicChatAPI(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  return new Promise((resolve) => {
+    publicChatApp(req as any, res as any, () => resolve())
+  })
+}
+
 // ─── Request handler ─────────────────────────────────────────────────────────
 
 async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -78,6 +118,18 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
   if (req.method === 'OPTIONS') {
     res.writeHead(204)
     res.end()
+    return
+  }
+
+  // Public Chat API — NO requiere auth
+  if (req.url?.startsWith('/chat')) {
+    await handlePublicChatAPI(req, res)
+    return
+  }
+
+  // Agent API routes — handle separately (uses Express router)
+  if (req.url?.startsWith('/agents')) {
+    await handleAgentAPI(req, res)
     return
   }
 
@@ -394,6 +446,66 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
     return
   }
 
+  // POST /finance/transactions — crear transacción
+  if (req.method === 'POST' && req.url === '/finance/transactions') {
+    try {
+      const result = await createTransaction(parsed as any)
+      sendJSON(res, 201, result)
+    } catch (err) {
+      logger.error({ err }, 'POST /finance/transactions error')
+      sendJSON(res, 500, { error: String(err) })
+    }
+    return
+  }
+
+  // POST /finance/gastos-mensuales — crear gasto mensual
+  if (req.method === 'POST' && req.url === '/finance/gastos-mensuales') {
+    try {
+      const result = await createGastoMensual(parsed as any)
+      sendJSON(res, 201, result)
+    } catch (err) {
+      logger.error({ err }, 'POST /finance/gastos-mensuales error')
+      sendJSON(res, 500, { error: String(err) })
+    }
+    return
+  }
+
+  // POST /finance/gastos-anuales — crear gasto anual
+  if (req.method === 'POST' && req.url === '/finance/gastos-anuales') {
+    try {
+      const result = await createGastoAnual(parsed as any)
+      sendJSON(res, 201, result)
+    } catch (err) {
+      logger.error({ err }, 'POST /finance/gastos-anuales error')
+      sendJSON(res, 500, { error: String(err) })
+    }
+    return
+  }
+
+  // GET /finance/gastos-mensuales — listar gastos mensuales activos
+  if (req.method === 'GET' && req.url === '/finance/gastos-mensuales') {
+    try {
+      const data = await getGastosMensuales()
+      sendJSON(res, 200, data)
+    } catch (err) {
+      logger.error({ err }, 'GET /finance/gastos-mensuales error')
+      sendJSON(res, 500, { error: String(err) })
+    }
+    return
+  }
+
+  // GET /finance/gastos-anuales — listar gastos anuales activos
+  if (req.method === 'GET' && req.url === '/finance/gastos-anuales') {
+    try {
+      const data = await getGastosAnuales()
+      sendJSON(res, 200, data)
+    } catch (err) {
+      logger.error({ err }, 'GET /finance/gastos-anuales error')
+      sendJSON(res, 500, { error: String(err) })
+    }
+    return
+  }
+
   // GET /finance/summary — resumen financiero vía Supabase
   if (req.method === 'GET' && req.url === '/finance/summary') {
     try {
@@ -406,6 +518,208 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
     } catch (err) {
       logger.error({ err }, 'finance/summary error')
       sendJSON(res, 500, { error: String(err) })
+    }
+    return
+  }
+
+  // POST /occupancy/run — ejecutar Captain Occupancy manualmente
+  if (req.method === 'POST' && req.url === '/occupancy/run') {
+    try {
+      const { runCaptainOccupancy } = await import('./agents/captain-occupancy.js')
+      const results = await runCaptainOccupancy('manual')
+      sendJSON(res, 200, { success: true, results })
+    } catch (err) {
+      logger.error({ err }, '/occupancy/run error')
+      sendJSON(res, 500, { success: false, error: String(err) })
+    }
+    return
+  }
+
+  // GET /occupancy/status — últimas ejecuciones de Captain Occupancy
+  if (req.method === 'GET' && req.url === '/occupancy/status') {
+    try {
+      const { createClient } = await import('@supabase/supabase-js')
+      const supabase = createClient(
+        process.env.SUPABASE_URL || 'https://csiiulvqzkgijxbgdqcv.supabase.co',
+        process.env.SUPABASE_SERVICE_KEY || ''
+      )
+      const { data: executions } = await supabase
+        .from('agent_executions')
+        .select('*')
+        .eq('agent_name', 'occupancy')
+        .order('started_at', { ascending: false })
+        .limit(10)
+      sendJSON(res, 200, { success: true, executions })
+    } catch (err) {
+      logger.error({ err }, '/occupancy/status error')
+      sendJSON(res, 500, { success: false, error: String(err) })
+    }
+    return
+  }
+
+  // POST /execute-action — ejecutar acciones agénticas de tareas personales
+  if (req.method === 'POST' && req.url === '/execute-action') {
+    try {
+      const action = parsed
+      let result: any = {}
+
+      switch (action.type) {
+        case 'deploy':
+          // TODO: Implementar lógica de deploy
+          result = { message: `Deploy to ${action.target} scheduled` }
+          break
+
+        case 'run_command':
+          // Ejecutar comando en el sistema
+          const { execSync } = await import('child_process')
+          const cwd = typeof action.cwd === 'string' ? action.cwd : PROJECT_ROOT
+          const output = execSync(action.command as string, {
+            cwd,
+            encoding: 'utf8',
+            timeout: 30000
+          })
+          result = { command: action.command, output }
+          break
+
+        case 'git_commit':
+          // Git commit automático
+          const { execSync: gitExec } = await import('child_process')
+          const gitOutput = gitExec(`git commit -am "${action.message}"`, {
+            cwd: PROJECT_ROOT,
+            encoding: 'utf8'
+          })
+          result = { message: action.message, output: gitOutput }
+          break
+
+        case 'notify':
+          // Enviar notificación por Telegram
+          // TODO: Integrar con bot de Telegram
+          result = { channel: action.channel, message: action.message, sent: true }
+          break
+
+        default:
+          sendJSON(res, 400, { error: `Unknown action type: ${action.type}` })
+          return
+      }
+
+      sendJSON(res, 200, { success: true, result })
+    } catch (err: any) {
+      logger.error({ err }, '/execute-action error')
+      sendJSON(res, 500, { success: false, error: err.message })
+    }
+    return
+  }
+
+  // POST /notify — enviar notificación por Telegram
+  if (req.method === 'POST' && req.url === '/notify') {
+    try {
+      const { message } = parsed
+      // TODO: Integrar con bot de Telegram
+      logger.info({ message }, 'notification sent')
+      sendJSON(res, 200, { sent: true, message })
+    } catch (err) {
+      logger.error({ err }, '/notify error')
+      sendJSON(res, 500, { error: String(err) })
+    }
+    return
+  }
+
+  // POST /webhooks/git-commit — webhook post-commit: analiza commit y auto-mueve tareas
+  if (req.method === 'POST' && req.url === '/webhooks/git-commit') {
+    try {
+      const { matchCommitToTasks, getLatestCommitInfo } = await import('./agents/task-validator.js')
+      const commit = getLatestCommitInfo()
+      if (!commit) {
+        sendJSON(res, 200, { success: true, message: 'No commit found', matches: [] })
+        return
+      }
+
+      const result = await matchCommitToTasks(commit)
+      logger.info({
+        commit: commit.hash?.substring(0, 7),
+        message: commit.message,
+        completed: result.tasksCompleted,
+        started: result.tasksStarted,
+        newClients: result.newClients
+      }, '🔗 Git webhook processed')
+
+      // Notificar por Telegram si hubo cambios
+      if (result.matches.length > 0 || result.newClients > 0) {
+        try {
+          const lines = ['📋 *Auto-update post-commit*', `\`${commit.hash?.substring(0, 7)}\` ${commit.message}`, '']
+          if (result.newClients > 0) lines.push(`🆕 ${result.newClients} cliente(s) nuevo(s) detectado(s)`)
+          for (const m of result.matches) {
+            const icon = m.newStatus === 'done' ? '✅' : '🔄'
+            lines.push(`${icon} ${m.taskTitle} → ${m.newStatus}`)
+            lines.push(`   _${m.reason}_`)
+          }
+          // Fire-and-forget notification
+          fetch(`http://localhost:${PORT}/notify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${MC_TOKEN}` },
+            body: JSON.stringify({ message: lines.join('\n') })
+          }).catch(() => {})
+        } catch { /* notification is best-effort */ }
+      }
+
+      sendJSON(res, 200, {
+        success: true,
+        commit: { hash: commit.hash?.substring(0, 7), message: commit.message },
+        tasksCompleted: result.tasksCompleted,
+        tasksStarted: result.tasksStarted,
+        newClients: result.newClients,
+        matches: result.matches
+      })
+    } catch (err) {
+      logger.error({ err }, '/webhooks/git-commit error')
+      sendJSON(res, 500, { error: String(err) })
+    }
+    return
+  }
+
+  // POST /tasks/validate — validar tareas en curso automáticamente
+  if (req.method === 'POST' && req.url === '/tasks/validate') {
+    try {
+      const { validateAllInProgressTasks } = await import('./agents/task-validator.js')
+      const { completed, started, newClients } = await validateAllInProgressTasks()
+      sendJSON(res, 200, { success: true, completed, started, newClients })
+    } catch (err) {
+      logger.error({ err }, '/tasks/validate error')
+      sendJSON(res, 500, { error: String(err) })
+    }
+    return
+  }
+
+  // POST /tasks/validate/:taskId — validar tarea específica
+  const validateTaskMatch = req.url?.match(/^\/tasks\/validate\/([a-f0-9-]+)$/)
+  if (req.method === 'POST' && validateTaskMatch) {
+    try {
+      const taskId = validateTaskMatch[1]
+      const { validateTask } = await import('./agents/task-validator.js')
+      const completed = await validateTask(taskId)
+      sendJSON(res, 200, { success: true, completed })
+    } catch (err: any) {
+      logger.error({ err }, '/tasks/validate/:taskId error')
+      sendJSON(res, 500, { error: err.message })
+    }
+    return
+  }
+
+  // POST /tasks/validate-rule — probar una regla antes de guardarla
+  if (req.method === 'POST' && req.url === '/tasks/validate-rule') {
+    try {
+      const { rule_type, rule_config } = parsed
+      if (!rule_type || !rule_config) {
+        sendJSON(res, 400, { error: 'rule_type and rule_config required' })
+        return
+      }
+
+      const { validateRule } = await import('./agents/task-validator.js')
+      const result = await validateRule({ rule_type, rule_config } as any)
+      sendJSON(res, 200, { passed: result.passed, error: result.error })
+    } catch (err: any) {
+      logger.error({ err }, '/tasks/validate-rule error')
+      sendJSON(res, 500, { error: err.message })
     }
     return
   }

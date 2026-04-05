@@ -31,7 +31,7 @@ export default function ReportesPage() {
   const fetchMeses = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/reportes/meses')
+      const res = await fetch('/api/finance/reportes/meses')
       const json = await res.json()
       setMeses(json.meses || [])
     } catch (error) {

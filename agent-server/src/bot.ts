@@ -10,7 +10,7 @@ import { downloadMedia, buildPhotoMessage, buildDocumentMessage } from './media.
 import { listTasks } from './db.js'
 import { logger } from './logger.js'
 import { mcStart, mcEnd, mcError } from './mc-client.js'
-import { getFinanceSummary } from './finance-client.js'
+import { getFinanceSummary, createTransaction, createGastoMensual, createGastoAnual, getGastosMensuales, getGastosAnuales } from './finance-client.js'
 
 // ─── Formatting ─────────────────────────────────────────────────────────────
 
@@ -371,6 +371,132 @@ export function createBot(): Bot {
     }
   })
 
+  // /gasto <monto> <descripcion> [cuenta] — registrar gasto rápido
+  bot.command('gasto', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+    try {
+      const text = ctx.match?.trim()
+      if (!text) {
+        await ctx.reply('Uso: /gasto 50 comida [Personal]\nEjemplo: /gasto 15.99 Netflix Personal', { parse_mode: 'HTML' })
+        return
+      }
+      const parts = text.split(/\s+/)
+      const monto = parseFloat(parts[0])
+      if (isNaN(monto) || monto <= 0) {
+        await ctx.reply('❌ Monto inválido. Ejemplo: /gasto 50 comida')
+        return
+      }
+      const descripcion = parts[1] || 'Sin descripción'
+      const cuenta = parts[2] || 'Personal'
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+      await createTransaction({ tipo: 'gasto', monto, descripcion, categoria: descripcion, cuenta, estado: 'pagado', moneda: 'USD' })
+      await ctx.reply(`✅ Gasto registrado: <b>$${monto}</b> — ${descripcion} (${cuenta})`, { parse_mode: 'HTML' })
+    } catch (err) {
+      logger.error({ err }, '/gasto error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
+  // /ingreso <monto> <descripcion> [cuenta] — registrar ingreso rápido
+  bot.command('ingreso', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+    try {
+      const text = ctx.match?.trim()
+      if (!text) {
+        await ctx.reply('Uso: /ingreso 1000 Freelance [Personal]\nEjemplo: /ingreso 500 Nómina Personal', { parse_mode: 'HTML' })
+        return
+      }
+      const parts = text.split(/\s+/)
+      const monto = parseFloat(parts[0])
+      if (isNaN(monto) || monto <= 0) {
+        await ctx.reply('❌ Monto inválido. Ejemplo: /ingreso 1000 Freelance')
+        return
+      }
+      const descripcion = parts[1] || 'Ingreso'
+      const cuenta = parts[2] || 'Personal'
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+      await createTransaction({ tipo: 'ingreso', monto, descripcion, categoria: descripcion, cuenta, estado: 'pagado', moneda: 'USD' })
+      await ctx.reply(`✅ Ingreso registrado: <b>$${monto}</b> — ${descripcion} (${cuenta})`, { parse_mode: 'HTML' })
+    } catch (err) {
+      logger.error({ err }, '/ingreso error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
+  // /suscripcion <nombre> <monto> [dia] [cuenta] — agregar gasto mensual recurrente
+  bot.command('suscripcion', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+    try {
+      const text = ctx.match?.trim()
+      if (!text) {
+        await ctx.reply('Uso: /suscripcion Netflix 15.99 [15] [Personal]\nEjemplo: /suscripcion Spotify 9.99 1 Personal', { parse_mode: 'HTML' })
+        return
+      }
+      const parts = text.split(/\s+/)
+      if (parts.length < 2) {
+        await ctx.reply('❌ Necesito nombre y monto. Ejemplo: /suscripcion Netflix 15.99')
+        return
+      }
+      const nombre = parts[0]
+      const monto = parseFloat(parts[1])
+      if (isNaN(monto) || monto <= 0) {
+        await ctx.reply('❌ Monto inválido.')
+        return
+      }
+      const dia = parts[2] ? parseInt(parts[2]) : 1
+      const cuenta = parts[3] || 'Personal'
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+      await createGastoMensual({ nombre_app: nombre, monto, dia_de_cobro: dia, cuenta, categoria: 'Tecnología' })
+      await ctx.reply(`✅ Suscripción agregada: <b>${nombre}</b> $${monto}/mes — día ${dia} (${cuenta})`, { parse_mode: 'HTML' })
+    } catch (err) {
+      logger.error({ err }, '/suscripcion error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
+  // /suscripciones — listar gastos mensuales activos
+  bot.command('suscripciones', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+    try {
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+      const mensuales = await getGastosMensuales() as any[]
+      const anuales = await getGastosAnuales() as any[]
+
+      let text = '<b>💳 GASTOS RECURRENTES</b>\n\n'
+
+      if (mensuales.length > 0) {
+        text += '<b>📅 Mensuales:</b>\n'
+        let totalMensual = 0
+        for (const g of mensuales) {
+          text += `  • ${g.nombre_app}: $${g.monto} — día ${g.dia_de_cobro} (${g.cuenta || '-'})\n`
+          totalMensual += g.monto
+        }
+        text += `  <b>Total: $${totalMensual.toFixed(2)}/mes</b>\n\n`
+      } else {
+        text += 'No hay gastos mensuales registrados.\n\n'
+      }
+
+      if (anuales.length > 0) {
+        const MESES = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+        text += '<b>📆 Anuales:</b>\n'
+        let totalAnual = 0
+        for (const g of anuales) {
+          text += `  • ${g.nombre_servicio}: $${g.monto} — ${MESES[g.mes_de_cobro] || '?'} día ${g.dia_de_cobro}\n`
+          totalAnual += g.monto
+        }
+        text += `  <b>Total: $${totalAnual.toFixed(2)}/año ($${(totalAnual / 12).toFixed(2)}/mes)</b>\n`
+      }
+
+      const chunks = splitMessage(text)
+      for (const chunk of chunks) {
+        await ctx.reply(chunk, { parse_mode: 'HTML' })
+      }
+    } catch (err) {
+      logger.error({ err }, '/suscripciones error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
   // /tareas — lista de tareas de Mission Control (desde el board)
   bot.command('tareas', async (ctx) => {
     if (!isAuthorised(String(ctx.chat.id))) return
@@ -459,6 +585,319 @@ export function createBot(): Bot {
       }
     } catch (err) {
       logger.error({ err }, '/reporte error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AGENT ORCHESTRATION COMMANDS — Sistema de Agentes Multi-Proyecto
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // /agentes — lista todos los agentes disponibles
+  bot.command('agentes', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+
+    try {
+      // Importar el orchestrator
+      const { orchestrator } = await import('./orchestrator.js')
+      const agents = orchestrator.listAgents()
+
+      let text = '<b>🤖 AGENTES DISPONIBLES</b>\n\n'
+      text += '<i>Estos agentes trabajan en todos tus proyectos y pueden colaborar entre ellos.</i>\n\n'
+
+      agents.forEach((agent, i) => {
+        const emoji = i === 0 ? '🔍' : i === 1 ? '🎨' : i === 2 ? '🧠' : '⚙️'
+        text += `${emoji} <b>${agent.name}</b>\n`
+        text += `   ${agent.description}\n`
+        text += `   <i>Skills: ${agent.skills.slice(0, 3).join(', ')}</i>\n\n`
+      })
+
+      text += '\n<b>USO:</b>\n'
+      text += '/investigar [tema] — Market Researcher\n'
+      text += '/marca [proyecto] — Brand Architect\n'
+      text += '/retar [decisión] — Strategic Challenger\n'
+      text += '/agente [nombre] [tarea] — Ejecutar agente específico\n'
+
+      const chunks = splitMessage(text)
+      for (const chunk of chunks) {
+        await ctx.reply(chunk, { parse_mode: 'HTML' })
+      }
+    } catch (err) {
+      logger.error({ err }, '/agentes error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
+  // /investigar [tema] — ejecutar Market Researcher
+  bot.command('investigar', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+    if (!ctx.message?.text) return
+
+    const query = ctx.message.text.replace('/investigar', '').trim()
+    if (!query) {
+      await ctx.reply('Uso: /investigar [tema]\n\nEjemplo: /investigar mercado de fisioterapia en México')
+      return
+    }
+
+    try {
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+
+      const { orchestrator } = await import('./orchestrator.js')
+      const { runMarketResearcher } = await import('./agents/market-researcher.js')
+
+      await ctx.reply('🔍 Market Researcher iniciando investigación...')
+
+      // Crear tarea
+      const task = await orchestrator.createTask('market-researcher', query, { priority: 'high' })
+
+      // Ejecutar directamente
+      const report = await runMarketResearcher(query)
+
+      let text = '<b>🔍 REPORTE DE INVESTIGACIÓN</b>\n\n'
+      text += `<b>Mercado:</b> ${report.marketOverview.size}\n`
+      text += `<b>Madurez:</b> ${report.marketOverview.maturity}\n`
+      text += `<b>Jugadores clave:</b> ${report.marketOverview.keyPlayers.join(', ')}\n\n`
+
+      text += '<b>🎯 OPORTUNIDADES</b>\n'
+      report.opportunities.slice(0, 3).forEach((opp, i) => {
+        text += `${i + 1}. ${opp}\n`
+      })
+
+      text += '\n<b>⚠️ AMENAZAS</b>\n'
+      report.threats.slice(0, 2).forEach((threat, i) => {
+        text += `${i + 1}. ${threat}\n`
+      })
+
+      text += '\n<b>💡 RECOMENDACIONES</b>\n'
+      report.recommendations.slice(0, 3).forEach((rec) => {
+        text += `${rec}\n`
+      })
+
+      text += `\n<i>Reporte completo guardado en BD (${report.executedAt})</i>`
+
+      // Marcar tarea completada
+      await orchestrator.executeTask(task.id)
+
+      const chunks = splitMessage(text)
+      for (const chunk of chunks) {
+        await ctx.reply(chunk, { parse_mode: 'HTML' })
+      }
+    } catch (err) {
+      logger.error({ err }, '/investigar error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
+  // /marca [proyecto] — ejecutar Brand Architect
+  bot.command('marca', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+    if (!ctx.message?.text) return
+
+    const projectName = ctx.message.text.replace('/marca', '').trim()
+    if (!projectName) {
+      await ctx.reply('Uso: /marca [proyecto]\n\nEjemplo: /marca MedCare MVP')
+      return
+    }
+
+    try {
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+
+      const { orchestrator } = await import('./orchestrator.js')
+      const { runBrandArchitect } = await import('./agents/brand-architect.js')
+
+      await ctx.reply('🎨 Brand Architect diseñando identidad...')
+
+      // Crear tarea
+      const task = await orchestrator.createTask('brand-architect', `Diseñar marca para ${projectName}`, { priority: 'high' })
+
+      // Ejecutar
+      const identity = await runBrandArchitect(`Diseñar marca completa para ${projectName}`, {
+        projectName
+      })
+
+      let text = `<b>🎨 IDENTIDAD DE MARCA: ${identity.projectName}</b>\n\n`
+
+      text += '<b>🎭 PERSONALIDAD</b>\n'
+      text += identity.brandPersonality.join(' • ') + '\n\n'
+
+      text += '<b>🎨 PALETA DE COLORES</b>\n'
+      text += `Primary: ${identity.colorPalette.primary.name} (${identity.colorPalette.primary.hex})\n`
+      text += `${identity.colorPalette.primary.psychology}\n\n`
+
+      text += `Secondary: ${identity.colorPalette.secondary.name} (${identity.colorPalette.secondary.hex})\n`
+      text += `Accent: ${identity.colorPalette.accent.name} (${identity.colorPalette.accent.hex})\n\n`
+
+      text += '<b>✍️ TIPOGRAFÍA</b>\n'
+      text += `Headings: ${identity.typography.heading.family}\n`
+      text += `Body: ${identity.typography.body.family}\n\n`
+
+      text += '<b>🗣️ TONO DE VOZ</b>\n'
+      text += `Formal ←${identity.toneOfVoice.spectrum.formalVsCasual}→ Casual\n`
+      text += `Técnico ←${identity.toneOfVoice.spectrum.technicalVsAccessible}→ Accesible\n\n`
+
+      text += '<b>💎 DIFERENCIADORES</b>\n'
+      identity.differentiators.slice(0, 2).forEach((diff) => {
+        text += `• ${diff}\n`
+      })
+
+      text += '\n<b>🎯 EMOTIONAL TRIGGERS</b>\n'
+      identity.emotionalTriggers.slice(0, 2).forEach((trigger) => {
+        text += `• ${trigger}\n`
+      })
+
+      text += `\n<b>🖼️ CONCEPTOS DE LOGO</b>\n`
+      text += `${identity.logoConceptos.length} conceptos generados.\n`
+      text += `Concepto recomendado: ${identity.logoConceptos[0].name}\n`
+
+      text += `\n<i>Identidad completa guardada en BD (${identity.executedAt})</i>`
+
+      // Marcar tarea completada
+      await orchestrator.executeTask(task.id)
+
+      const chunks = splitMessage(text)
+      for (const chunk of chunks) {
+        await ctx.reply(chunk, { parse_mode: 'HTML' })
+      }
+    } catch (err) {
+      logger.error({ err }, '/marca error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
+  // /retar [decisión] — ejecutar Strategic Challenger
+  bot.command('retar', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+    if (!ctx.message?.text) return
+
+    const decision = ctx.message.text.replace('/retar', '').trim()
+    if (!decision) {
+      await ctx.reply(
+        'Uso: /retar [decisión]\n\n' +
+        'Ejemplo: /retar Construir una app móvil nativa para iOS y Android\n\n' +
+        'El Strategic Challenger cuestionará tu decisión y propondrá alternativas.'
+      )
+      return
+    }
+
+    try {
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+
+      const { orchestrator } = await import('./orchestrator.js')
+      const { runStrategicChallenger } = await import('./agents/strategic-challenger.js')
+
+      await ctx.reply('🧠 Strategic Challenger analizando decisión...')
+
+      // Crear tarea
+      const task = await orchestrator.createTask('strategic-challenger', `Validar: ${decision}`, { priority: 'high' })
+
+      // Ejecutar
+      const report = await runStrategicChallenger(decision)
+
+      const assessmentEmoji = {
+        'approved': '✅',
+        'approved-with-reservations': '⚠️',
+        'not-recommended': '🚫',
+        'blocked': '❌'
+      }
+
+      let text = '<b>🧠 STRATEGIC CHALLENGE</b>\n\n'
+      text += `<b>Decisión:</b> ${decision}\n\n`
+      text += `<b>Assessment:</b> ${assessmentEmoji[report.overallAssessment]} ${report.overallAssessment.toUpperCase()}\n`
+      text += `<b>Confianza:</b> ${report.confidence}%\n\n`
+
+      if (report.challenges.length > 0) {
+        text += '<b>⚠️ CHALLENGES IDENTIFICADOS</b>\n'
+        const criticalChallenges = report.challenges.filter(c => c.severity === 'critical' || c.severity === 'blocker')
+        criticalChallenges.slice(0, 3).forEach((c, i) => {
+          const icon = c.severity === 'blocker' ? '🛑' : '⚠️'
+          text += `${icon} ${c.question}\n`
+          text += `   ${c.reasoning}\n`
+          text += `   <i>→ ${c.suggestedAction}</i>\n\n`
+        })
+      }
+
+      if (report.alternatives.length > 0) {
+        text += '<b>💡 ALTERNATIVAS</b>\n'
+        report.alternatives.slice(0, 2).forEach((alt, i) => {
+          text += `${i + 1}. <b>${alt.title}</b>\n`
+          text += `   Esfuerzo: ${alt.effort} | Impacto: ${alt.impact}\n`
+          text += `   ${alt.recommendation}\n\n`
+        })
+      }
+
+      text += '<b>📋 RECOMENDACIÓN FINAL</b>\n'
+      text += report.finalRecommendation + '\n'
+
+      text += `\n<i>Análisis completo guardado en BD (${report.executedAt})</i>`
+
+      // Marcar tarea completada
+      await orchestrator.executeTask(task.id)
+
+      const chunks = splitMessage(text)
+      for (const chunk of chunks) {
+        await ctx.reply(chunk, { parse_mode: 'HTML' })
+      }
+    } catch (err) {
+      logger.error({ err }, '/retar error')
+      await ctx.reply(`❌ Error: ${String(err)}`)
+    }
+  })
+
+  // /agente [nombre] [tarea] — ejecutar agente genérico
+  bot.command('agente', async (ctx) => {
+    if (!isAuthorised(String(ctx.chat.id))) return
+    if (!ctx.message?.text) return
+
+    const args = ctx.message.text.replace('/agente', '').trim().split(' ')
+    if (args.length < 2) {
+      await ctx.reply(
+        'Uso: /agente [nombre] [tarea]\n\n' +
+        'Ejemplo: /agente market-researcher analizar competencia de CRMs\n\n' +
+        'Usa /agentes para ver la lista de agentes disponibles.'
+      )
+      return
+    }
+
+    const agentName = args[0]
+    const task = args.slice(1).join(' ')
+
+    try {
+      await ctx.api.sendChatAction(ctx.chat.id, 'typing')
+
+      const { orchestrator } = await import('./orchestrator.js')
+
+      const agent = orchestrator.getAgent(agentName)
+      if (!agent) {
+        await ctx.reply(`❌ Agente '${agentName}' no encontrado. Usa /agentes para ver disponibles.`)
+        return
+      }
+
+      await ctx.reply(`🤖 Ejecutando ${agent.name}...`)
+
+      // Crear y ejecutar tarea
+      const taskObj = await orchestrator.createTask(agentName, task, { priority: 'high' })
+      const result = await orchestrator.executeTask(taskObj.id)
+
+      let text = `<b>🤖 ${agent.name.toUpperCase()}</b>\n\n`
+      text += `<b>Tarea:</b> ${task}\n`
+      text += `<b>Estado:</b> ${result.status === 'completed' ? '✅' : '❌'}\n\n`
+
+      if (result.result) {
+        text += `<b>Resultado:</b>\n${JSON.stringify(result.result, null, 2)}\n`
+      }
+
+      if (result.error) {
+        text += `<b>Error:</b> ${result.error}\n`
+      }
+
+      text += `\n<i>Ejecutado: ${result.completedAt || 'N/A'}</i>`
+
+      const chunks = splitMessage(text)
+      for (const chunk of chunks) {
+        await ctx.reply(chunk, { parse_mode: 'HTML' })
+      }
+    } catch (err) {
+      logger.error({ err }, '/agente error')
       await ctx.reply(`❌ Error: ${String(err)}`)
     }
   })

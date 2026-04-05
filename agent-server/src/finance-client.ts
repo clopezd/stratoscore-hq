@@ -80,6 +80,92 @@ function isGasto(tipo: string): boolean {
   return t === 'gasto' || t === 'expense' || t === 'egreso' || t === 'salida'
 }
 
+// ─── Write helpers ───────────────────────────────────────────────────────────
+
+async function supabasePost(table: string, body: Record<string, unknown>): Promise<unknown> {
+  const url = `${ANALYTICS_SUPABASE_URL}/rest/v1/${table}`
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { ...supabaseHeaders(), 'Prefer': 'return=representation' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`Supabase POST ${res.status}: ${text}`)
+  }
+  return res.json()
+}
+
+export interface CreateTransactionInput {
+  tipo: 'ingreso' | 'gasto' | 'transferencia'
+  monto: number
+  categoria?: string
+  descripcion?: string
+  fecha_hora?: string
+  cuenta?: string
+  cuenta_destino?: string
+  estado?: string
+  moneda?: string
+  tasa_cambio?: number
+}
+
+export interface CreateGastoMensualInput {
+  nombre_app: string
+  categoria?: string
+  dia_de_cobro?: number
+  monto: number
+  activo?: boolean
+  cuenta?: string
+}
+
+export interface CreateGastoAnualInput {
+  nombre_servicio: string
+  categoria?: string
+  mes_de_cobro?: number
+  dia_de_cobro?: number
+  monto: number
+  activo?: boolean
+  cuenta?: string
+}
+
+export async function createTransaction(input: CreateTransactionInput): Promise<unknown> {
+  if (!ANALYTICS_SUPABASE_URL || !ANALYTICS_SUPABASE_KEY) throw new Error('ANALYTICS_SUPABASE vars no configuradas')
+  return supabasePost('transacciones', {
+    tipo: input.tipo, monto: input.monto, categoria: input.categoria || null,
+    descripcion: input.descripcion || null, fecha_hora: input.fecha_hora || new Date().toISOString(),
+    cuenta: input.cuenta || null, cuenta_destino: input.cuenta_destino || null,
+    estado: input.estado || 'pagado', moneda: input.moneda || 'USD', tasa_cambio: input.tasa_cambio || 1.0,
+  })
+}
+
+export async function createGastoMensual(input: CreateGastoMensualInput): Promise<unknown> {
+  if (!ANALYTICS_SUPABASE_URL || !ANALYTICS_SUPABASE_KEY) throw new Error('ANALYTICS_SUPABASE vars no configuradas')
+  return supabasePost('gastos_mensuales', {
+    nombre_app: input.nombre_app, categoria: input.categoria || 'Tecnología',
+    dia_de_cobro: input.dia_de_cobro || 1, monto: input.monto,
+    activo: input.activo ?? true, cuenta: input.cuenta || 'Personal',
+  })
+}
+
+export async function createGastoAnual(input: CreateGastoAnualInput): Promise<unknown> {
+  if (!ANALYTICS_SUPABASE_URL || !ANALYTICS_SUPABASE_KEY) throw new Error('ANALYTICS_SUPABASE vars no configuradas')
+  return supabasePost('gastos_anuales', {
+    nombre_servicio: input.nombre_servicio, categoria: input.categoria || 'Tecnología',
+    mes_de_cobro: input.mes_de_cobro || 1, dia_de_cobro: input.dia_de_cobro || 1,
+    monto: input.monto, activo: input.activo ?? true, cuenta: input.cuenta || 'Personal',
+  })
+}
+
+export async function getGastosMensuales(): Promise<unknown[]> {
+  if (!ANALYTICS_SUPABASE_URL || !ANALYTICS_SUPABASE_KEY) return []
+  return (await supabaseGet('gastos_mensuales', 'select=*&activo=eq.true&order=dia_de_cobro.asc')) as unknown[]
+}
+
+export async function getGastosAnuales(): Promise<unknown[]> {
+  if (!ANALYTICS_SUPABASE_URL || !ANALYTICS_SUPABASE_KEY) return []
+  return (await supabaseGet('gastos_anuales', 'select=*&activo=eq.true&order=mes_de_cobro.asc')) as unknown[]
+}
+
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 /**
