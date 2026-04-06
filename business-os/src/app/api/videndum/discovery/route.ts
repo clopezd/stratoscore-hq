@@ -67,26 +67,54 @@ export interface ClientDiscoveryPayload {
   concerns?: string
 }
 
+function getServiceClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  return createServiceClient(supabaseUrl, supabaseServiceKey, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  })
+}
+
 /**
  * POST /api/videndum/discovery
- * Guarda el discovery del cliente para diseñar la plataforma
+ * Guarda o actualiza el discovery del cliente para diseñar la plataforma
  * NOTA: Este endpoint permite submissions anónimas (sin autenticación)
+ * Si incluye { id: "..." }, actualiza el registro existente en vez de crear uno nuevo
  */
 export async function POST(request: Request) {
   try {
-    const payload: ClientDiscoveryPayload = await request.json()
+    const { id, ...payload }: ClientDiscoveryPayload & { id?: string } = await request.json()
+    const supabase = getServiceClient()
 
-    // Usar service role client para permitir inserts anónimos
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    if (id) {
+      // Update existing record
+      const { data, error } = await supabase
+        .from('client_discovery')
+        .update({
+          ...payload,
+          submitted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .single()
 
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
+      if (error) {
+        console.error('[discovery] Error updating discovery:', error)
+        return NextResponse.json(
+          { error: `Error actualizando discovery: ${error.message}` },
+          { status: 500 }
+        )
       }
-    })
 
+      return NextResponse.json({
+        success: true,
+        data,
+        message: '¡Información actualizada! Gracias por completar el formulario.'
+      })
+    }
+
+    // Insert new record
     const { data, error } = await supabase
       .from('client_discovery')
       .insert({
@@ -123,9 +151,38 @@ export async function POST(request: Request) {
 
 /**
  * GET /api/videndum/discovery
- * Obtiene discovery del usuario actual (o todos si es admin)
+ * - Con ?id=xxx → retorna un registro específico (público, para continuar formulario)
+ * - Sin id → requiere auth, retorna discovery del usuario o todos si es admin
  */
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const publicId = searchParams.get('id')
+
+  // Public fetch by ID — para que el cliente pueda continuar su formulario
+  if (publicId) {
+    try {
+      const supabase = getServiceClient()
+      const { data, error } = await supabase
+        .from('client_discovery')
+        .select('*')
+        .eq('id', publicId)
+        .single()
+
+      if (error || !data) {
+        return NextResponse.json({ error: 'Formulario no encontrado' }, { status: 404 })
+      }
+
+      return NextResponse.json({ data })
+    } catch (e) {
+      console.error('[discovery] Error fetching by ID:', e)
+      return NextResponse.json(
+        { error: e instanceof Error ? e.message : 'Error desconocido' },
+        { status: 500 }
+      )
+    }
+  }
+
+  // Authenticated fetch
   const supabase = await createClient()
 
   const { data: { user }, error: authError } = await supabase.auth.getUser()

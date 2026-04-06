@@ -1,13 +1,41 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import type { ClientDiscoveryPayload } from '@/app/api/videndum/discovery/route'
 
+// Which fields belong to each section
+const sectionFields: Record<number, (keyof ClientDiscoveryPayload)[]> = {
+  1: ['current_forecast_process', 'current_tools', 'time_spent_weekly', 'who_does_forecast', 'who_approves', 'approval_frequency'],
+  2: ['key_metrics_needed', 'comparison_needs', 'time_periods_needed', 'detail_level_needed'],
+  3: ['decision_frequency', 'decision_examples', 'urgency_level', 'daily_questions', 'monthly_questions'],
+  4: ['biggest_problem', 'second_problem', 'manual_work', 'time_wasted'],
+  5: ['ideal_workflow', 'must_have_features', 'nice_to_have_features', 'success_looks_like'],
+  6: ['num_skus', 'forecast_horizon', 'team_size', 'team_locations', 'technical_level', 'integration_needs'],
+}
+
+function isSectionComplete(data: ClientDiscoveryPayload, section: number): boolean {
+  const fields = sectionFields[section]
+  if (!fields) return false
+  // A section is "complete" if at least half its fields have data
+  let filled = 0
+  for (const f of fields) {
+    const v = data[f]
+    if (Array.isArray(v) ? v.length > 0 : v !== undefined && v !== null && v !== '') filled++
+  }
+  return filled >= Math.ceil(fields.length / 2)
+}
+
 export function ClientDiscoveryForm() {
+  const searchParams = useSearchParams()
+  const resumeId = searchParams.get('continuar')
+
   const [loading, setLoading] = useState(false)
+  const [loadingResume, setLoadingResume] = useState(!!resumeId)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [currentSection, setCurrentSection] = useState(1)
+  const [existingId, setExistingId] = useState<string | null>(null)
 
   const [formData, setFormData] = useState<ClientDiscoveryPayload>({
     current_forecast_process: '',
@@ -55,6 +83,30 @@ export function ClientDiscoveryForm() {
     concerns: ''
   })
 
+  // Load existing data when resuming
+  useEffect(() => {
+    if (!resumeId) return
+    fetch(`/api/videndum/discovery?id=${resumeId}`)
+      .then(r => r.json())
+      .then(({ data }) => {
+        if (!data) return
+        setExistingId(data.id)
+        // Populate form with existing data (skip DB-only fields)
+        const { id: _id, user_id: _u, user_email: _e, submitted_at: _s, status: _st,
+          reviewed_by: _rb, reviewed_at: _ra, created_at: _c, updated_at: _up, ...fields } = data
+        setFormData(prev => ({ ...prev, ...fields }))
+        // Jump to first incomplete section
+        for (let s = 1; s <= 6; s++) {
+          if (!isSectionComplete(fields, s)) {
+            setCurrentSection(s)
+            break
+          }
+        }
+      })
+      .catch(() => setError('No se pudo cargar el formulario anterior'))
+      .finally(() => setLoadingResume(false))
+  }, [resumeId])
+
   // Raw text state for array fields — parse to array only on submit/navigation
   const [arrayTexts, setArrayTexts] = useState<Record<string, string>>({})
 
@@ -87,11 +139,13 @@ export function ClientDiscoveryForm() {
     setSuccess(false)
 
     // Merge any pending array texts into final payload
-    const finalData = { ...formData }
+    const finalData: Record<string, unknown> = { ...formData }
     for (const [field, text] of Object.entries(arrayTexts)) {
       const items = text.split(',').map(s => s.trim()).filter(Boolean)
-      ;(finalData as Record<string, unknown>)[field] = items
+      finalData[field] = items
     }
+    // If resuming, include the ID so the API updates instead of inserting
+    if (existingId) finalData.id = existingId
 
     try {
       const response = await fetch('/api/videndum/discovery', {
@@ -117,6 +171,15 @@ export function ClientDiscoveryForm() {
 
   const totalSections = 6
 
+  if (loadingResume) {
+    return (
+      <div className="max-w-4xl mx-auto text-center py-20">
+        <div className="w-10 h-10 mx-auto mb-4 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-gray-400">Cargando tus respuestas anteriores...</p>
+      </div>
+    )
+  }
+
   if (success) {
     return (
       <div className="max-w-4xl mx-auto">
@@ -140,15 +203,36 @@ export function ClientDiscoveryForm() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Diseño de Plataforma Videndum</h1>
-        <p className="text-gray-400">Cuéntanos cómo trabajas HOY para diseñar la herramienta perfecta para ti</p>
-        <p className="text-sm text-gray-500 mt-1">⏱️ Tiempo estimado: 10-12 minutos</p>
+        {existingId ? (
+          <>
+            <div className="bg-blue-900/30 border border-blue-500/30 rounded-lg px-4 py-3 mb-2">
+              <p className="text-blue-300 text-sm">Tus respuestas anteriores ya están cargadas. Revisá o completá las secciones que falten y dale Enviar al final.</p>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-gray-400">Cuéntanos cómo trabajas HOY para diseñar la herramienta perfecta para ti</p>
+            <p className="text-sm text-gray-500 mt-1">Tiempo estimado: 10-12 minutos</p>
+          </>
+        )}
 
-        {/* Progress bar */}
-        <div className="mt-4 bg-white/[0.05] rounded-full h-2 overflow-hidden">
-          <div
-            className="bg-blue-500 h-full transition-all duration-300"
-            style={{ width: `${(currentSection / totalSections) * 100}%` }}
-          />
+        {/* Section indicators */}
+        <div className="mt-4 flex gap-2">
+          {Array.from({ length: totalSections }, (_, i) => i + 1).map(s => {
+            const complete = isSectionComplete(formData, s)
+            const isCurrent = s === currentSection
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => { flushArrayTexts(); setCurrentSection(s); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                className={`flex-1 h-2 rounded-full transition-all duration-300 ${
+                  isCurrent ? 'bg-blue-500' : complete ? 'bg-green-500/60' : 'bg-white/10'
+                }`}
+                title={`Sección ${s}${complete ? ' (completa)' : ''}`}
+              />
+            )
+          })}
         </div>
         <p className="text-xs text-gray-500 mt-2">Sección {currentSection} de {totalSections}</p>
       </div>
