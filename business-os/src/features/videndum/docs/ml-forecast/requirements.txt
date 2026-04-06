@@ -1,0 +1,13 @@
+# VIDENDUM ML FORECAST ENGINE — Dependencies
+
+# Core ML
+prophet==1.1.5
+pandas==2.1.4
+numpy==1.26.2
+
+# Database
+psycopg2-binary==2.9.9
+
+# Optional (para fase 2 — XGBoost)
+# xgboost==2.0.3
+# scikit-learn==1.3.2

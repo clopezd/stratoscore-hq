@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta Piloto - Mobility Group CR | StratosCore</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066FF;
+            --secondary: #00C896;
+            --dark: #1a1a2e;
+            --gray: #64748b;
+            --light-gray: #f1f5f9;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: white;
+        }
+
+        .page {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm;
+            background: white;
+        }
+
+        /* Cover Page */
+        .cover {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: linear-gradient(135deg, var(--primary) 0%, #0052cc 100%);
+            color: white;
+            padding: 60px 50px;
+            page-break-after: always;
+        }
+
+        .cover-header {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .cover-title {
+            margin-top: 80px;
+        }
+
+        .cover-title h1 {
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .cover-title h2 {
+            font-size: 28px;
+            font-weight: 300;
+            opacity: 0.95;
+            margin-bottom: 40px;
+        }
+
+        .cover-subtitle {
+            font-size: 18px;
+            opacity: 0.85;
+            max-width: 600px;
+            margin-bottom: 60px;
+        }
+
+        .cover-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .cover-meta-item h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .cover-meta-item p {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .cover-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .confidential {
+            font-size: 12px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Content Pages */
+        .content-page {
+            page-break-after: always;
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tbody tr:hover {
+            background: var(--light-gray);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--light-gray);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .card-success {
+            border-left-color: var(--success);
+            background: #f0fdf4;
+        }
+
+        .card-warning {
+            border-left-color: var(--warning);
+            background: #fffbeb;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            color: var(--gray);
+        }
+
+        /* Highlights */
+        .highlight {
+            background: linear-gradient(135deg, var(--primary) 0%, #0052cc 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+
+        .highlight h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .highlight p {
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Pricing Table */
+        .pricing-option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+
+        .pricing-option:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,102,255,0.1);
+        }
+
+        .pricing-option.recommended {
+            border-color: var(--primary);
+            position: relative;
+        }
+
+        .pricing-option.recommended::before {
+            content: "RECOMENDADO";
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .price {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .price-label {
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Icons */
+        .icon-check {
+            color: var(--success);
+            margin-right: 8px;
+        }
+
+        .icon-star {
+            color: var(--warning);
+            margin-right: 8px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: var(--light-gray);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Timeline */
+        .timeline {
+            margin: 30px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-marker {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        .timeline-content {
+            flex: 1;
+            padding-top: 5px;
+        }
+
+        .timeline-content h4 {
+            margin-top: 0;
+        }
+
+        /* Footer */
+        .page-footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-info {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .contact-info a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Print Styles */
+        @media print {
+            .page {
+                padding: 0;
+                max-width: 100%;
+            }
+
+            .content-page {
+                page-break-after: always;
+            }
+
+            .no-break {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- PORTADA -->
+<div class="cover">
+    <div>
+        <div class="cover-header">Propuesta de Servicios — Proyecto Piloto</div>
+
+        <div class="cover-title">
+            <h1>Sistema de Acompañamiento<br>Clínico Automatizado</h1>
+            <h2>No solo más pacientes — pacientes que completan su recuperación</h2>
+        </div>
+
+        <div class="cover-subtitle">
+            Un sistema inteligente que capta, convierte y retiene pacientes neurológicos en todo Costa Rica,
+            aumentando la ocupación de 30% a 70% en 3 meses.
+        </div>
+
+        <div class="cover-meta">
+            <div class="cover-meta-item">
+                <h4>Preparado para</h4>
+                <p>Mobility Group CR</p>
+            </div>
+            <div class="cover-meta-item">
+                <h4>Preparado por</h4>
+                <p>StratosCore</p>
+            </div>
+            <div class="cover-meta-item">
+                <h4>Fecha</h4>
+                <p>Marzo 2026</p>
+            </div>
+            <div class="cover-meta-item">
+                <h4>Versión</h4>
+                <p>PILOTO v1.0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="cover-footer">
+        <div class="logo">STRATOSCORE</div>
+        <div class="confidential">Documento Confidencial</div>
+    </div>
+</div>
+
+<!-- PÁGINA 1: LO QUE ENTENDIMOS -->
+<div class="page content-page">
+    <h1>01 — Lo Que Entendimos</h1>
+
+    <p style="font-size: 18px; font-weight: 600; margin-bottom: 30px;">
+        Tras analizar a fondo las necesidades de Mobility, identificamos un hallazgo clave:
+        <span style="color: var(--primary);">el decisor no es el paciente, sino su familia.</span>
+    </p>
+
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Perfil principal</strong></td>
+                    <td>Pacientes neurológicos (80%) — pero quien decide es la familia (hijos, esposos)</td>
+                </tr>
+                <tr>
+                    <td><strong>Problema central</strong></td>
+                    <td>Abandono temprano del tratamiento por falta de acompañamiento y educación continua</td>
+                </tr>
+                <tr>
+                    <td><strong>Situación actual</strong></td>
+                    <td>30–35 citas/semana, con alta tasa de deserción</td>
+                </tr>
+                <tr>
+                    <td><strong>Objetivo</strong></td>
+                    <td>50–60 citas/semana sostenidas + tratamientos completados</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="highlight">
+        <h3>El Reto Real</h3>
+        <p>No se trata solo de captar más pacientes, sino de guiarlos — junto a su familia —
+        hasta completar su recuperación. Cada paciente que abandona es una pérdida de ₡120,000+ en revenue potencial.</p>
+    </div>
+</div>
+
+<!-- PÁGINA 2: LA SOLUCIÓN -->
+<div class="page content-page">
+    <h1>02 — La Solución</h1>
+
+    <p style="font-size: 18px; margin-bottom: 30px;">
+        Un <strong>Sistema de Acompañamiento Clínico Automatizado</strong> que no solo capta pacientes,
+        sino que los guía hasta completar su recuperación, aumentando ingresos un 40% por mejor retención.
+    </p>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Captación Activa</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">&lt;5min</div>
+            <div class="stat-label">Tiempo de Respuesta</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">85%</div>
+            <div class="stat-label">Completamiento</div>
+        </div>
+    </div>
+
+    <h3>✅ Captación 24/7</h3>
+    <div class="card">
+        <p>Agente inteligente que capta prospectos por WhatsApp y publicidad digital.
+        Detecta si habla con un familiar o con el paciente y ajusta el lenguaje automáticamente.</p>
+        <p><strong>Respuesta en menos de 5 minutos</strong> — Mientras la competencia tarda horas,
+        su agente contesta al instante con preguntas sobre movilidad y transporte.</p>
+    </div>
+
+    <h3>✅ Acompañamiento Clínico IA</h3>
+    <div class="card">
+        <p>Seguimiento semanal personalizado con mensajes según la etapa del tratamiento.
+        Alertas automáticas ante inasistencias en 3 niveles de urgencia.</p>
+    </div>
+
+    <h3>✅ Panel de Retención</h3>
+    <div class="card">
+        <p>Tasa de completamiento, pacientes en riesgo, pérdida de ingresos por abandono.
+        Todo en tiempo real, accesible desde cualquier dispositivo.</p>
+    </div>
+</div>
+
+<!-- PÁGINA 3: QUÉ INCLUYE -->
+<div class="page content-page">
+    <h1>03 — Qué Incluye</h1>
+
+    <h2>Captación y Conversión</h2>
+    <ul>
+        <li><strong>Página de aterrizaje emocional</strong> — texto enfocado en familias, con testimonios de hijos y esposos</li>
+        <li><strong>Campaña en Facebook, Instagram y Google Ads</strong> — segmentación precisa para alcanzar al familiar que toma la decisión</li>
+        <li><strong>Agente WhatsApp con IA</strong> — detecta si habla con familia o paciente, ajusta lenguaje y agenda citas las 24 horas, los 7 días</li>
+    </ul>
+
+    <h2>Retención y Acompañamiento</h2>
+    <ul>
+        <li><strong>Acompañamiento Clínico Automatizado</strong> — seguimiento semanal personalizado con mensajes según la etapa del tratamiento</li>
+        <li><strong>Sistema de Alertas en 3 Niveles</strong> — Día 1: WhatsApp automático. Día 3: Alerta al terapeuta. Día 7: Escalamiento urgente</li>
+        <li><strong>Panel de Retención</strong> — métricas de completamiento, pacientes en riesgo y pérdida de ingresos por abandono</li>
+    </ul>
+
+    <h2>Integración</h2>
+    <ul>
+        <li><strong>Conexión con el sistema actual de Mobility</strong> — integración directa, sin duplicar procesos ni afectar operación actual</li>
+    </ul>
+</div>
+
+<!-- PÁGINA 4: INVERSIÓN -->
+<div class="page content-page">
+    <h1>04 — Inversión</h1>
+
+    <p style="font-size: 18px; margin-bottom: 40px;">
+        Dos opciones de setup. Ambas incluyen el sistema completo de captación + retención durante 3 meses de piloto.
+    </p>
+
+    <div class="pricing-option">
+        <h3>Opción 1: Setup Básico</h3>
+        <div class="price-label">Implementación inicial</div>
+        <div class="price">$1,500 <span style="font-size: 24px; font-weight: 400;">USD</span></div>
+
+        <h4>Incluye:</h4>
+        <ul>
+            <li>Landing page emocional optimizada</li>
+            <li>Integración WhatsApp Business API (Twilio)</li>
+            <li>Agente IA básico (respuestas 24/7)</li>
+            <li>1 campaña Facebook/Instagram (3 creativos)</li>
+            <li>Setup Google Ads (10 keywords)</li>
+            <li>Integración con sistema Mobility</li>
+            <li>Testing y QA completo</li>
+            <li>Capacitación del equipo (1.5h)</li>
+        </ul>
+
+        <p style="margin-top: 20px;"><strong>Total implementación:</strong> ~30 horas</p>
+    </div>
+
+    <div class="pricing-option recommended">
+        <h3>Opción 2: Setup Completo ⭐</h3>
+        <div class="price-label">Implementación inicial</div>
+        <div class="price">$2,000 <span style="font-size: 24px; font-weight: 400;">USD</span></div>
+
+        <h4>Todo lo de Opción 1, MÁS:</h4>
+        <ul>
+            <li><strong>Sistema de Retención Automático</strong> (alertas 3 niveles)</li>
+            <li><strong>Panel de Retención</strong> (dashboard métricas en tiempo real)</li>
+            <li><strong>Email Nurturing</strong> (5 emails automatizados)</li>
+            <li><strong>2da Campaña de Ads</strong> (retargeting + lookalike)</li>
+        </ul>
+
+        <p style="margin-top: 20px;"><strong>Total implementación:</strong> ~43 horas</p>
+
+        <div class="card-success" style="margin-top: 20px; padding: 15px; border-radius: 8px;">
+            <p style="margin: 0;"><strong>Por qué recomendamos Opción 2:</strong>
+            El sistema anti-abandono genera ₡2.4M/mes adicionales en ingresos recuperados por retención.
+            Los $500 USD extra se pagan solos en la primera semana.</p>
+        </div>
+    </div>
+
+    <h2 style="margin-top: 50px;">Mensualidad Durante Piloto</h2>
+    <div class="pricing-option">
+        <div class="price-label">Meses 1-3</div>
+        <div class="price">$500 <span style="font-size: 24px; font-weight: 400;">USD/mes</span></div>
+
+        <h4>Incluye:</h4>
+        <ul>
+            <li>Hosting Vercel + Supabase Pro</li>
+            <li>Twilio WhatsApp API (~$100/mes)</li>
+            <li>Resend Email API</li>
+            <li>OpenRouter API (Claude IA)</li>
+            <li>Soporte prioritario (4-6h/mes)</li>
+            <li>Optimización continua de campañas</li>
+        </ul>
+    </div>
+
+    <div class="highlight" style="margin-top: 40px;">
+        <h3>Total Inversión Piloto (3 Meses)</h3>
+        <div class="stats-grid">
+            <div class="stat-card" style="background: rgba(255,255,255,0.2); color: white;">
+                <div class="stat-number" style="color: white;">$3,000</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">Opción 1 (Básico)</div>
+            </div>
+            <div class="stat-card" style="background: rgba(255,255,255,0.2); color: white;">
+                <div class="stat-number" style="color: white;">$3,500</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">Opción 2 (Completo)</div>
+            </div>
+            <div class="stat-card" style="background: rgba(255,255,255,0.2); color: white;">
+                <div class="stat-number" style="color: white;">815%</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">ROI Proyectado</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PÁGINA 5: CONDICIONES DEL PILOTO -->
+<div class="page content-page">
+    <h1>05 — Condiciones del Piloto</h1>
+
+    <p style="font-size: 18px; margin-bottom: 30px;">
+        A cambio de este pricing especial (50-60% menos que propuestas estándar), solicitamos:
+    </p>
+
+    <h2>✅ Lo Que Mobility Aporta</h2>
+
+    <div class="card">
+        <h3>1. Acceso completo a métricas reales</h3>
+        <ul>
+            <li>Dashboard de citas, conversiones, retención</li>
+            <li>Datos de pacientes (anonimizados para reportes)</li>
+            <li>Feedback del equipo sobre el sistema</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>2. Permiso para caso de estudio</h3>
+        <ul>
+            <li>Publicar resultados (con datos anonimizados)</li>
+            <li>Usar en portfolio y presentaciones a futuros clientes</li>
+            <li>Mencionar a Mobility como cliente (opcional: logo en web)</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>3. Testimonial (si funciona)</h3>
+        <ul>
+            <li>Video testimonial corto (2-3 min) del dueño/director</li>
+            <li>O testimonial escrito sobre resultados obtenidos</li>
+            <li>Solo si están satisfechos con los resultados</li>
+        </ul>
+    </div>
+
+    <h2>✅ Lo Que StratosCore Garantiza</h2>
+
+    <div class="card-success">
+        <ul style="margin: 0;">
+            <li><strong>Sistema completo operativo en 6 semanas</strong></li>
+            <li><strong>Soporte prioritario</strong> durante los 3 meses de piloto</li>
+            <li><strong>Optimización continua</strong> basada en resultados reales</li>
+            <li><strong>Sin compromisos post-piloto:</strong>
+                <ul>
+                    <li>Si funciona → Continúan a $500/mes sin compromiso</li>
+                    <li>Si no funciona → Terminan sin penalidad</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <h2 style="margin-top: 50px;">Criterios de Éxito del Piloto</h2>
+
+    <p>Para considerar el piloto exitoso, necesitamos alcanzar <strong>3 de 5 metas mínimas:</strong></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Métrica</th>
+                <th>Meta Mínima</th>
+                <th>Meta Ideal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Leads captados (3 meses)</strong></td>
+                <td>150+</td>
+                <td>220+</td>
+            </tr>
+            <tr>
+                <td><strong>Evaluaciones agendadas</strong></td>
+                <td>60+</td>
+                <td>100+</td>
+            </tr>
+            <tr>
+                <td><strong>Conversiones a paciente</strong></td>
+                <td>35+</td>
+                <td>60+</td>
+            </tr>
+            <tr>
+                <td><strong>Citas/semana Mes 3</strong></td>
+                <td>45+</td>
+                <td>55+</td>
+            </tr>
+            <tr>
+                <td><strong>Ocupación Mes 3</strong></td>
+                <td>55%+</td>
+                <td>70%+</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- PÁGINA 6: RESULTADOS ESPERADOS -->
+<div class="page content-page">
+    <h1>06 — Resultados Esperados</h1>
+
+    <h2>Proyección a 90 Días</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Periodo</th>
+                <th>Meta</th>
+                <th>Impacto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Mes 1</strong></td>
+                <td>Lanzamiento + primeros prospectos</td>
+                <td>Validación del sistema de captación y retención</td>
+            </tr>
+            <tr>
+                <td><strong>Mes 2</strong></td>
+                <td>Optimización y escalamiento</td>
+                <td>40–50 citas/semana + reducción visible de abandono</td>
+            </tr>
+            <tr>
+                <td><strong>Mes 3</strong></td>
+                <td>50–60 citas/semana</td>
+                <td>Meta alcanzada + 150+ pacientes nuevos + 85% completamiento</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2 style="margin-top: 50px;">Proyección Conservadora por Métrica</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Métrica</th>
+                <th>Hoy</th>
+                <th>Mes 1</th>
+                <th>Mes 2</th>
+                <th>Mes 3</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Leads captados</strong></td>
+                <td>~10/mes</td>
+                <td>35</td>
+                <td>70</td>
+                <td>110</td>
+            </tr>
+            <tr>
+                <td><strong>Evaluaciones agendadas</strong></td>
+                <td>~8/mes</td>
+                <td>18</td>
+                <td>35</td>
+                <td>55</td>
+            </tr>
+            <tr>
+                <td><strong>Conversiones a paciente</strong></td>
+                <td>~5/mes</td>
+                <td>10</td>
+                <td>21</td>
+                <td>33</td>
+            </tr>
+            <tr>
+                <td><strong>Citas/semana</strong></td>
+                <td>30-35</td>
+                <td>38</td>
+                <td>47</td>
+                <td>56</td>
+            </tr>
+            <tr>
+                <td><strong>Ocupación</strong></td>
+                <td>30%</td>
+                <td>38%</td>
+                <td>59%</td>
+                <td>70%</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="highlight" style="margin-top: 40px;">
+        <h3>ROI Proyectado</h3>
+        <p><strong>Total 3 meses:</strong> ~64 pacientes nuevos</p>
+        <p><strong>Revenue generado:</strong> ₡19.2M (64 × ₡300K LTV promedio)</p>
+        <p><strong>Inversión total:</strong> $3,500 USD = ₡2.1M</p>
+        <div style="font-size: 48px; font-weight: 800; margin-top: 20px;">ROI: 815%</div>
+    </div>
+</div>
+
+<!-- PÁGINA 7: CRONOGRAMA -->
+<div class="page content-page">
+    <h1>07 — Cronograma de Implementación</h1>
+
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-marker">0</div>
+            <div class="timeline-content">
+                <h4>Semana 0: Kickoff</h4>
+                <ul>
+                    <li>Reunión inicial (1h): Definir accesos, objetivos, FAQs</li>
+                    <li>Entrega de credenciales: Supabase, calendario, WhatsApp Business</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-marker">1-2</div>
+            <div class="timeline-content">
+                <h4>Semanas 1-2: Desarrollo</h4>
+                <ul>
+                    <li>Landing page + formulario</li>
+                    <li>Agente WhatsApp IA</li>
+                    <li>Creativos de ads</li>
+                    <li>Integraciones con sistema actual</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-marker">3</div>
+            <div class="timeline-content">
+                <h4>Semana 3: Testing</h4>
+                <ul>
+                    <li>Pruebas internas completas</li>
+                    <li>Campaña piloto con $10/día</li>
+                    <li>Ajustes según feedback</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-marker">4-5</div>
+            <div class="timeline-content">
+                <h4>Semanas 4-5: Lanzamiento Soft</h4>
+                <ul>
+                    <li>Activar ads a presupuesto completo</li>
+                    <li>Monitoreo diario</li>
+                    <li>Optimización en tiempo real</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-marker">6</div>
+            <div class="timeline-content">
+                <h4>Semana 6: Operación Full</h4>
+                <ul>
+                    <li>Sistema autónomo operando</li>
+                    <li>Capacitación del equipo</li>
+                    <li>Entrega de accesos a dashboards</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-success" style="margin-top: 40px;">
+        <h3 style="margin-top: 0;">Total: 6 semanas hasta operación completa</h3>
+        <p style="margin: 0;">Sistema 100% automatizado. Mobility solo atiende evaluaciones pre-agendadas.</p>
+    </div>
+</div>
+
+<!-- PÁGINA 8: DESPUÉS DEL PILOTO -->
+<div class="page content-page">
+    <h1>08 — Después del Piloto</h1>
+
+    <h2>Si Funciona (Resultados Alcanzados)</h2>
+
+    <div class="card-success">
+        <p><strong>Continúan con:</strong></p>
+        <ul>
+            <li><strong>Mensualidad:</strong> $500 USD/mes (sin cambios)</li>
+            <li><strong>Sin compromiso de permanencia:</strong> Pueden cancelar con 30 días de aviso</li>
+            <li><strong>Optimización continua:</strong> Seguimos mejorando el sistema basado en datos</li>
+        </ul>
+    </div>
+
+    <h2 style="margin-top: 40px;">Si No Funciona (Resultados No Alcanzados)</h2>
+
+    <div class="card">
+        <ul style="margin: 0;">
+            <li>Terminan sin penalidad</li>
+            <li>Sin pagos adicionales</li>
+            <li>Se quedan con el sistema implementado (es suyo)</li>
+            <li>Analizamos qué falló (aprendemos ambos)</li>
+        </ul>
+    </div>
+
+    <h2 style="margin-top: 50px;">Comparación: Piloto vs Propuesta Estándar</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Concepto</th>
+                <th>Propuesta Estándar</th>
+                <th>Modelo Piloto</th>
+                <th>Ahorro</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Setup</strong></td>
+                <td>$6,000 USD</td>
+                <td>$1,500-2,000 USD</td>
+                <td class="icon-check">-$4,000 (-67%)</td>
+            </tr>
+            <tr>
+                <td><strong>Mensualidad</strong></td>
+                <td>$1,000 USD</td>
+                <td>$500 USD</td>
+                <td class="icon-check">-$500 (-50%)</td>
+            </tr>
+            <tr>
+                <td><strong>Total 3 meses</strong></td>
+                <td>$9,000 USD</td>
+                <td>$3,000-3,500 USD</td>
+                <td class="icon-check">-$5,500 (-61%)</td>
+            </tr>
+            <tr>
+                <td><strong>Compromiso post-piloto</strong></td>
+                <td>12 meses mínimo</td>
+                <td>Sin compromiso</td>
+                <td class="icon-check">Flexibilidad total</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="highlight" style="margin-top: 40px;">
+        <h3>Por Qué Este Pricing Es Especial</h3>
+        <p>Este es nuestro <strong>primer caso juntos</strong>. Necesitamos:</p>
+        <ul>
+            <li>Validar el sistema en producción con un centro de rehabilitación real</li>
+            <li>Aprender de su operación para mejorar el producto</li>
+            <li>Construir caso de estudio con métricas verificables</li>
+            <li>Generar testimoniales para futuros clientes</li>
+        </ul>
+        <p style="margin-bottom: 0;">Por eso ofrecemos 50-60% de descuento vs pricing estándar.
+        Es una inversión mutua: Mobility obtiene un sistema profesional a precio piloto,
+        y nosotros obtenemos nuestro primer caso de éxito en rehabilitación neurológica.</p>
+    </div>
+</div>
+
+<!-- PÁGINA 9: RESUMEN EJECUTIVO -->
+<div class="page content-page">
+    <h1>09 — Resumen Ejecutivo</h1>
+
+    <div class="highlight">
+        <h3>La Propuesta en 60 Segundos</h3>
+        <p>Te propongo un <strong>Proyecto Piloto de 3 meses</strong> para implementar un sistema automatizado
+        de captación y retención de pacientes neurológicos.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">$1.5-2K</div>
+            <div class="stat-label">Setup Único</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">$500</div>
+            <div class="stat-label">Mensualidad × 3 meses</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">815%</div>
+            <div class="stat-label">ROI Proyectado</div>
+        </div>
+    </div>
+
+    <h2>A Cambio De:</h2>
+    <ul>
+        <li>Acceso a métricas reales</li>
+        <li>Permiso para caso de estudio (datos anonimizados)</li>
+        <li>Testimonial si funciona (video o escrito)</li>
+    </ul>
+
+    <h2>Proyección Mes 3:</h2>
+    <ul>
+        <li><strong>110+ leads</strong> captados en todo Costa Rica</li>
+        <li><strong>55+ evaluaciones</strong> agendadas automáticamente</li>
+        <li><strong>33+ pacientes</strong> nuevos convertidos</li>
+        <li><strong>Ocupación 30% → 70%</strong> (meta casi alcanzada)</li>
+        <li><strong>Revenue adicional:</strong> ₡19.2M en 3 meses</li>
+    </ul>
+
+    <h2>Después del Piloto:</h2>
+    <div class="card-success">
+        <p><strong>Si funciona:</strong> $500/mes sin compromiso</p>
+        <p style="margin: 0;"><strong>Si no funciona:</strong> Terminan sin penalidad</p>
+    </div>
+
+    <h2 style="margin-top: 40px;">Timeline:</h2>
+    <p><strong>6 semanas</strong> hasta operación completa. Sistema 100% automatizado.</p>
+
+    <div class="highlight" style="margin-top: 40px;">
+        <h3>No Solo Más Pacientes</h3>
+        <p style="font-size: 20px; font-weight: 600; margin: 0;">
+            Pacientes que completan su recuperación.
+        </p>
+    </div>
+</div>
+
+<!-- PÁGINA 10: PRÓXIMO PASO -->
+<div class="page content-page">
+    <h1>10 — Próximo Paso</h1>
+
+    <p style="font-size: 18px; margin-bottom: 40px;">
+        El camino hacia las 50+ citas semanales y 85% de completamiento comienza con una sola reunión.
+    </p>
+
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-marker">1</div>
+            <div class="timeline-content">
+                <h3>Reunión de 30 Minutos</h3>
+                <p><strong>Objetivo:</strong> Validar modelo piloto, definir setup (básico o completo),
+                revisar accesos necesarios, agendar kickoff.</p>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-marker">2</div>
+            <div class="timeline-content">
+                <h3>Kickoff (Semana 0)</h3>
+                <p><strong>Duración:</strong> 1 hora</p>
+                <p><strong>Entregables:</strong> Plan de implementación personalizado,
+                accesos compartidos, calendario de hitos.</p>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-marker">3</div>
+            <div class="timeline-content">
+                <h3>Implementación (Semanas 1-6)</h3>
+                <p>Desarrollo, testing, lanzamiento soft, y operación full.</p>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-marker">4</div>
+            <div class="timeline-content">
+                <h3>Evaluación (30 Días Post-Lanzamiento)</h3>
+                <p>Revisión de métricas, optimización, escalamiento.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="highlight" style="margin-top: 60px;">
+        <h3>¿Listo Para Escalar Mobility?</h3>
+        <p style="font-size: 18px; margin-bottom: 30px;">
+            Agendemos 30 minutos esta semana para alinear detalles y comenzar.
+        </p>
+
+        <div class="contact-info" style="color: white; font-size: 16px;">
+            <p><strong>Email:</strong> <a href="mailto:carlos@stratoscore.app" style="color: white; text-decoration: underline;">carlos@stratoscore.app</a></p>
+            <p><strong>Web:</strong> <a href="https://stratoscore.app" style="color: white; text-decoration: underline;">stratoscore.app</a></p>
+            <p><strong>WhatsApp:</strong> [Tu número]</p>
+        </div>
+    </div>
+
+    <div class="page-footer" style="margin-top: 80px;">
+        <div class="logo" style="color: var(--primary);">STRATOSCORE</div>
+        <div class="contact-info">
+            <p>Documento Confidencial — Válido por 15 días</p>
+            <p>Versión PILOTO v1.0 — Marzo 2026</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
