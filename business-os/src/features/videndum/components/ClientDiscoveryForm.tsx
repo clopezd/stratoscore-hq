@@ -55,17 +55,49 @@ export function ClientDiscoveryForm() {
     concerns: ''
   })
 
+  // Raw text state for array fields — parse to array only on submit/navigation
+  const [arrayTexts, setArrayTexts] = useState<Record<string, string>>({})
+
+  const getArrayText = (field: keyof ClientDiscoveryPayload) => {
+    if (field in arrayTexts) return arrayTexts[field as string]
+    const val = formData[field]
+    return Array.isArray(val) && val.length > 0 ? val.join(', ') : ''
+  }
+
+  const handleArrayTextChange = (field: keyof ClientDiscoveryPayload, value: string) => {
+    setArrayTexts(prev => ({ ...prev, [field]: value }))
+  }
+
+  const flushArrayTexts = () => {
+    const updates: Partial<ClientDiscoveryPayload> = {}
+    for (const [field, text] of Object.entries(arrayTexts)) {
+      const items = text.split(',').map(s => s.trim()).filter(Boolean)
+      ;(updates as Record<string, string[]>)[field] = items
+    }
+    if (Object.keys(updates).length > 0) {
+      setFormData(prev => ({ ...prev, ...updates }))
+      setArrayTexts({})
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
     setSuccess(false)
 
+    // Merge any pending array texts into final payload
+    const finalData = { ...formData }
+    for (const [field, text] of Object.entries(arrayTexts)) {
+      const items = text.split(',').map(s => s.trim()).filter(Boolean)
+      ;(finalData as Record<string, unknown>)[field] = items
+    }
+
     try {
       const response = await fetch('/api/videndum/discovery', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(finalData)
       })
 
       const result = await response.json()
@@ -81,11 +113,6 @@ export function ClientDiscoveryForm() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleArrayChange = (field: keyof ClientDiscoveryPayload, value: string) => {
-    const items = value.split(',').map(s => s.trim()).filter(Boolean)
-    setFormData(prev => ({ ...prev, [field]: items }))
   }
 
   const totalSections = 6
@@ -126,7 +153,16 @@ export function ClientDiscoveryForm() {
         <p className="text-xs text-gray-500 mt-2">Sección {currentSection} de {totalSections}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form
+        onSubmit={handleSubmit}
+        onKeyDown={(e) => {
+          // Prevent Enter from auto-submitting the form (bug: last page auto-skipped)
+          if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+            e.preventDefault()
+          }
+        }}
+        className="space-y-8"
+      >
         {/* SECCIÓN 1: Proceso Actual */}
         {currentSection === 1 && (
           <section className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 sm:p-6">
@@ -214,8 +250,8 @@ export function ClientDiscoveryForm() {
                 <label className="block text-gray-300 mb-2">¿Qué métricas clave necesitas ver? (separadas por coma)</label>
                 <input
                   type="text"
-                  value={formData.key_metrics_needed?.join(', ') || ''}
-                  onChange={(e) => handleArrayChange('key_metrics_needed', e.target.value)}
+                  value={getArrayText('key_metrics_needed')}
+                  onChange={(e) => handleArrayTextChange('key_metrics_needed', e.target.value)}
                   placeholder="Ej: Precisión del forecast, SKUs con problemas, Tendencias de venta, Desviaciones grandes"
                   className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
@@ -236,8 +272,8 @@ export function ClientDiscoveryForm() {
                 <label className="block text-gray-300 mb-2">¿Qué períodos necesitas analizar? (separados por coma)</label>
                 <input
                   type="text"
-                  value={formData.time_periods_needed?.join(', ') || ''}
-                  onChange={(e) => handleArrayChange('time_periods_needed', e.target.value)}
+                  value={getArrayText('time_periods_needed')}
+                  onChange={(e) => handleArrayTextChange('time_periods_needed', e.target.value)}
                   placeholder="Ej: Semana actual, Mes actual, Últimos 3 meses, Año completo"
                   className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
@@ -266,8 +302,8 @@ export function ClientDiscoveryForm() {
                 <label className="block text-gray-300 mb-2">¿Qué decisiones tomas? (separadas por coma)</label>
                 <input
                   type="text"
-                  value={formData.decision_examples?.join(', ') || ''}
-                  onChange={(e) => handleArrayChange('decision_examples', e.target.value)}
+                  value={getArrayText('decision_examples')}
+                  onChange={(e) => handleArrayTextChange('decision_examples', e.target.value)}
                   placeholder="Ej: Ajustar producción semanal, Contactar proveedores, Revisar inventario, Escalar a gerencia"
                   className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
@@ -299,8 +335,8 @@ export function ClientDiscoveryForm() {
               <div>
                 <label className="block text-gray-300 mb-2">Preguntas diarias/semanales que necesitas responder (separadas por coma)</label>
                 <textarea
-                  value={formData.daily_questions?.join(', ') || ''}
-                  onChange={(e) => handleArrayChange('daily_questions', e.target.value)}
+                  value={getArrayText('daily_questions')}
+                  onChange={(e) => handleArrayTextChange('daily_questions', e.target.value)}
                   placeholder="Ej: ¿Qué debo producir esta semana?, ¿Hay algún SKU con problema crítico?, ¿Qué necesita ajuste urgente?"
                   rows={3}
                   className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
@@ -310,8 +346,8 @@ export function ClientDiscoveryForm() {
               <div>
                 <label className="block text-gray-300 mb-2">Preguntas mensuales/estratégicas (separadas por coma)</label>
                 <textarea
-                  value={formData.monthly_questions?.join(', ') || ''}
-                  onChange={(e) => handleArrayChange('monthly_questions', e.target.value)}
+                  value={getArrayText('monthly_questions')}
+                  onChange={(e) => handleArrayTextChange('monthly_questions', e.target.value)}
                   placeholder="Ej: ¿Cómo fue la precisión del mes?, ¿Qué SKUs están fallando consistentemente?, ¿Mejoramos vs trimestre pasado?"
                   rows={3}
                   className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
@@ -406,8 +442,8 @@ export function ClientDiscoveryForm() {
                 <label className="block text-gray-300 mb-2">Features IMPRESCINDIBLES (separadas por coma)</label>
                 <input
                   type="text"
-                  value={formData.must_have_features?.join(', ') || ''}
-                  onChange={(e) => handleArrayChange('must_have_features', e.target.value)}
+                  value={getArrayText('must_have_features')}
+                  onChange={(e) => handleArrayTextChange('must_have_features', e.target.value)}
                   placeholder="Ej: Ver forecast vs real, Filtrar por SKU, Exportar a Excel, Ver desviaciones grandes"
                   className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
@@ -417,8 +453,8 @@ export function ClientDiscoveryForm() {
                 <label className="block text-gray-300 mb-2">Features DESEABLES (nice to have, separadas por coma)</label>
                 <input
                   type="text"
-                  value={formData.nice_to_have_features?.join(', ') || ''}
-                  onChange={(e) => handleArrayChange('nice_to_have_features', e.target.value)}
+                  value={getArrayText('nice_to_have_features')}
+                  onChange={(e) => handleArrayTextChange('nice_to_have_features', e.target.value)}
                   placeholder="Ej: Alertas automáticas, Gráficos interactivos, Acceso móvil, Comentarios en tiempo real"
                   className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
@@ -502,8 +538,8 @@ export function ClientDiscoveryForm() {
                   <label className="block text-gray-300 mb-2">Ubicaciones del equipo</label>
                   <input
                     type="text"
-                    value={formData.team_locations?.join(', ') || ''}
-                    onChange={(e) => handleArrayChange('team_locations', e.target.value)}
+                    value={getArrayText('team_locations')}
+                    onChange={(e) => handleArrayTextChange('team_locations', e.target.value)}
                     placeholder="Ej: Costa Rica, UK"
                     className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                   />
@@ -525,8 +561,8 @@ export function ClientDiscoveryForm() {
                 <label className="block text-gray-300 mb-2">¿Necesitan integrar con otros sistemas? (separados por coma)</label>
                 <input
                   type="text"
-                  value={formData.integration_needs?.join(', ') || ''}
-                  onChange={(e) => handleArrayChange('integration_needs', e.target.value)}
+                  value={getArrayText('integration_needs')}
+                  onChange={(e) => handleArrayTextChange('integration_needs', e.target.value)}
                   placeholder="Ej: SAP, Odoo, Excel automático, Power BI, API"
                   className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 text-base min-h-[48px]"
                 />
@@ -570,6 +606,7 @@ export function ClientDiscoveryForm() {
             <button
               type="button"
               onClick={() => {
+                flushArrayTexts()
                 setCurrentSection(prev => Math.min(totalSections, prev + 1))
                 window.scrollTo({ top: 0, behavior: 'smooth' })
               }}
