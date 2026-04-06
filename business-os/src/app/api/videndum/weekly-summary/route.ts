@@ -39,25 +39,37 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const windowMonths = parseInt(searchParams.get('window') ?? '2') // default 2 meses ≈ 8 semanas
   const topN = parseInt(searchParams.get('top') ?? '10')
+  const paramYear = searchParams.get('year') ? parseInt(searchParams.get('year')!) : null
+  const paramMonth = searchParams.get('month') ? parseInt(searchParams.get('month')!) : null
+  const catalogType = searchParams.get('catalog_type') // 'INV', 'PKG', or null for all
 
   try {
-    // Determine the analysis window: last N months with data
-    const { data: latestRecords } = await supabase
-      .from('videndum_records')
-      .select('year, month')
-      .eq('tenant_id', 'videndum')
-      .eq('metric_type', 'revenue')
-      .not('month', 'is', null)
-      .order('year', { ascending: false })
-      .order('month', { ascending: false })
-      .limit(1)
+    let latestYear: number
+    let latestMonth: number
 
-    if (!latestRecords?.length) {
-      return NextResponse.json({ error: 'No hay datos disponibles' }, { status: 404 })
+    if (paramYear && paramMonth) {
+      // Use explicit period from params
+      latestYear = paramYear
+      latestMonth = paramMonth
+    } else {
+      // Determine the analysis window: last N months with data
+      const { data: latestRecords } = await supabase
+        .from('videndum_records')
+        .select('year, month')
+        .eq('tenant_id', 'videndum')
+        .eq('metric_type', 'revenue')
+        .not('month', 'is', null)
+        .order('year', { ascending: false })
+        .order('month', { ascending: false })
+        .limit(1)
+
+      if (!latestRecords?.length) {
+        return NextResponse.json({ error: 'No hay datos disponibles' }, { status: 404 })
+      }
+
+      latestYear = latestRecords[0].year
+      latestMonth = latestRecords[0].month
     }
-
-    const latestYear = latestRecords[0].year
-    const latestMonth = latestRecords[0].month
 
     // Build list of months to analyze (latest N months)
     const analysisMonths: { year: number; month: number }[] = []
@@ -268,14 +280,64 @@ export async function GET(req: Request) {
     const totalOrderBook = (orderBookResult.data ?? []).reduce((sum, r) => sum + parseFloat(String(r.quantity ?? 0)), 0)
     const totalOrderIntake = (orderIntakeResult.data ?? []).reduce((sum, r) => sum + parseFloat(String(r.quantity ?? 0)), 0)
 
+    // Available periods (for the period selector)
+    const { data: availablePeriods } = await supabase
+      .from('videndum_records')
+      .select('year, month')
+      .eq('tenant_id', 'videndum')
+      .eq('metric_type', 'revenue')
+      .not('month', 'is', null)
+    const periodsSet = new Set<string>()
+    for (const r of availablePeriods ?? []) {
+      periodsSet.add(`${r.year}-${String(r.month).padStart(2, '0')}`)
+    }
+    const periods = [...periodsSet].sort().reverse()
+
     // Period label
     const firstMonth = analysisMonths[analysisMonths.length - 1]
     const lastMonth = analysisMonths[0]
     const periodLabelFull = `${MONTH_NAMES[firstMonth.month - 1]}-${MONTH_NAMES[lastMonth.month - 1]} ${lastMonth.year}`
 
+    // Calculate previous period MAPE for trend
+    const prevAnalysisMonths: { year: number; month: number }[] = []
+    let py2 = prevMonth.year, pm2 = prevMonth.month
+    for (let i = 0; i < windowMonths; i++) {
+      prevAnalysisMonths.push({ year: py2, month: pm2 })
+      pm2--
+      if (pm2 < 1) { pm2 = 12; py2-- }
+    }
+
+    const [prevForecastRes, prevRealRes] = await Promise.all([
+      supabase.from('planning_forecasts')
+        .select('part_number, quantity')
+        .eq('tenant_id', 'videndum')
+        .or(prevAnalysisMonths.map(am => `and(year.eq.${am.year},month.eq.${am.month})`).join(',')),
+      supabase.from('videndum_records')
+        .select('part_number, quantity')
+        .eq('tenant_id', 'videndum')
+        .eq('metric_type', 'revenue')
+        .not('month', 'is', null)
+        .or(prevAnalysisMonths.map(am => `and(year.eq.${am.year},month.eq.${am.month})`).join(',')),
+    ])
+
+    let prevMape: number | null = null
+    if (prevForecastRes.data?.length && prevRealRes.data?.length) {
+      const pForecastMap = new Map<string, number>()
+      for (const r of prevForecastRes.data) pForecastMap.set(r.part_number, (pForecastMap.get(r.part_number) ?? 0) + parseFloat(String(r.quantity ?? 0)))
+      const pRealMap = new Map<string, number>()
+      for (const r of prevRealRes.data) pRealMap.set(r.part_number, (pRealMap.get(r.part_number) ?? 0) + parseFloat(String(r.quantity ?? 0)))
+      let pAbsErr = 0, pTotalF = 0
+      for (const [sku, real] of pRealMap) {
+        const fc = pForecastMap.get(sku)
+        if (fc && fc > 0) { pAbsErr += Math.abs(real - fc); pTotalF += fc }
+      }
+      if (pTotalF > 0) prevMape = Math.round((pAbsErr / pTotalF) * 10000) / 100
+    }
+
     return NextResponse.json({
       kpis: {
         mape_global: Math.round(mapeGlobal * 100) / 100,
+        mape_prev: prevMape,
         mape_grade: getGrade(mapeGlobal),
         total_skus_analyzed: globalCount,
         skus_with_alerts: alerts.length,
@@ -288,6 +350,7 @@ export async function GET(req: Request) {
       worst_skus: worstSkus,
       best_skus: bestSkus,
       accuracy_distribution: distribution,
+      available_periods: periods,
     }, {
       headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
     })

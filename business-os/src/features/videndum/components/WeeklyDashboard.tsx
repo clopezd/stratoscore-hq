@@ -1,6 +1,8 @@
 'use client'
 
-import { Target, AlertTriangle, Package, TrendingUp, TrendingDown, RefreshCw, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Target, AlertTriangle, Package, TrendingUp, TrendingDown, RefreshCw, ArrowUpRight, ArrowDownRight, Search, Calendar, HelpCircle } from 'lucide-react'
 import { useWeeklyDashboard } from '../hooks/useWeeklyDashboard'
 import type { WeeklyKPIs, WeeklyAlert, SkuAccuracy } from '../types'
 
@@ -24,27 +26,109 @@ const SEVERITY_COLORS: Record<string, string> = {
   MEDIUM: 'border-amber-500/30 bg-amber-500/5',
 }
 
+const MONTH_LABELS: Record<string, string> = {
+  '01': 'Ene', '02': 'Feb', '03': 'Mar', '04': 'Abr', '05': 'May', '06': 'Jun',
+  '07': 'Jul', '08': 'Ago', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dic',
+}
+
 function fmt(n: number) {
   return n.toLocaleString('en-US', { maximumFractionDigits: 0 })
 }
 
-// ── KPI Cards ────────────────────────────────────────────────────────────────
+function periodLabel(p: string) {
+  const [y, m] = p.split('-')
+  return `${MONTH_LABELS[m] ?? m} ${y}`
+}
 
-function KpiCard({ label, value, sub, icon, accent }: {
-  label: string; value: string; sub: string; icon: React.ReactNode; accent: string
+// ── Tooltip ──────────────────────────────────────────────────────────────────
+
+function Tooltip({ text }: { text: string }) {
+  return (
+    <span className="group relative inline-flex ml-1 cursor-help">
+      <HelpCircle size={12} className="text-gray-500 group-hover:text-gray-300 transition-colors" />
+      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[#1a1a2e] border border-white/10 rounded-lg text-[11px] text-gray-300 leading-relaxed w-56 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50 shadow-xl">
+        {text}
+        <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px w-2 h-2 bg-[#1a1a2e] border-b border-r border-white/10 rotate-45" />
+      </span>
+    </span>
+  )
+}
+
+// ── Period Selector ──────────────────────────────────────────────────────────
+
+function PeriodSelector({ periods, selected, onChange }: {
+  periods: string[]
+  selected: string | null
+  onChange: (p: string | null) => void
 }) {
   return (
-    <div className="relative overflow-hidden bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
-      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      <div className={`inline-flex p-2 rounded-lg mb-3 ${accent}`}>
-        {icon}
-      </div>
-      <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">{label}</p>
-      <p className="text-2xl font-bold text-white">{value}</p>
-      <p className="text-[11px] mt-0.5 text-gray-400">{sub}</p>
+    <div className="flex items-center gap-2">
+      <Calendar size={14} className="text-gray-500" />
+      <select
+        value={selected ?? ''}
+        onChange={e => onChange(e.target.value || null)}
+        className="px-3 py-1.5 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white cursor-pointer appearance-none pr-7"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
+      >
+        <option value="">Último período</option>
+        {periods.map(p => (
+          <option key={p} value={p}>{periodLabel(p)}</option>
+        ))}
+      </select>
     </div>
   )
 }
+
+// ── SKU Search ───────────────────────────────────────────────────────────────
+
+function SkuSearch({ allSkus }: { allSkus: SkuAccuracy[] }) {
+  const [query, setQuery] = useState('')
+  const router = useRouter()
+
+  const results = query.length >= 2
+    ? allSkus.filter(s => s.part_number.toLowerCase().includes(query.toLowerCase())).slice(0, 8)
+    : []
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500" />
+        <input
+          type="text"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Buscar SKU..."
+          className="pl-8 pr-3 py-1.5 text-xs bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder-gray-500 w-52"
+        />
+      </div>
+      {results.length > 0 && (
+        <div className="absolute top-full mt-1 left-0 w-72 bg-[#13131f] border border-white/10 rounded-lg shadow-2xl z-50 overflow-hidden">
+          {results.map(s => (
+            <button
+              key={s.part_number}
+              onClick={() => {
+                router.push(`/videndum/forecast-accuracy?sku=${s.part_number}`)
+                setQuery('')
+              }}
+              className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-white/[0.05] transition-colors border-b border-white/[0.03] last:border-0"
+            >
+              <div>
+                <span className="font-mono text-xs text-white">{s.part_number}</span>
+                {s.catalog_type && <span className="text-[10px] text-gray-500 ml-1.5">{s.catalog_type}</span>}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] font-bold px-1 py-0.5 rounded border ${GRADE_COLORS[s.grade]}`}>{s.grade}</span>
+                <span className="text-[10px] text-gray-400">{s.mape}%</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── KPI Cards ────────────────────────────────────────────────────────────────
 
 function KpiSection({ kpis }: { kpis: WeeklyKPIs }) {
   const gradeColor = GRADE_COLORS[kpis.mape_grade] ?? 'text-gray-400'
@@ -57,39 +141,67 @@ function KpiSection({ kpis }: { kpis: WeeklyKPIs }) {
         <div className="inline-flex p-2 rounded-lg mb-3 bg-indigo-500/10">
           <Target size={15} className="text-indigo-300" />
         </div>
-        <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">MAPE Global</p>
+        <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">
+          MAPE Global
+          <Tooltip text="Mean Absolute Percentage Error. Mide qué tan lejos estuvo el forecast del resultado real. Menor = mejor. A(<10%) es excelente, F(>50%) requiere revisión urgente." />
+        </p>
         <div className="flex items-baseline gap-2">
           <p className="text-2xl font-bold text-white">{kpis.mape_global}%</p>
           <span className={`text-xs font-semibold px-1.5 py-0.5 rounded border ${gradeColor}`}>
             {kpis.mape_grade}
           </span>
         </div>
-        <p className="text-[11px] mt-0.5 text-gray-400">{GRADE_LABELS[kpis.mape_grade]} - {kpis.period_label}</p>
+        <p className="text-[11px] mt-0.5 text-gray-400">
+          {GRADE_LABELS[kpis.mape_grade]} - {kpis.period_label}
+          {kpis.mape_prev !== null && kpis.mape_prev !== undefined && (
+            <span className={`ml-2 ${kpis.mape_global < kpis.mape_prev ? 'text-emerald-400' : kpis.mape_global > kpis.mape_prev ? 'text-red-400' : 'text-gray-500'}`}>
+              {kpis.mape_global < kpis.mape_prev ? '↓ Mejoró' : kpis.mape_global > kpis.mape_prev ? '↑ Empeoró' : '= Igual'}
+              {' '}(antes: {kpis.mape_prev}%)
+            </span>
+          )}
+        </p>
       </div>
 
-      <KpiCard
-        label="Alertas activas"
-        value={String(kpis.skus_with_alerts)}
-        sub={`De ${kpis.total_skus_analyzed} SKUs analizados`}
-        icon={<AlertTriangle size={15} className="text-amber-300" />}
-        accent="bg-amber-500/10"
-      />
-      <KpiCard
-        label="Order Book"
-        value={fmt(kpis.total_order_book)}
-        sub="Unidades en backlog"
-        icon={<Package size={15} className="text-blue-300" />}
-        accent="bg-blue-500/10"
-      />
-      <KpiCard
-        label="Sesgo (Bias)"
-        value={`${kpis.forecast_bias > 0 ? '+' : ''}${fmt(kpis.forecast_bias)}`}
-        sub={biasLabel}
-        icon={kpis.forecast_bias >= 0
-          ? <TrendingUp size={15} className="text-emerald-300" />
-          : <TrendingDown size={15} className="text-red-300" />}
-        accent={kpis.forecast_bias >= 0 ? 'bg-emerald-500/10' : 'bg-red-500/10'}
-      />
+      <div className="relative overflow-hidden bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="inline-flex p-2 rounded-lg mb-3 bg-amber-500/10">
+          <AlertTriangle size={15} className="text-amber-300" />
+        </div>
+        <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">
+          Alertas activas
+          <Tooltip text="SKUs con cambios mayores a 20% entre el mes actual y el anterior. Cambios grandes pueden indicar problemas de demanda o datos incorrectos." />
+        </p>
+        <p className="text-2xl font-bold text-white">{kpis.skus_with_alerts}</p>
+        <p className="text-[11px] mt-0.5 text-gray-400">De {kpis.total_skus_analyzed} SKUs analizados</p>
+      </div>
+
+      <div className="relative overflow-hidden bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="inline-flex p-2 rounded-lg mb-3 bg-blue-500/10">
+          <Package size={15} className="text-blue-300" />
+        </div>
+        <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">
+          Order Book
+          <Tooltip text="Total de unidades en backlog — órdenes confirmadas pendientes de entregar. Si es alto respecto al forecast, puede indicar producción insuficiente." />
+        </p>
+        <p className="text-2xl font-bold text-white">{fmt(kpis.total_order_book)}</p>
+        <p className="text-[11px] mt-0.5 text-gray-400">Unidades en backlog</p>
+      </div>
+
+      <div className="relative overflow-hidden bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="inline-flex p-2 rounded-lg mb-3 ${kpis.forecast_bias >= 0 ? 'bg-emerald-500/10' : 'bg-red-500/10'}">
+          {kpis.forecast_bias >= 0
+            ? <TrendingUp size={15} className="text-emerald-300" />
+            : <TrendingDown size={15} className="text-red-300" />}
+        </div>
+        <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">
+          Sesgo (Bias)
+          <Tooltip text="Promedio de la diferencia entre real y forecast. Positivo = sub-forecast (vendemos más de lo planeado). Negativo = sobre-forecast (planeamos de más, riesgo de sobre-inventario)." />
+        </p>
+        <p className="text-2xl font-bold text-white">{kpis.forecast_bias > 0 ? '+' : ''}{fmt(kpis.forecast_bias)}</p>
+        <p className="text-[11px] mt-0.5 text-gray-400">{biasLabel}</p>
+      </div>
     </div>
   )
 }
@@ -97,9 +209,13 @@ function KpiSection({ kpis }: { kpis: WeeklyKPIs }) {
 // ── Alerts Section ───────────────────────────────────────────────────────────
 
 function AlertCard({ alert }: { alert: WeeklyAlert }) {
+  const router = useRouter()
   const isSpike = alert.alert_type === 'DEMAND_SPIKE'
   return (
-    <div className={`border rounded-lg p-3 ${SEVERITY_COLORS[alert.severity]}`}>
+    <button
+      onClick={() => router.push(`/videndum/forecast-accuracy?sku=${alert.part_number}`)}
+      className={`border rounded-lg p-3 text-left w-full hover:brightness-125 transition-all cursor-pointer ${SEVERITY_COLORS[alert.severity]}`}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {isSpike
@@ -115,7 +231,7 @@ function AlertCard({ alert }: { alert: WeeklyAlert }) {
         <span>{fmt(alert.previous_value)} → {fmt(alert.current_value)} uds</span>
         <span>{alert.period}</span>
       </div>
-    </div>
+    </button>
   )
 }
 
@@ -123,7 +239,7 @@ function AlertsSection({ alerts }: { alerts: WeeklyAlert[] }) {
   if (!alerts || alerts.length === 0) {
     return (
       <div className="bg-emerald-900/10 border border-emerald-500/20 rounded-xl p-6 text-center">
-        <p className="text-emerald-400 font-medium">Sin alertas esta semana</p>
+        <p className="text-emerald-400 font-medium">Sin alertas este período</p>
         <p className="text-sm text-gray-500 mt-1">Todos los SKUs dentro de rangos normales</p>
       </div>
     )
@@ -138,7 +254,7 @@ function AlertsSection({ alerts }: { alerts: WeeklyAlert[] }) {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white">
           Cambios Significativos
-          <span className="text-sm font-normal text-gray-500 ml-2">(&gt;20% vs mes anterior)</span>
+          <Tooltip text="SKUs cuya demanda real cambió más de 20% respecto al mes anterior. Revisar si es tendencia real o dato atípico antes de ajustar el plan." />
         </h3>
         <span className="text-xs text-gray-500">{alerts.length} alertas</span>
       </div>
@@ -221,9 +337,12 @@ function AccuracyTable({ title, skus, type }: { title: string; skus: SkuAccuracy
 function AccuracyDistribution({ distribution }: { distribution: { grade: string; count: number; pct: number }[] }) {
   return (
     <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
-      <h4 className="text-sm font-semibold text-white mb-3">Distribución de Accuracy</h4>
+      <h4 className="text-sm font-semibold text-white mb-3">
+        Distribución de Accuracy
+        <Tooltip text="Cuántos SKUs caen en cada rango de error. Lo ideal es tener la mayoría en A y B. SKUs en D y F necesitan revisión del método de forecast." />
+      </h4>
       <div className="space-y-2">
-        {distribution.map(d => {
+        {(distribution ?? []).map(d => {
           const gc = GRADE_COLORS[d.grade] ?? ''
           return (
             <div key={d.grade} className="flex items-center gap-3">
@@ -250,8 +369,32 @@ function AccuracyDistribution({ distribution }: { distribution: { grade: string;
 
 // ── Main Component ───────────────────────────────────────────────────────────
 
+function CatalogFilter({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const opts = [
+    { label: 'Todos', value: 'all' },
+    { label: 'INV', value: 'INV' },
+    { label: 'PKG', value: 'PKG' },
+  ]
+  return (
+    <div className="flex items-center rounded-lg border border-white/[0.08] overflow-hidden">
+      {opts.map(o => (
+        <button
+          key={o.value}
+          onClick={() => onChange(o.value)}
+          className={`px-3 py-1.5 text-xs transition-colors ${
+            value === o.value ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-white hover:bg-white/[0.03]'
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export function WeeklyDashboard() {
-  const { data, loading, error, refresh } = useWeeklyDashboard()
+  const { data, loading, error, refresh, selectedPeriod, changePeriod } = useWeeklyDashboard()
+  const [catalogFilter, setCatalogFilter] = useState('all')
 
   if (loading) {
     return (
@@ -283,35 +426,56 @@ export function WeeklyDashboard() {
 
   if (!data) return null
 
+  // Apply catalog filter
+  const filterByCatalog = (skus: SkuAccuracy[]) =>
+    catalogFilter === 'all' ? skus : skus.filter(s => s.catalog_type === catalogFilter)
+
+  const filteredAlerts = catalogFilter === 'all'
+    ? (data.alerts ?? [])
+    : (data.alerts ?? []).filter(a => a.catalog_type === catalogFilter)
+
+  const filteredWorst = filterByCatalog(data.worst_skus ?? [])
+  const filteredBest = filterByCatalog(data.best_skus ?? [])
+  const allSkus = [...filteredWorst, ...filteredBest]
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Header with controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-white">Resumen Operativo</h2>
           <p className="text-sm text-gray-500">{data.kpis.period_label} — {data.kpis.total_skus_analyzed} SKUs analizados</p>
         </div>
-        <button
-          onClick={refresh}
-          className="p-2 hover:bg-white/[0.05] rounded-lg transition-colors text-gray-400 hover:text-white"
-          title="Actualizar datos"
-        >
-          <RefreshCw size={16} />
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <SkuSearch allSkus={allSkus} />
+          <CatalogFilter value={catalogFilter} onChange={setCatalogFilter} />
+          <PeriodSelector
+            periods={data.available_periods ?? []}
+            selected={selectedPeriod}
+            onChange={changePeriod}
+          />
+          <button
+            onClick={refresh}
+            className="p-2 hover:bg-white/[0.05] rounded-lg transition-colors text-gray-400 hover:text-white"
+            title="Actualizar datos"
+          >
+            <RefreshCw size={16} />
+          </button>
+        </div>
       </div>
 
       {/* KPIs */}
       <KpiSection kpis={data.kpis} />
 
       {/* Alerts */}
-      <AlertsSection alerts={data.alerts} />
+      <AlertsSection alerts={filteredAlerts} />
 
       {/* Accuracy Distribution + Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <AccuracyDistribution distribution={data.accuracy_distribution} />
         <div className="lg:col-span-2 space-y-4">
-          <AccuracyTable title="Top 10 — Peor Accuracy (requieren atención)" skus={data.worst_skus} type="worst" />
-          <AccuracyTable title="Top 10 — Mejor Accuracy" skus={data.best_skus} type="best" />
+          <AccuracyTable title="Top 10 — Peor Accuracy (requieren atención)" skus={filteredWorst} type="worst" />
+          <AccuracyTable title="Top 10 — Mejor Accuracy" skus={filteredBest} type="best" />
         </div>
       </div>
     </div>

@@ -141,6 +141,7 @@ export interface WeeklyAlert {
 
 export interface WeeklyKPIs {
   mape_global: number           // MAPE últimos 2 meses (≈8 semanas)
+  mape_prev: number | null      // MAPE del período anterior (para tendencia)
   mape_grade: 'A' | 'B' | 'C' | 'D' | 'F'
   total_skus_analyzed: number
   skus_with_alerts: number
@@ -167,4 +168,5 @@ export interface WeeklySummaryData {
   worst_skus: SkuAccuracy[]
   best_skus: SkuAccuracy[]
   accuracy_distribution: { grade: string; count: number; pct: number }[]
+  available_periods: string[] // ['2026-02', '2026-01', '2025-12', ...]
 }

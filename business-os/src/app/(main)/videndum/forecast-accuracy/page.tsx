@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Target, Download, Filter } from 'lucide-react'
 
 interface ProductAnalysis {
@@ -43,11 +44,22 @@ function fmt(n: number) {
 }
 
 export default function ForecastAccuracyPage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse h-96 bg-white/[0.03] rounded-xl" />}>
+      <ForecastAccuracyContent />
+    </Suspense>
+  )
+}
+
+function ForecastAccuracyContent() {
+  const searchParams = useSearchParams()
+  const skuParam = searchParams.get('sku')
+
   const [data, setData] = useState<AccuracyData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [gradeFilter, setGradeFilter] = useState<string>('all')
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(skuParam ?? '')
   const [sortField, setSortField] = useState<'mape' | 'variance_pct' | 'total_real'>('mape')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
 
