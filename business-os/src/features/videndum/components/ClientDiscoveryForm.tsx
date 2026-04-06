@@ -14,16 +14,23 @@ const sectionFields: Record<number, (keyof ClientDiscoveryPayload)[]> = {
   6: ['num_skus', 'forecast_horizon', 'team_size', 'team_locations', 'technical_level', 'integration_needs'],
 }
 
-function isSectionComplete(data: ClientDiscoveryPayload, section: number): boolean {
+function countFilledFields(data: ClientDiscoveryPayload, section: number): { filled: number; total: number } {
   const fields = sectionFields[section]
-  if (!fields) return false
-  // A section is "complete" if at least half its fields have data
+  if (!fields) return { filled: 0, total: 0 }
   let filled = 0
   for (const f of fields) {
     const v = data[f]
-    if (Array.isArray(v) ? v.length > 0 : v !== undefined && v !== null && v !== '') filled++
+    const hasValue = Array.isArray(v) ? v.length > 0
+      : typeof v === 'number' ? true
+      : v !== undefined && v !== null && v !== ''
+    if (hasValue) filled++
   }
-  return filled >= Math.ceil(fields.length / 2)
+  return { filled, total: fields.length }
+}
+
+function isSectionComplete(data: ClientDiscoveryPayload, section: number): boolean {
+  const { filled, total } = countFilledFields(data, section)
+  return filled >= Math.ceil(total / 2)
 }
 
 export function ClientDiscoveryForm() {
@@ -95,13 +102,18 @@ export function ClientDiscoveryForm() {
         const { id: _id, user_id: _u, user_email: _e, submitted_at: _s, status: _st,
           reviewed_by: _rb, reviewed_at: _ra, created_at: _c, updated_at: _up, ...fields } = data
         setFormData(prev => ({ ...prev, ...fields }))
-        // Jump to first incomplete section
+        // Jump to the section with least completion (most empty fields)
+        let bestSection = 6
+        let leastFilled = Infinity
         for (let s = 1; s <= 6; s++) {
-          if (!isSectionComplete(fields, s)) {
-            setCurrentSection(s)
-            break
+          const { filled, total } = countFilledFields(fields, s)
+          const ratio = total > 0 ? filled / total : 1
+          if (ratio < leastFilled) {
+            leastFilled = ratio
+            bestSection = s
           }
         }
+        setCurrentSection(bestSection)
       })
       .catch(() => setError('No se pudo cargar el formulario anterior'))
       .finally(() => setLoadingResume(false))
