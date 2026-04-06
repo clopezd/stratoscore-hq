@@ -144,8 +144,8 @@ export function ClientDiscoveryForm() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     setLoading(true)
     setError(null)
     setSuccess(false)
@@ -250,9 +250,8 @@ export function ClientDiscoveryForm() {
       </div>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={(e) => e.preventDefault()}
         onKeyDown={(e) => {
-          // Prevent Enter from auto-submitting the form (bug: last page auto-skipped)
           if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
             e.preventDefault()
           }
@@ -712,7 +711,8 @@ export function ClientDiscoveryForm() {
             </button>
           ) : (
             <button
-              type="submit"
+              type="button"
+              onClick={() => handleSubmit()}
               disabled={loading}
               className="px-6 sm:px-8 py-3 bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors text-sm sm:text-base min-h-[48px]"
             >
