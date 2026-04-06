@@ -1,36 +1,36 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BarChart2, Microscope, Upload, Factory, Brain, ClipboardList } from 'lucide-react'
+import { LayoutDashboard, Target, Factory, BarChart2, Upload } from 'lucide-react'
 
 const TABS = [
   {
     href: '/videndum',
-    label: 'Dashboard',
-    icon: BarChart2,
+    label: 'Resumen',
+    icon: LayoutDashboard,
     exact: true,
-    tooltip: 'Vista general de KPIs y métricas principales'
+    tooltip: 'Resumen operativo semanal: alertas, MAPE, SKUs críticos'
+  },
+  {
+    href: '/videndum/forecast-accuracy',
+    label: 'Accuracy',
+    icon: Target,
+    exact: false,
+    tooltip: 'Forecast Accuracy por SKU — MAPE, grades, filtros'
   },
   {
     href: '/videndum/planning',
     label: 'Planning',
     icon: Factory,
     exact: false,
-    tooltip: 'Órdenes de producción semanales · Propuesta CR → Aprobación UK'
+    tooltip: 'Plan de producción: recomendaciones + export IFS'
   },
   {
-    href: '/videndum/ml-forecast',
-    label: 'ML Forecast',
-    icon: Brain,
+    href: '/videndum/historico',
+    label: 'Histórico',
+    icon: BarChart2,
     exact: false,
-    tooltip: 'Predicciones del modelo ML · Solo lectura · Diagnóstico'
-  },
-  {
-    href: '/videndum/analisis',
-    label: 'Análisis',
-    icon: Microscope,
-    exact: false,
-    tooltip: 'Análisis profundo con IA y herramientas avanzadas'
+    tooltip: 'Dashboard histórico: revenue, estacionalidad, tendencias'
   },
   {
     href: '/videndum/ingesta',
@@ -38,13 +38,6 @@ const TABS = [
     icon: Upload,
     exact: false,
     tooltip: 'Importación y carga de datos desde archivos Excel'
-  },
-  {
-    href: '/videndum/redesign',
-    label: 'Discovery',
-    icon: ClipboardList,
-    exact: false,
-    tooltip: 'Cuéntanos cómo trabajas HOY para diseñar la plataforma perfecta'
   },
 ] as const
 

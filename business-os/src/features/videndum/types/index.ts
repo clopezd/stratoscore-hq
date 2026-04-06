@@ -125,3 +125,46 @@ export interface VidendumDashboardData {
   top_parts: TopPartRow[]
   kpis: VidendumKPIs
 }
+
+// ── Weekly Dashboard (MVP Operativo) ────────────────────────────────────────
+
+export interface WeeklyAlert {
+  part_number: string
+  catalog_type: string | null
+  alert_type: 'DEMAND_SPIKE' | 'DEMAND_DROP' | 'ACCURACY_DEGRADATION'
+  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM'
+  change_pct: number
+  previous_value: number
+  current_value: number
+  period: string // "2026-M02 vs 2026-M01"
+}
+
+export interface WeeklyKPIs {
+  mape_global: number           // MAPE últimos 2 meses (≈8 semanas)
+  mape_grade: 'A' | 'B' | 'C' | 'D' | 'F'
+  total_skus_analyzed: number
+  skus_with_alerts: number
+  total_order_book: number
+  total_order_intake: number
+  forecast_bias: number         // positivo = sobre-forecast
+  period_label: string          // "Feb-Mar 2026"
+}
+
+export interface SkuAccuracy {
+  part_number: string
+  catalog_type: string | null
+  mape: number
+  grade: 'A' | 'B' | 'C' | 'D' | 'F'
+  forecast_qty: number
+  real_qty: number
+  variance_pct: number
+  months_compared: number
+}
+
+export interface WeeklySummaryData {
+  kpis: WeeklyKPIs
+  alerts: WeeklyAlert[]
+  worst_skus: SkuAccuracy[]
+  best_skus: SkuAccuracy[]
+  accuracy_distribution: { grade: string; count: number; pct: number }[]
+}

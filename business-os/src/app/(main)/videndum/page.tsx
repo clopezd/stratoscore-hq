@@ -1,5 +1,5 @@
-import { VidendumDashboard } from '@/features/videndum/components/VidendumDashboard'
+import { WeeklyDashboard } from '@/features/videndum/components/WeeklyDashboard'
 
 export default function VidendumPage() {
-  return <VidendumDashboard />
+  return <WeeklyDashboard />
 }
