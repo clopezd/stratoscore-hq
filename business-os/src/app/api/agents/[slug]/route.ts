@@ -1,32 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { runSingleAgent } from '@/features/agents/services/scheduler'
 import { AGENTS } from '@/features/agents/config/agents'
 import type { AgentSlug } from '@/features/agents/types'
 
-async function authorize(req: NextRequest): Promise<boolean> {
-  // Check gateway token
+function authorize(req: NextRequest): boolean {
   const auth = req.headers.get('authorization')
   const token = process.env.OPENCLAW_GATEWAY_TOKEN ?? 'tumision_2026'
-  if (auth === `Bearer ${token}`) return true
-
-  // Check Supabase session (cookies)
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) return true
-  } catch {
-    // auth check failed
-  }
-
-  return false
+  return auth === `Bearer ${token}`
 }
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  if (!(await authorize(req))) {
+  if (!authorize(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

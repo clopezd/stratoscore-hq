@@ -1,4 +1,4 @@
-import { DashboardMedcare } from '@/features/_archived/medcare/components/DashboardMedcare'
+import { DashboardMedcare } from '@/features/medcare/components/DashboardMedcare'
 
 export default function MedcarePage() {
   return <DashboardMedcare />

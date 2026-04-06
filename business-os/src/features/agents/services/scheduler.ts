@@ -1,54 +1,34 @@
 import { runAgent } from './run-agent'
-import { DAILY_EXECUTION_ORDER, WEEKLY_AGENTS, AGENTS } from '../config/agents'
-import { createServiceClient } from '@/lib/supabase/service'
+import { DAILY_EXECUTION_ORDER, WEEKLY_AGENTS } from '../config/agents'
 import type { AgentSlug, AgentRunResult } from '../types'
 
 /**
- * Registra la ejecución de un agente como tarea en el board.
- * Tareas completadas se marcan como 'done', fallidas como 'backlog'.
- */
-async function logAgentTask(result: AgentRunResult): Promise<void> {
-  try {
-    const supabase = createServiceClient()
-    const config = AGENTS[result.agent]
-    const title = `${config?.emoji ?? ''} ${config?.name ?? result.agent}: ${result.success ? 'Ejecución completada' : 'Error en ejecución'}`
-
-    await supabase.from('tasks').insert({
-      title,
-      description: result.success
-        ? result.report?.substring(0, 500) ?? 'Ejecución exitosa'
-        : `Error: ${result.error}`,
-      status: result.success ? 'done' : 'todo',
-      tags: ['agente', result.agent, result.success ? 'completado' : 'error'],
-    })
-  } catch {
-    // No bloquear el pipeline si falla el registro
-  }
-}
-
-/**
- * Ejecuta la cadena diaria de agentes en orden.
- * Cada agente espera al anterior (pipeline secuencial).
+ * Ejecuta la cadena diaria de agentes en orden con CONTEXT CHAIN.
+ * Cada agente recibe el output acumulado de los anteriores.
  */
 export async function runDailyPipeline(): Promise<AgentRunResult[]> {
   const results: AgentRunResult[] = []
+  let accumulatedContext = ''
 
   for (const slug of DAILY_EXECUTION_ORDER) {
-    const result = await runAgent(slug)
+    const result = await runAgent(slug, undefined, accumulatedContext || undefined)
     results.push(result)
-    await logAgentTask(result)
 
     // Si el Collector falla, no tiene sentido correr el resto
     if (slug === 'collector' && !result.success) {
-      const aborted: AgentRunResult = {
+      results.push({
         agent: 'analyst' as AgentSlug,
         success: false,
         error: 'Abortado: Collector falló',
         duration_ms: 0,
-      }
-      results.push(aborted)
-      await logAgentTask(aborted)
+      })
       break
+    }
+
+    // Acumular contexto para el siguiente agente
+    if (result.success && result.report) {
+      const config = (await import('../config/agents')).AGENTS[slug]
+      accumulatedContext += `\n\n### ${config.emoji} ${config.name} (${slug}):\n${result.report}`
     }
   }
 
@@ -56,16 +36,21 @@ export async function runDailyPipeline(): Promise<AgentRunResult[]> {
 }
 
 /**
- * Ejecuta los agentes semanales (domingos).
- * Cleanup primero, Estratega después.
+ * Ejecuta los agentes semanales (domingos) con context chain.
+ * Cleanup primero, Estratega después, CDO al final.
  */
 export async function runWeeklyPipeline(): Promise<AgentRunResult[]> {
   const results: AgentRunResult[] = []
+  let accumulatedContext = ''
 
   for (const slug of WEEKLY_AGENTS) {
-    const result = await runAgent(slug)
+    const result = await runAgent(slug, undefined, accumulatedContext || undefined)
     results.push(result)
-    await logAgentTask(result)
+
+    if (result.success && result.report) {
+      const config = (await import('../config/agents')).AGENTS[slug]
+      accumulatedContext += `\n\n### ${config.emoji} ${config.name} (${slug}):\n${result.report}`
+    }
   }
 
   return results
@@ -79,7 +64,5 @@ export async function runSingleAgent(
   slug: AgentSlug,
   prompt?: string
 ): Promise<AgentRunResult> {
-  const result = await runAgent(slug, prompt)
-  await logAgentTask(result)
-  return result
+  return runAgent(slug, prompt)
 }

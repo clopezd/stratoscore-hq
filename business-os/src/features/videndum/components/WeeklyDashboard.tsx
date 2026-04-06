@@ -120,7 +120,7 @@ function AlertCard({ alert }: { alert: WeeklyAlert }) {
 }
 
 function AlertsSection({ alerts }: { alerts: WeeklyAlert[] }) {
-  if (alerts.length === 0) {
+  if (!alerts || alerts.length === 0) {
     return (
       <div className="bg-emerald-900/10 border border-emerald-500/20 rounded-xl p-6 text-center">
         <p className="text-emerald-400 font-medium">Sin alertas esta semana</p>
@@ -173,7 +173,7 @@ function AlertsSection({ alerts }: { alerts: WeeklyAlert[] }) {
 // ── Accuracy Table ───────────────────────────────────────────────────────────
 
 function AccuracyTable({ title, skus, type }: { title: string; skus: SkuAccuracy[]; type: 'worst' | 'best' }) {
-  if (skus.length === 0) return null
+  if (!skus || skus.length === 0) return null
   return (
     <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
       <div className="px-4 py-3 border-b border-white/[0.06]">

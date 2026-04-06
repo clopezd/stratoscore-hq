@@ -17,36 +17,6 @@ export function MissionControlDashboard() {
       {/* Main Content */}
       <div className="p-4 md:p-6 space-y-6 md:space-y-8 max-w-full">
 
-<<<<<<< Updated upstream
-        {/* Quick Actions */}
-        {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <QuickActionCard
-              icon="📊"
-              label="My Tasks"
-              count={data?.stats.totalTasks}
-              href="/dashboard?view=list"
-            />
-            <QuickActionCard
-              icon="📋"
-              label="Board"
-              count={data?.stats.totalTasks}
-              href="/dashboard?view=kanban"
-            />
-            <QuickActionCard
-              icon="💰"
-              label="Finance OS"
-              href="/finanzas"
-            />
-            <QuickActionCard
-              icon="⚙️"
-              label="Settings"
-              href="/settings"
-            />
-          </div>
-        )}
-      </section>
-=======
         {/* Quick Access Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <QuickActionCard
@@ -89,7 +59,6 @@ export function MissionControlDashboard() {
             ) : null}
           </p>
         </section>
->>>>>>> Stashed changes
 
       {/* Loading State */}
       {loading && (

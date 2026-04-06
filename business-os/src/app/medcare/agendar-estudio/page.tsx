@@ -1,4 +1,4 @@
-import { FormularioAgendarEstudio } from '@/features/_archived/medcare/components/FormularioAgendarEstudio'
+import { FormularioAgendarEstudio } from '@/features/medcare/components/FormularioAgendarEstudio'
 
 // Página PÚBLICA - no requiere autenticación
 // URL para compartir: /medcare/agendar-estudio

@@ -670,3 +670,99 @@ export async function saveMemory(
 
   if (error) throw new Error(`saveMemory: ${error.message}`)
 }
+
+// ── Collector: Recolección de métricas por proyecto ──
+
+export async function collectProjectMetrics(projectSlug: string): Promise<Record<string, number>> {
+  const db = supabase()
+  const metrics: Record<string, number> = {}
+
+  try {
+    switch (projectSlug) {
+      case 'videndum': {
+        const [productos, planes, forecasts, feedback, requirements] = await Promise.all([
+          db.from('videndum_productos').select('*', { count: 'exact', head: true }),
+          db.from('videndum_planes').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+          db.from('planning_forecasts').select('*', { count: 'exact', head: true }),
+          db.from('client_feedback').select('*', { count: 'exact', head: true }),
+          db.from('client_requirements').select('*', { count: 'exact', head: true }),
+        ])
+        metrics.productos_total = productos.count ?? 0
+        metrics.planes_activos = planes.count ?? 0
+        metrics.forecasts_total = forecasts.count ?? 0
+        metrics.feedback_count = feedback.count ?? 0
+        metrics.requirements_count = requirements.count ?? 0
+        break
+      }
+      case 'mobility': {
+        const [pacientes, activos, citas, leads, terapeutas] = await Promise.all([
+          db.from('mobility_patients').select('*', { count: 'exact', head: true }),
+          db.from('mobility_patients').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+          db.from('mobility_appointments').select('*', { count: 'exact', head: true })
+            .gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
+          db.from('mobility_leads').select('*', { count: 'exact', head: true }).eq('status', 'nuevo'),
+          db.from('mobility_therapists').select('*', { count: 'exact', head: true }).eq('activo', true),
+        ])
+        metrics.pacientes_total = pacientes.count ?? 0
+        metrics.pacientes_activos = activos.count ?? 0
+        metrics.citas_semana = citas.count ?? 0
+        metrics.leads_nuevos = leads.count ?? 0
+        metrics.terapeutas_activos = terapeutas.count ?? 0
+        break
+      }
+      case 'bidhunter': {
+        const [oportunidades, nuevas, evaluaciones, drafts] = await Promise.all([
+          db.from('bidhunter_opportunities').select('*', { count: 'exact', head: true }),
+          db.from('bidhunter_opportunities').select('*', { count: 'exact', head: true })
+            .gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
+          db.from('bidhunter_evaluations').select('*', { count: 'exact', head: true }),
+          db.from('bidhunter_drafts').select('*', { count: 'exact', head: true }),
+        ])
+        metrics.oportunidades_total = oportunidades.count ?? 0
+        metrics.oportunidades_nuevas = nuevas.count ?? 0
+        metrics.evaluaciones = evaluaciones.count ?? 0
+        metrics.drafts = drafts.count ?? 0
+        break
+      }
+      case 'medcare': {
+        const [servicios, leads, leadsNuevos] = await Promise.all([
+          db.from('medcare_servicios').select('*', { count: 'exact', head: true }).eq('activo', true),
+          db.from('medcare_leads').select('*', { count: 'exact', head: true }),
+          db.from('medcare_leads').select('*', { count: 'exact', head: true }).eq('estado', 'nuevo'),
+        ])
+        metrics.servicios_activos = servicios.count ?? 0
+        metrics.leads_total = leads.count ?? 0
+        metrics.leads_nuevos = leadsNuevos.count ?? 0
+        break
+      }
+      case 'finanzas': {
+        const startOfMonth = new Date()
+        startOfMonth.setDate(1)
+        startOfMonth.setHours(0, 0, 0, 0)
+        const monthStart = startOfMonth.toISOString()
+
+        const [txCount, ingresos, gastos, cuentas] = await Promise.all([
+          db.from('transacciones').select('*', { count: 'exact', head: true })
+            .gte('fecha_hora', monthStart),
+          db.from('transacciones').select('monto')
+            .eq('tipo', 'ingreso').gte('fecha_hora', monthStart),
+          db.from('transacciones').select('monto')
+            .eq('tipo', 'gasto').gte('fecha_hora', monthStart),
+          db.from('cuentas').select('*', { count: 'exact', head: true }).eq('activa', true),
+        ])
+        metrics.transacciones_mes = txCount.count ?? 0
+        metrics.ingresos_mes = (ingresos.data ?? []).reduce((s, t) => s + Number(t.monto), 0)
+        metrics.gastos_mes = (gastos.data ?? []).reduce((s, t) => s + Number(t.monto), 0)
+        metrics.cuentas_activas = cuentas.count ?? 0
+        break
+      }
+    }
+  } catch (err) {
+    // Si una tabla no existe, retornamos lo que tengamos
+    const msg = err instanceof Error ? err.message : String(err)
+    metrics._error = 1
+    metrics._error_message = msg as unknown as number // hack para mantener Record<string, number>
+  }
+
+  return metrics
+}
