@@ -22,7 +22,8 @@ const PUBLIC_PATHS = [
   '/videndum-discovery',
   '/videndum/discovery',
   '/encuesta',
-  '/demo-landing'
+  '/demo-landing',
+  '/fitsync-landing'
 ]
 
 function isPublicPath(pathname: string): boolean {
@@ -31,6 +32,10 @@ function isPublicPath(pathname: string): boolean {
 
 function isLavanderiaSubdomain(hostname: string): boolean {
   return hostname.startsWith('lavanderia.') && !hostname.startsWith('lavanderia-')
+}
+
+function isFitSyncSubdomain(hostname: string): boolean {
+  return hostname.startsWith('fitsync.')
 }
 
 /**
@@ -57,6 +62,28 @@ export function middleware(request: NextRequest) {
   const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.split(':')[0]?.trim()
   const hostHeader = request.headers.get('host')?.split(':')[0]?.trim()
   const hostname = forwardedHost ?? hostHeader ?? request.nextUrl.hostname
+
+  // ── 0. Subdominio fitsync → rewrite a /fitsync-landing y /fitsync ────────
+  if (isFitSyncSubdomain(hostname)) {
+    if (pathname.startsWith('/_next') || pathname.startsWith('/api')) {
+      return NextResponse.next({ request: { headers: requestHeaders } })
+    }
+    // Root → landing page
+    if (pathname === '/') {
+      return NextResponse.rewrite(new URL('/fitsync-landing', request.url), { request: { headers: requestHeaders } })
+    }
+    // /app → the authenticated app
+    if (pathname === '/app' || pathname.startsWith('/app/')) {
+      const appPath = pathname === '/app' ? '/fitsync' : `/fitsync${pathname.slice(4)}`
+      return NextResponse.rewrite(new URL(appPath, request.url), { request: { headers: requestHeaders } })
+    }
+    // Auth pages pass through
+    if (pathname === '/login' || pathname === '/signup' || pathname.startsWith('/fitsync')) {
+      return NextResponse.next({ request: { headers: requestHeaders } })
+    }
+    // Everything else → landing
+    return NextResponse.rewrite(new URL('/fitsync-landing', request.url), { request: { headers: requestHeaders } })
+  }
 
   // ── 1. Subdominio lavanderia → rewrite a /lavanderia ─────────────────────
   if (isLavanderiaSubdomain(hostname)) {
