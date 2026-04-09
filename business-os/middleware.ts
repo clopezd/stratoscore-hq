@@ -77,8 +77,8 @@ export function middleware(request: NextRequest) {
 
   // ── 3. Dominios raíz (stratoscore.app, www.) ─────────────────────────────
   if (MAIN_HOSTNAMES.has(hostname)) {
-    // Landing: si llegan a / sin sesión, servir landing.html directo (sin redirect)
-    if (pathname === '/' && !hasSession(request)) {
+    // Landing: / SIEMPRE muestra el landing público (con o sin sesión)
+    if (pathname === '/') {
       return NextResponse.rewrite(new URL('/landing.html', request.url), { request: { headers: requestHeaders } })
     }
     // Rutas públicas: siempre accesibles
