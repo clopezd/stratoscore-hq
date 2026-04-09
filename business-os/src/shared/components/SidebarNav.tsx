@@ -25,6 +25,7 @@ import {
   Crosshair,
   Accessibility,
   Calculator,
+  HeartPulse,
 } from 'lucide-react'
 import { Logo } from '@/shared/components/Logo'
 import { VidendumLogo } from '@/shared/components/VidendumLogo'
@@ -63,6 +64,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/videndum',    label: 'Videndum',    icon: BarChart2,     ownerOnly: true, exact: false, section: 'clientes' },
   { href: '/mobility',    label: 'Mobility',    icon: Accessibility, ownerOnly: true, exact: false, section: 'clientes' },
   { href: '/bidhunter',   label: 'BidHunter',   icon: Crosshair,     ownerOnly: true, exact: false, section: 'clientes' },
+  { href: '/medcare',     label: 'MedCare',     icon: HeartPulse,    ownerOnly: true, exact: false, section: 'clientes' },
   { href: '/contacr',     label: 'ContaCR',     icon: Calculator,    ownerOnly: true, exact: false, section: 'clientes' },
 
   // Herramientas

@@ -3,7 +3,7 @@
 // ============================================================
 
 export type TipoEstudio = 'mamografia' | 'ultrasonido'
-export type EstadoLeadMedcare = 'nuevo' | 'contactado' | 'cita_agendada' | 'completado' | 'descartado'
+export type EstadoLeadMedcare = 'nuevo' | 'contactado' | 'cita_agendada' | 'completado' | 'no_show' | 'descartado'
 export type HorarioPreferido = 'manana' | 'tarde' | 'cualquiera'
 export type GeneroMedcare = 'Femenino' | 'Masculino' | 'Otro'
 
@@ -38,6 +38,11 @@ export interface LeadMedcare {
   notas: string | null
   contactado_en: string | null
   cita_id: string | null
+  // Campos HuliPractice
+  huli_patient_id: string | null
+  huli_appointment_id: string | null
+  huli_appointment_status: string | null
+  fecha_cita: string | null
   // Campos de importación CSV
   fecha_nacimiento: string | null
   genero: GeneroMedcare | null
@@ -80,6 +85,10 @@ export interface LeadMedcareUpdate {
   notas?: string
   contactado_en?: string
   cita_id?: string
+  huli_patient_id?: string
+  huli_appointment_id?: string
+  huli_appointment_status?: string
+  fecha_cita?: string
 }
 
 export interface MedcareOcupacion {

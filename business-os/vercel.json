@@ -6,6 +6,18 @@
     {
       "path": "/api/cron/agents",
       "schedule": "0 16 * * *"
+    },
+    {
+      "path": "/api/medcare/cron/confirmaciones",
+      "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/medcare/cron/recordatorios",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/medcare/cron/reengagement",
+      "schedule": "0 16 * * *"
     }
   ]
 }

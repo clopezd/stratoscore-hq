@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StratosCore — Configuración WhatsApp Business API</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    .container { max-width: 720px; margin: 0 auto; padding: 32px 24px; }
+    .header { background: linear-gradient(135deg, #c41e2a 0%, #1a1a2e 100%); color: white; padding: 40px 32px; border-radius: 16px; margin-bottom: 32px; }
+    .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    .header p { font-size: 14px; opacity: 0.85; }
+    .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+    .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; margin-bottom: 20px; }
+    .card h2 { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
+    .card h2 .num { background: #c41e2a; color: white; width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .card .subtitle { font-size: 13px; color: #64748b; margin-bottom: 16px; }
+    .card ol, .card ul { padding-left: 20px; }
+    .card li { margin-bottom: 10px; font-size: 14px; }
+    .card li strong { color: #c41e2a; }
+    .url-box { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; color: #334155; word-break: break-all; margin: 12px 0; }
+    .warning { background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #92400e; margin: 12px 0; }
+    .warning::before { content: '⚠️ '; }
+    .info { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #1e40af; margin: 12px 0; }
+    .info::before { content: 'ℹ️ '; }
+    .success { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #166534; margin: 12px 0; }
+    .success::before { content: '✅ '; }
+    .screenshot { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 8px; padding: 20px; text-align: center; color: #94a3b8; font-size: 13px; margin: 12px 0; }
+    .result-box { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 16px 20px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 14px; margin: 16px 0; }
+    .result-box .label { color: #94a3b8; font-size: 12px; display: block; margin-bottom: 4px; }
+    .result-box .value { color: #fbbf24; font-weight: 600; }
+    .time-estimate { display: inline-block; background: #f0fdf4; color: #166534; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .divider { height: 1px; background: #e2e8f0; margin: 24px 0; }
+    .footer { text-align: center; padding: 24px; color: #94a3b8; font-size: 12px; }
+    .option-box { border: 2px solid #e2e8f0; border-radius: 10px; padding: 16px; margin: 8px 0; }
+    .option-box.recommended { border-color: #c41e2a; background: #fef2f2; }
+    .option-box h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .option-box p { font-size: 13px; color: #64748b; }
+    .option-box .tag { display: inline-block; background: #c41e2a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 8px; }
+    img { max-width: 100%; border-radius: 8px; margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="badge">StratosCore</div>
+      <h1>WhatsApp Business API</h1>
+      <p>Instrucciones para activar confirmaciones automáticas y recordatorios por WhatsApp.</p>
+    </div>
+
+    <!-- Qué se logra -->
+    <div class="card">
+      <h2>¿Qué se activa con esto?</h2>
+      <div class="subtitle">Automatizaciones que se activan una vez configurado</div>
+      <ul>
+        <li><strong>Confirmación automática 24h antes:</strong> el sistema envía un WhatsApp al paciente pidiendo que confirme su cita. Si responde SÍ, se confirma en Huli. Si responde NO, se cancela automáticamente.</li>
+        <li><strong>Recordatorio 2 horas antes:</strong> aviso automático con dirección y hora de la cita.</li>
+        <li><strong>Re-agendamiento:</strong> pacientes que cancelan reciben un mensaje 48h después invitándolos a reagendar.</li>
+      </ul>
+      <div class="success">Costo: gratis para las primeras 1,000 conversaciones/mes. MedCare necesitaría ~200-300/mes.</div>
+    </div>
+
+    <!-- Paso 1 -->
+    <div class="card">
+      <h2><span class="num">1</span> Crear cuenta Meta Business</h2>
+      <div class="subtitle"><span class="time-estimate">~5 minutos</span></div>
+      <ol>
+        <li>Abrir <strong><a href="https://business.facebook.com" target="_blank">business.facebook.com</a></strong></li>
+        <li>Si ya tienen una cuenta Business de MedCare (por Facebook Ads o Instagram), pueden usarla. Si no, crear una nueva.</li>
+        <li>Datos a ingresar:
+          <ul>
+            <li>Nombre del negocio: <strong>MedCare Centro Médico Especializado</strong></li>
+            <li>Email: <strong>gerencia@rmacarecenter.com</strong> (o el email oficial)</li>
+          </ul>
+        </li>
+      </ol>
+      <div class="info">Si ya manejan el Instagram @medcare_cr o hacen ads en Facebook, probablemente ya tienen esta cuenta.</div>
+    </div>
+
+    <!-- Paso 2 -->
+    <div class="card">
+      <h2><span class="num">2</span> Crear app en Meta Developers</h2>
+      <div class="subtitle"><span class="time-estimate">~10 minutos</span></div>
+      <ol>
+        <li>Abrir <strong><a href="https://developers.facebook.com/apps/" target="_blank">developers.facebook.com/apps</a></strong></li>
+        <li>Click en <strong>"Crear app"</strong></li>
+        <li>Seleccionar tipo: <strong>"Business"</strong> (Empresa)</li>
+        <li>Nombre de la app: <strong>MedCare WhatsApp</strong></li>
+        <li>Asociar con la cuenta Business de MedCare del paso anterior</li>
+        <li>Click <strong>"Crear app"</strong></li>
+      </ol>
+      <div class="divider"></div>
+      <ol start="7">
+        <li>En el dashboard de la app, buscar la sección <strong>"Agregar productos"</strong></li>
+        <li>Buscar <strong>"WhatsApp"</strong> y click en <strong>"Configurar"</strong></li>
+      </ol>
+      <div class="screenshot">Aquí debería verse el panel de WhatsApp en el dashboard de la app</div>
+    </div>
+
+    <!-- Paso 3 -->
+    <div class="card">
+      <h2><span class="num">3</span> Configurar número de WhatsApp</h2>
+      <div class="subtitle"><span class="time-estimate">~10 minutos</span></div>
+
+      <p style="font-size: 14px; margin-bottom: 12px;">Elija una de estas dos opciones:</p>
+
+      <div class="option-box recommended">
+        <div class="tag">RECOMENDADO</div>
+        <h4>Opción A: Usar el número actual (8368-2100)</h4>
+        <p>El mismo número que ya usan los pacientes. Se migra a la API oficial de Meta.</p>
+        <ol style="margin-top: 8px;">
+          <li>En WhatsApp > <strong>API Setup</strong> → click <strong>"Add phone number"</strong></li>
+          <li>Ingresar: <strong>+506 8368-2100</strong></li>
+          <li>Seleccionar verificación por <strong>SMS</strong></li>
+          <li>Ingresar el código recibido</li>
+        </ol>
+        <div class="warning">Al migrar el número a la API, la app de WhatsApp Business en el celular dejará de funcionar para ese número. Todas las conversaciones se manejan via la API (nuestro sistema). Si necesitan seguir usando WhatsApp manualmente, elijan la Opción B.</div>
+      </div>
+
+      <div class="option-box">
+        <h4>Opción B: Usar un número nuevo</h4>
+        <p>Comprar una SIM nueva y usar ese número solo para el bot automático. El 8368-2100 sigue funcionando manualmente.</p>
+        <ol style="margin-top: 8px;">
+          <li>Conseguir un número de celular nuevo (cualquier operador CR)</li>
+          <li>Registrarlo en la API igual que la Opción A</li>
+        </ol>
+        <div class="info">Costo: solo el de la SIM (~₡1,000). El número nuevo se usa exclusivamente para confirmaciones automáticas.</div>
+      </div>
+    </div>
+
+    <!-- Paso 4 -->
+    <div class="card">
+      <h2><span class="num">4</span> Obtener las credenciales</h2>
+      <div class="subtitle"><span class="time-estimate">~5 minutos</span> — Este es el paso más importante</div>
+
+      <p style="font-size: 14px; margin-bottom: 12px;">Una vez registrado el número, ir a <strong>WhatsApp > API Setup</strong> en el dashboard de la app:</p>
+
+      <ol>
+        <li>
+          <strong>Phone Number ID</strong><br>
+          Aparece debajo del número registrado. Es un número largo, ejemplo: <code>123456789012345</code>
+        </li>
+        <li>
+          <strong>Access Token permanente</strong><br>
+          Click en <strong>"Generate access token"</strong>. Seleccionar permisos: <code>whatsapp_business_messaging</code> y <code>whatsapp_business_management</code>.<br>
+          <div class="warning">Copiar el token inmediatamente. Es largo (200+ caracteres). No usar el token temporal de 24h — necesitamos el permanente.</div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Paso 5 -->
+    <div class="card">
+      <h2><span class="num">5</span> Enviarnos los datos</h2>
+      <div class="subtitle"><span class="time-estimate">~1 minuto</span></div>
+
+      <p style="font-size: 14px; margin-bottom: 16px;">Enviar estos 2 datos por un canal seguro (WhatsApp o email directo, NO en un grupo):</p>
+
+      <div class="result-box">
+        <span class="label">Phone Number ID:</span>
+        <span class="value">_________________________________</span>
+        <br><br>
+        <span class="label">Access Token:</span>
+        <span class="value">_________________________________</span>
+      </div>
+
+      <div class="success">Con estos datos, nosotros configuramos todo. Las confirmaciones automáticas se activan al día siguiente.</div>
+
+      <p style="font-size: 14px; margin-top: 16px;"><strong>Webhook (lo configuramos nosotros):</strong></p>
+      <div class="url-box">
+        URL: https://www.stratoscore.app/api/medcare/whatsapp<br>
+        Verify Token: medcare_wh_2026
+      </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="card" style="border-color: #c41e2a; border-width: 2px;">
+      <h2>Resumen</h2>
+      <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;"><strong>Tiempo total estimado</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9; text-align: right;">30 minutos</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;"><strong>Costo mensual</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9; text-align: right;">$0 (gratis hasta 1,000 conversaciones)</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;"><strong>Quién lo hace</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9; text-align: right;">Dueño de la cuenta Meta Business</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0;"><strong>Qué nos envían</strong></td>
+          <td style="padding: 8px 0; text-align: right;">Phone Number ID + Access Token</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Soporte -->
+    <div class="card">
+      <h2>¿Necesitan ayuda?</h2>
+      <p style="font-size: 14px;">Si tienen dudas durante el proceso, pueden:</p>
+      <ul>
+        <li>Enviarnos un screenshot de donde se queden y les indicamos qué hacer</li>
+        <li>Agendar una llamada de 15 minutos para hacerlo juntos</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      StratosCore<br>
+      Documento generado el 9 de abril, 2026
+    </div>
+
+  </div>
+</body>
+</html>
