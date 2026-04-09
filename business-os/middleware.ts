@@ -78,7 +78,7 @@ export function middleware(request: NextRequest) {
   // ── 3. Dominios raíz (stratoscore.app, www.) ─────────────────────────────
   if (MAIN_HOSTNAMES.has(hostname)) {
     // Rutas públicas: siempre accesibles
-    if (isPublicPath(pathname) || pathname.startsWith('/api/') || pathname.startsWith('/lavanderia')) {
+    if (isPublicPath(pathname) || pathname === '/landing.html' || pathname.startsWith('/api/') || pathname.startsWith('/lavanderia')) {
       return NextResponse.next({ request: { headers: requestHeaders } })
     }
     // Rutas protegidas: redirigir a login si no hay sesión (preserva la ruta original)
