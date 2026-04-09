@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StratosCore — Ecosistemas Agenticos 360° | Tu Negocio en Piloto Automatico</title>
+  <meta name="description" content="Creamos ecosistemas agenticos 360° que conectan tu agenda, CRM, marketing y logistica con IA. Tu negocio en piloto automatico.">
+  <meta name="theme-color" content="#001117">
+  <meta property="og:title" content="StratosCore — Ecosistemas Agenticos 360°">
+  <meta property="og:description" content="Tu negocio en piloto automatico. Agenda, CRM, marketing y logistica conectados con IA.">
+  <meta property="og:image" content="/images/stratoscore-social.png">
+  <link rel="icon" href="/images/stratoscore-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #001117;
+      --bg-2: #001a22;
+      --accent: #00F2FE;
+      --accent-dim: rgba(0,242,254,0.10);
+      --accent-glow: rgba(0,242,254,0.25);
+      --accent-strong: rgba(0,242,254,0.40);
+      --text: #E0E0E0;
+      --text-bright: #FFFFFF;
+      --text-muted: #8B949E;
+      --text-subtle: #4B5563;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(0,242,254,0.25);
+      --red: #FF4757;
+      --green: #10B981;
+      --wa-green: #25D366;
+      --card-bg: rgba(255,255,255,0.025);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+    a { color:inherit; text-decoration:none; }
+    .container { max-width:1100px; margin:0 auto; padding:0 20px; }
+
+    /* ── Starscape ── */
+    #starscape { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:0.5; }
+
+    /* ── Nav ── */
+    nav { position:fixed; top:0; left:0; right:0; z-index:50; padding:16px 0; transition:all 0.4s; }
+    nav.scrolled { background:rgba(0,17,23,0.92); backdrop-filter:blur(24px); border-bottom:1px solid var(--border); padding:12px 0; }
+    .nav-inner { max-width:1100px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; }
+    .wordmark { font-weight:400; font-size:14px; letter-spacing:0.35em; color:var(--text); }
+    .wordmark b { color:var(--accent); font-weight:300; }
+    .nav-links { display:flex; gap:32px; align-items:center; }
+    .nav-links a { font-size:13px; color:var(--text-muted); transition:color 0.2s; }
+    .nav-links a:hover { color:var(--accent); }
+
+    /* ── Buttons ── */
+    .btn-primary { padding:10px 24px; background:var(--accent); color:var(--bg); font-weight:600; font-size:13px; border-radius:8px; border:none; cursor:pointer; transition:all 0.3s; display:inline-flex; align-items:center; gap:6px; }
+    .btn-primary:hover { box-shadow:0 4px 24px var(--accent-glow); transform:translateY(-1px); }
+    .btn-outline { padding:10px 24px; background:transparent; color:var(--accent); font-weight:500; font-size:13px; border-radius:8px; border:1px solid rgba(0,242,254,0.3); cursor:pointer; transition:all 0.3s; display:inline-flex; align-items:center; gap:6px; }
+    .btn-outline:hover { background:var(--accent-dim); border-color:var(--accent); }
+    .btn-wa { padding:10px 24px; background:var(--wa-green); color:#fff; font-weight:600; font-size:13px; border-radius:8px; border:none; cursor:pointer; transition:all 0.3s; display:inline-flex; align-items:center; gap:6px; }
+    .btn-wa:hover { box-shadow:0 4px 24px rgba(37,211,102,0.45); transform:translateY(-1px); background:#22c55e; }
+    .btn-wa-outline { padding:10px 24px; background:transparent; color:var(--wa-green); font-weight:500; font-size:13px; border-radius:8px; border:1px solid rgba(37,211,102,0.4); cursor:pointer; transition:all 0.3s; display:inline-flex; align-items:center; gap:6px; }
+    .btn-wa-outline:hover { background:rgba(37,211,102,0.1); border-color:var(--wa-green); }
+
+    /* ── Hamburger ── */
+    .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; z-index:60; position:relative; }
+    .hamburger span { display:block; width:22px; height:2px; background:var(--text); margin:5px 0; border-radius:2px; transition:all 0.3s ease; }
+    .hamburger.active span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+    .hamburger.active span:nth-child(2) { opacity:0; }
+    .hamburger.active span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
+
+    /* ── Mobile Menu Overlay ── */
+    .mobile-menu { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,17,23,0.97); backdrop-filter:blur(24px); z-index:55; flex-direction:column; align-items:center; justify-content:center; gap:28px; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-size:20px; color:var(--text); font-weight:500; transition:color 0.2s; }
+    .mobile-menu a:hover { color:var(--accent); }
+    .mobile-menu .btn-primary { font-size:16px; padding:14px 32px; }
+    .mobile-menu .btn-wa { font-size:16px; padding:14px 32px; }
+
+    /* ── Hero ── */
+    .hero { min-height:100vh; display:flex; align-items:center; position:relative; z-index:1; }
+    .hero-content { max-width:680px; }
+    .hero-tag { display:inline-flex; align-items:center; gap:8px; padding:6px 14px; background:rgba(255,71,87,0.1); border:1px solid rgba(255,71,87,0.2); border-radius:100px; font-size:12px; color:var(--red); font-weight:500; margin-bottom:28px; }
+    .hero h1 { font-size:clamp(32px,5.5vw,58px); font-weight:800; line-height:1.08; color:var(--text-bright); margin-bottom:20px; }
+    .hero h1 .strike { text-decoration:line-through; opacity:0.35; font-weight:400; }
+    .hero h1 em { font-style:normal; color:var(--accent); }
+    .hero .sub { font-size:clamp(16px,2vw,19px); color:var(--text-muted); line-height:1.65; margin-bottom:36px; max-width:520px; }
+    .hero .sub strong { color:var(--text); font-weight:500; }
+    .hero-ctas { display:flex; gap:12px; flex-wrap:wrap; }
+    .hero-proof { margin-top:48px; display:flex; align-items:center; gap:16px; }
+    .hero-proof .avatars { display:flex; }
+    .hero-proof .avatars span { width:32px; height:32px; border-radius:50%; background:var(--accent-dim); border:2px solid var(--bg); margin-left:-8px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:var(--accent); }
+    .hero-proof .avatars span:first-child { margin-left:0; }
+    .hero-proof p { font-size:13px; color:var(--text-muted); }
+    .hero-proof p strong { color:var(--text); }
+
+    /* ── Pain Section ── */
+    .pain { padding:120px 0; position:relative; z-index:1; }
+    .pain-label { font-size:12px; text-transform:uppercase; letter-spacing:0.2em; color:var(--red); font-weight:600; margin-bottom:16px; }
+    .pain h2 { font-size:clamp(26px,4vw,40px); font-weight:700; color:var(--text-bright); margin-bottom:16px; line-height:1.15; }
+    .pain .lead { font-size:17px; color:var(--text-muted); margin-bottom:48px; max-width:600px; line-height:1.6; }
+    .pain-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+    .pain-card { background:rgba(255,71,87,0.04); border:1px solid rgba(255,71,87,0.12); border-radius:16px; padding:28px; transition:all 0.3s; }
+    .pain-card:hover { border-color:rgba(255,71,87,0.3); background:rgba(255,71,87,0.07); }
+    .pain-card .icon { font-size:28px; margin-bottom:12px; }
+    .pain-card h3 { font-size:16px; font-weight:600; color:var(--text-bright); margin-bottom:6px; }
+    .pain-card p { font-size:14px; color:var(--text-muted); line-height:1.55; }
+
+    /* ── Transition ── */
+    .transition-section { padding:80px 0; text-align:center; position:relative; z-index:1; }
+    .transition-section .arrow { font-size:40px; color:var(--accent); margin-bottom:16px; }
+    .transition-section h2 { font-size:clamp(24px,3.5vw,36px); font-weight:700; color:var(--text-bright); }
+    .transition-section h2 em { font-style:normal; color:var(--accent); }
+
+    /* ── Solution ── */
+    .solution { padding:80px 0 120px; position:relative; z-index:1; }
+    .solution-label { font-size:12px; text-transform:uppercase; letter-spacing:0.2em; color:var(--accent); font-weight:600; margin-bottom:16px; }
+    .solution h2 { font-size:clamp(26px,4vw,40px); font-weight:700; color:var(--text-bright); margin-bottom:48px; line-height:1.15; }
+    .sol-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .sol-card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:32px 24px; transition:all 0.4s cubic-bezier(0.4,0,0.2,1); }
+    .sol-card:hover { border-color:var(--border-hover); transform:translateY(-6px); background:rgba(255,255,255,0.04); }
+    .sol-card .sol-icon { width:44px; height:44px; background:var(--accent-dim); border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:18px; color:var(--accent); font-size:20px; }
+    .sol-card h3 { font-size:17px; font-weight:600; color:var(--text-bright); margin-bottom:8px; }
+    .sol-card p { font-size:14px; color:var(--text-muted); line-height:1.55; }
+    .sol-card.featured { border-color:rgba(0,242,254,0.2); background:rgba(0,242,254,0.04); }
+    .sol-card.featured:hover { border-color:var(--accent); box-shadow:0 8px 40px rgba(0,242,254,0.12); }
+
+    /* ── Proof ── */
+    .proof { padding:100px 0; position:relative; z-index:1; }
+    .proof-label { font-size:12px; text-transform:uppercase; letter-spacing:0.2em; color:var(--accent); font-weight:600; margin-bottom:12px; text-align:center; }
+    .proof h2 { font-size:clamp(26px,4vw,36px); font-weight:700; color:var(--text-bright); margin-bottom:48px; text-align:center; }
+    .proof-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .proof-card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:32px 28px; position:relative; overflow:hidden; }
+    .proof-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--accent); }
+    .proof-card .client { font-size:20px; font-weight:700; color:var(--text-bright); }
+    .proof-card .industry { font-size:13px; color:var(--accent); margin-bottom:16px; }
+    .proof-card .result { font-size:14px; color:var(--text-muted); line-height:1.6; margin-bottom:20px; }
+    .proof-card .stat { font-size:36px; font-weight:800; color:var(--accent); }
+    .proof-card .stat-label { font-size:12px; color:var(--text-muted); }
+
+    /* ── How ── */
+    .how { padding:100px 0; position:relative; z-index:1; }
+    .how h2 { font-size:clamp(26px,4vw,36px); font-weight:700; color:var(--text-bright); margin-bottom:48px; text-align:center; }
+    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; counter-reset:step; }
+    .step { position:relative; padding:32px 24px; counter-increment:step; }
+    .step::before { content:counter(step); position:absolute; top:28px; left:24px; font-size:48px; font-weight:800; color:var(--accent-dim); line-height:1; }
+    .step h3 { font-size:17px; font-weight:600; color:var(--text-bright); margin-bottom:8px; padding-left:40px; }
+    .step p { font-size:14px; color:var(--text-muted); line-height:1.55; padding-left:40px; }
+    .step-line { position:absolute; top:50%; right:-12px; width:24px; height:2px; background:var(--border); }
+    .step:last-child .step-line { display:none; }
+
+    /* ── CTA Final ── */
+    .cta-final { padding:120px 0; text-align:center; position:relative; z-index:1; }
+    .cta-final::before { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:600px; height:600px; background:radial-gradient(circle,var(--accent-dim) 0%,transparent 70%); pointer-events:none; }
+    .cta-final h2 { font-size:clamp(28px,4.5vw,44px); font-weight:800; color:var(--text-bright); margin-bottom:16px; line-height:1.1; }
+    .cta-final h2 em { font-style:normal; color:var(--accent); }
+    .cta-final .sub { font-size:18px; color:var(--text-muted); margin-bottom:40px; max-width:500px; margin-left:auto; margin-right:auto; line-height:1.6; }
+    .cta-final .ctas { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+    .cta-final .micro { font-size:12px; color:var(--text-subtle); }
+
+    /* ── Lead Form ── */
+    .lead-form { max-width:440px; margin:0 auto; background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:32px; margin-top:48px; text-align:left; }
+    .lead-form h3 { font-size:18px; font-weight:600; color:var(--text-bright); margin-bottom:4px; }
+    .lead-form .form-sub { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
+    .lead-form input, .lead-form textarea { width:100%; padding:12px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; font-family:inherit; margin-bottom:12px; transition:border 0.2s; }
+    .lead-form input:focus, .lead-form textarea:focus { outline:none; border-color:var(--accent); }
+    .lead-form textarea { resize:vertical; min-height:80px; }
+    .lead-form .btn-primary { width:100%; justify-content:center; padding:14px; font-size:15px; }
+
+    /* ── Footer ── */
+    footer { border-top:1px solid var(--border); padding:32px 0; position:relative; z-index:1; }
+    .footer-inner { max-width:1100px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; align-items:center; }
+    .footer-text { font-size:12px; color:var(--text-subtle); }
+
+    /* ── Animations ── */
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .reveal { opacity:0; transform:translateY(40px); transition:all 0.8s cubic-bezier(0.4,0,0.2,1); }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal.d1 { transition-delay:0.1s; }
+    .reveal.d2 { transition-delay:0.2s; }
+    .reveal.d3 { transition-delay:0.3s; }
+    .reveal.d4 { transition-delay:0.4s; }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE: Mobile First
+       ══════════════════════════════════════════ */
+
+    /* ── Mobile (default) ── */
+    .nav-links { display:none; }
+    .hamburger { display:block; }
+    .pain-grid, .sol-grid, .proof-grid, .steps { grid-template-columns:1fr; }
+    .hero-proof { flex-direction:column; align-items:flex-start; gap:12px; }
+    .footer-inner { flex-direction:column; gap:8px; text-align:center; }
+    .step-line { display:none; }
+    .hero { min-height:auto; padding:120px 0 60px; }
+    .hero h1 { font-size:32px; }
+    .hero .sub { font-size:16px; }
+    .hero-ctas { flex-direction:column; }
+    .hero-ctas a { width:100%; justify-content:center; padding:14px 20px; font-size:15px; }
+    .pain { padding:80px 0; }
+    .pain h2 { font-size:26px; }
+    .pain .lead { font-size:15px; }
+    .pain-card { padding:20px; }
+    .transition-section { padding:48px 0; }
+    .transition-section h2 { font-size:24px; }
+    .solution { padding:60px 0 80px; }
+    .solution h2 { font-size:26px; margin-bottom:32px; }
+    .sol-card { padding:24px 20px; }
+    .proof { padding:60px 0; }
+    .proof h2 { font-size:26px; margin-bottom:32px; }
+    .proof-card { padding:24px 20px; }
+    .proof-card .stat { font-size:30px; }
+    .how { padding:60px 0; }
+    .how h2 { font-size:26px; margin-bottom:32px; }
+    .step { padding:24px 16px; }
+    .step::before { font-size:36px; top:20px; left:16px; }
+    .step h3 { padding-left:32px; font-size:16px; }
+    .step p { padding-left:32px; font-size:13px; }
+    .cta-final { padding:80px 0; }
+    .cta-final h2 { font-size:28px; }
+    .cta-final .sub { font-size:16px; }
+    .cta-final .ctas a { width:100%; justify-content:center; font-size:15px !important; padding:14px 24px !important; }
+    .lead-form { padding:24px; margin-top:32px; }
+    .section-label { font-size:11px; }
+
+    /* ── Tablet (640px+) ── */
+    @media (min-width:640px) {
+      .hero-ctas { flex-direction:row; }
+      .hero-ctas a { width:auto; }
+      .pain-grid { grid-template-columns:repeat(2,1fr); }
+      .sol-grid { grid-template-columns:repeat(2,1fr); }
+      .proof-grid { grid-template-columns:repeat(2,1fr); }
+      .cta-final .ctas a { width:auto; }
+    }
+
+    /* ── Desktop (1024px+) ── */
+    @media (min-width:1024px) {
+      .nav-links { display:flex; }
+      .hamburger { display:none; }
+      .mobile-menu { display:none !important; }
+      .hero { min-height:100vh; }
+      .hero h1 { font-size:58px; }
+      .hero .sub { font-size:19px; }
+      .hero-proof { flex-direction:row; align-items:center; gap:16px; }
+      .pain { padding:120px 0; }
+      .pain h2 { font-size:40px; }
+      .pain .lead { font-size:17px; }
+      .pain-card { padding:28px; }
+      .transition-section { padding:80px 0; }
+      .transition-section h2 { font-size:36px; }
+      .solution { padding:80px 0 120px; }
+      .solution h2 { font-size:40px; margin-bottom:48px; }
+      .sol-grid { grid-template-columns:repeat(3,1fr); }
+      .sol-card { padding:32px 24px; }
+      .proof { padding:100px 0; }
+      .proof h2 { font-size:36px; margin-bottom:48px; }
+      .proof-grid { grid-template-columns:repeat(3,1fr); }
+      .proof-card { padding:32px 28px; }
+      .how { padding:100px 0; }
+      .how h2 { font-size:36px; margin-bottom:48px; }
+      .steps { grid-template-columns:repeat(3,1fr); }
+      .step-line { display:block; }
+      .step { padding:32px 24px; }
+      .step::before { font-size:48px; }
+      .step h3 { padding-left:40px; }
+      .step p { padding-left:40px; }
+      .cta-final { padding:120px 0; }
+      .cta-final h2 { font-size:44px; }
+      .cta-final .sub { font-size:18px; }
+      .footer-inner { flex-direction:row; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="starscape"></canvas>
+
+<!-- WhatsApp Floating Button -->
+<a href="https://wa.me/50664220701?text=Hola%2C%20quiero%20saber%20mas%20sobre%20StratosCore" class="wa-float" aria-label="WhatsApp">
+  <svg width="28" height="28" fill="white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+<style>
+  .wa-float { position:fixed; bottom:96px; right:24px; width:56px; height:56px; background:var(--wa-green); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(37,211,102,0.4); z-index:99; transition:all 0.3s; }
+  .wa-float:hover { transform:scale(1.1); box-shadow:0 6px 28px rgba(37,211,102,0.5); }
+  @media (min-width:1024px) { .wa-float { bottom:100px; right:32px; } }
+</style>
+
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#problema" onclick="closeMobile()">El Problema</a>
+  <a href="#solucion" onclick="closeMobile()">La Solucion</a>
+  <a href="#resultados" onclick="closeMobile()">Resultados</a>
+  <a href="#contacto" class="btn-primary" onclick="closeMobile()">Quiero Automatizar</a>
+  <a href="https://wa.me/50664220701?text=Hola%2C%20quiero%20saber%20mas%20sobre%20StratosCore" class="btn-wa" onclick="closeMobile()">
+    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+    WhatsApp directo
+  </a>
+</div>
+
+<!-- Nav -->
+<nav id="nav">
+  <div class="nav-inner">
+    <span class="wordmark">STRATOS <b>|</b> CORE</span>
+    <button class="hamburger" id="hamburger" onclick="toggleMobile()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links">
+      <a href="#problema">El Problema</a>
+      <a href="#solucion">La Solucion</a>
+      <a href="#resultados">Resultados</a>
+      <a href="#contacto" class="btn-primary">Quiero Automatizar</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-tag reveal">
+        <span style="width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite"></span>
+        Ecosistemas Agenticos 360&deg;
+      </div>
+      <h1 class="reveal d1">
+        Tu negocio en<br>
+        <em>piloto automatico.</em>
+      </h1>
+      <p class="sub reveal d2">
+        Creamos ecosistemas agenticos que conectan tu agenda, CRM, marketing, logistica e inteligencia de negocio en <strong>un solo sistema con IA</strong>. Lo que otros tardan meses, nosotros lo construimos en dias.
+      </p>
+      <div class="hero-ctas reveal d3">
+        <a href="#contacto" class="btn-primary">
+          Quiero mi diagnostico gratis
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+        <a href="https://wa.me/50664220701" class="btn-wa-outline">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+          WhatsApp directo
+        </a>
+      </div>
+      <div class="hero-proof reveal d4">
+        <div class="avatars"><span>S</span><span>P</span><span>L</span></div>
+        <p><strong>Salud, produccion industrial y logistica</strong> — ya operan con StratosCore</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAIN ═══ -->
+<section class="pain" id="problema">
+  <div class="container">
+    <p class="pain-label reveal">Te suena familiar?</p>
+    <h2 class="reveal d1">Tu operacion funciona. Pero al 50% de lo que podria.</h2>
+    <p class="lead reveal d2">No es que no vendas. Es que pierdes dinero todos los dias por operar con piezas sueltas.</p>
+    <div class="pain-grid">
+      <div class="pain-card reveal d1">
+        <div class="icon">🔌</div>
+        <h3>Sistemas que no se hablan</h3>
+        <p>Tu pagina web por un lado. Tu agenda por otro. Tu CRM por otro. Tu marketing por otro. Cada uno vive en su isla. La data se pierde entre ellos.</p>
+      </div>
+      <div class="pain-card reveal d2">
+        <div class="icon">📊</div>
+        <h3>Proyecciones que nunca se cumplen</h3>
+        <p>Planificas ventas que no llegan. Produces de mas o de menos. No sabes cuanta demanda vas a tener la proxima semana. Reaccionas en vez de anticipar.</p>
+      </div>
+      <div class="pain-card reveal d3">
+        <div class="icon">📅</div>
+        <h3>Capacidad desperdiciada</h3>
+        <p>Tu agenda, tu equipo, tu planta — dan para el doble. Pero operas a media capacidad porque no llegas al cliente correcto en el momento correcto.</p>
+      </div>
+      <div class="pain-card reveal d4">
+        <div class="icon">📦</div>
+        <h3>Inventario y logistica a ciegas</h3>
+        <p>No sabes que tienes, que necesitas, ni cuando. Los deliveries fallan. El control es una hoja de Excel que nadie actualiza a tiempo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Transition ═══ -->
+<section class="transition-section">
+  <div class="container">
+    <div class="arrow reveal">&#8595;</div>
+    <h2 class="reveal d1">Y si todo eso <em>se conectara en uno solo?</em></h2>
+  </div>
+</section>
+
+<!-- ═══ SOLUTION ═══ -->
+<section class="solution" id="solucion">
+  <div class="container">
+    <p class="solution-label reveal">Ecosistema agentico 360&deg;</p>
+    <h2 class="reveal d1">Todo tu negocio conectado, automatizado e inteligente.</h2>
+    <div class="sol-grid">
+      <div class="sol-card featured reveal d1">
+        <div class="sol-icon">🔗</div>
+        <h3>Integracion total</h3>
+        <p>Conectamos tu web, tu agenda, tu CRM, tu ERP, tu logistica y tu marketing en un solo sistema. Un dato entra una vez y fluye a todos lados.</p>
+      </div>
+      <div class="sol-card reveal d2">
+        <div class="sol-icon">📊</div>
+        <h3>Forecast inteligente</h3>
+        <p>Prediccion de demanda con IA. Sabe cuanto vas a vender, cuanto producir, cuanto necesitas en inventario. Anticipa, no reacciona.</p>
+      </div>
+      <div class="sol-card reveal d3">
+        <div class="sol-icon">🤖</div>
+        <h3>Automatizacion con IA</h3>
+        <p>Confirmaciones, seguimiento, reportes, alertas — agentes de IA que ejecutan por vos. 24/7. Sin errores humanos.</p>
+      </div>
+      <div class="sol-card reveal d1">
+        <div class="sol-icon">📅</div>
+        <h3>Agendamiento y CRM</h3>
+        <p>Tus clientes agendan online, se confirman por WhatsApp, los que cancelan reciben seguimiento automatico. Tu capacidad se llena sola.</p>
+      </div>
+      <div class="sol-card reveal d2">
+        <div class="sol-icon">📦</div>
+        <h3>Inventario y logistica</h3>
+        <p>Control de stock en tiempo real, rutas de delivery optimizadas, alertas de reposicion. Todo visible desde un solo dashboard.</p>
+      </div>
+      <div class="sol-card reveal d3">
+        <div class="sol-icon">💡</div>
+        <h3>Inteligencia de negocio</h3>
+        <p>Dashboards en vivo, alertas accionables, oportunidades detectadas automaticamente. Datos que se convierten en decisiones.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SPEED ═══ -->
+<section class="transition-section" style="padding-bottom:0">
+  <div class="container">
+    <p class="section-label reveal" style="color:var(--accent)">Velocidad de implementacion</p>
+    <h2 class="reveal d1" style="margin-bottom:8px">Lo que otros tardan <span style="text-decoration:line-through;opacity:0.3">meses</span>, nosotros lo hacemos en <em>dias.</em></h2>
+    <p class="reveal d2" style="color:var(--text-muted);font-size:16px;max-width:500px;margin:0 auto">No es magia. Es un stack tecnologico de ultima generacion combinado con inteligencia artificial.</p>
+  </div>
+</section>
+
+<!-- ═══ PROOF ═══ -->
+<section class="proof" id="resultados">
+  <div class="container">
+    <p class="proof-label reveal">Resultados reales. Industrias diferentes.</p>
+    <h2 class="reveal d1">Negocios que dejaron de operar con piezas sueltas</h2>
+    <div class="proof-grid">
+      <div class="proof-card reveal d1">
+        <p class="client">MedCare</p>
+        <p class="industry">Salud — Centro medico</p>
+        <p class="result">Agenda de equipos medicos integrada con su EHR. Pacientes agendan online, confirman por WhatsApp. Dashboard de inteligencia en vivo.</p>
+        <div class="stat" data-count="48">0</div>
+        <p class="stat-label">horas de implementacion</p>
+      </div>
+      <div class="proof-card reveal d2">
+        <p class="client">Videndum</p>
+        <p class="industry">Manufactura — Produccion industrial</p>
+        <p class="result">Forecast de demanda con ML. Planificacion de produccion automatizada. Analisis de varianza en tiempo real. Dejaron de producir a ciegas.</p>
+        <div class="stat" data-count="40">0</div>
+        <p class="stat-label">% mas precision en forecast</p>
+      </div>
+      <div class="proof-card reveal d3">
+        <p class="client">Mobility</p>
+        <p class="industry">Servicios — Rehabilitacion fisica</p>
+        <p class="result">Calendario de especialistas, evaluaciones, seguimiento de clientes y comunicacion automatizada. Toda la operacion en un solo lugar.</p>
+        <div class="stat">3x</div>
+        <p class="stat-label">mas eficiente en coordinacion</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW ═══ -->
+<section class="how">
+  <div class="container">
+    <h2 class="reveal">Tres pasos. Sin drama.</h2>
+    <div class="steps">
+      <div class="step reveal d1">
+        <div class="step-line"></div>
+        <h3>Diagnostico gratis</h3>
+        <p>15 minutos. Analizamos tu operacion, tus sistemas actuales y tus cuellos de botella. Te decimos exactamente donde pierdes dinero.</p>
+      </div>
+      <div class="step reveal d2">
+        <div class="step-line"></div>
+        <h3>Construccion rapida</h3>
+        <p>Conectamos e integramos todo. Tu agenda, tu CRM, tu logistica, tu web. En dias, no meses. Sin disrumpir tu operacion actual.</p>
+      </div>
+      <div class="step reveal d3">
+        <h3>Piloto automatico</h3>
+        <p>Tu negocio opera con inteligencia artificial. Vos tomas las decisiones estrategicas. El sistema ejecuta el resto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA FINAL ═══ -->
+<section class="cta-final" id="contacto">
+  <div class="container">
+    <h2 class="reveal">Cada dia sin integracion<br>es dinero <em>que se pierde.</em></h2>
+    <p class="sub reveal d1">Agenda tu diagnostico gratuito. 15 minutos que pueden transformar tu operacion.</p>
+    <div class="ctas reveal d2">
+      <a href="https://wa.me/50664220701?text=Hola%2C%20quiero%20mi%20diagnostico%20gratis%20de%20StratosCore" class="btn-wa" style="padding:16px 32px;font-size:16px;">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+        Quiero mi diagnostico gratis
+      </a>
+    </div>
+    <p class="micro reveal d3">Sin costo. Sin compromiso. Sin vendedores insistentes.</p>
+
+    <div class="lead-form reveal d4">
+      <h3>O dejanos tus datos</h3>
+      <p class="form-sub">Te contactamos en menos de 24 horas con un analisis preliminar de tu caso.</p>
+      <form action="https://formspree.io/f/xblrwkjv" method="POST">
+        <input type="text" name="nombre" placeholder="Tu nombre" required>
+        <input type="email" name="email" placeholder="tu@email.com" required>
+        <input type="tel" name="telefono" placeholder="+506 0000 0000">
+        <textarea name="negocio" placeholder="Contanos brevemente: que hace tu negocio y que te frustra de tu operacion actual?"></textarea>
+        <button type="submit" class="btn-primary">Enviar</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <span class="wordmark" style="opacity:0.5;font-size:11px">STRATOS <b>|</b> CORE</span>
+    <span class="footer-text">&copy; 2026 StratosCore. Costa Rica.</span>
+  </div>
+</footer>
+
+<script>
+// Starscape
+(function(){
+  const c=document.getElementById('starscape'),x=c.getContext('2d');
+  let stars=[];
+  function resize(){c.width=window.innerWidth*devicePixelRatio;c.height=window.innerHeight*devicePixelRatio;c.style.width=window.innerWidth+'px';c.style.height=window.innerHeight+'px';x.scale(devicePixelRatio,devicePixelRatio);init();}
+  function init(){stars=[];for(let i=0;i<160;i++)stars.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,r:Math.random()*1.2+0.3,o:Math.random()*0.6+0.2,dx:(Math.random()-0.5)*0.015,dy:(Math.random()-0.5)*0.01,ts:Math.random()*0.003+0.001,tp:Math.random()*Math.PI*2});}
+  function draw(){x.clearRect(0,0,c.width/devicePixelRatio,c.height/devicePixelRatio);stars.forEach(s=>{s.x+=s.dx;s.y+=s.dy;if(s.x<0)s.x=window.innerWidth;if(s.x>window.innerWidth)s.x=0;if(s.y<0)s.y=window.innerHeight;if(s.y>window.innerHeight)s.y=0;const t=Math.sin(Date.now()*s.ts+s.tp);x.beginPath();x.arc(s.x,s.y,s.r,0,Math.PI*2);x.fillStyle=`rgba(255,255,255,${Math.max(0,s.o+t*0.25)})`;x.fill();});requestAnimationFrame(draw);}
+  resize();window.addEventListener('resize',resize);draw();
+})();
+
+// Nav scroll
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50));
+
+// Hamburger menu
+function toggleMobile(){
+  const menu=document.getElementById('mobileMenu');
+  const btn=document.getElementById('hamburger');
+  const isOpen=menu.classList.contains('open');
+  menu.classList.toggle('open');
+  btn.classList.toggle('active');
+  document.body.style.overflow=isOpen?'':'hidden';
+}
+function closeMobile(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('active');
+  document.body.style.overflow='';
+}
+
+// Reveal on scroll
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});});});
+
+// Count-up animation
+const countObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const target=parseInt(e.target.dataset.count);if(!target)return;let current=0;const step=Math.ceil(target/40);const timer=setInterval(()=>{current+=step;if(current>=target){current=target;clearInterval(timer);}e.target.textContent=current;},30);countObs.unobserve(e.target);}});},{threshold:0.5});
+document.querySelectorAll('[data-count]').forEach(el=>countObs.observe(el));
+</script>
+
+<!-- StratosCore Chat Widget -->
+<style>
+#sc-widget-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#00F2FE,#00b4d8);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(0,242,254,0.35);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;}
+#sc-widget-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(0,242,254,0.5);}
+#sc-widget-btn svg{width:26px;height:26px;fill:#001117;}
+#sc-widget-panel{position:fixed;bottom:92px;right:24px;z-index:9999;width:380px;max-width:calc(100vw - 32px);height:520px;max-height:calc(100vh - 120px);background:#0a1218;border:1px solid rgba(0,242,254,0.2);border-radius:16px;display:none;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.6);}
+#sc-widget-panel.open{display:flex;}
+#sc-widget-header{padding:16px;background:rgba(0,242,254,0.06);border-bottom:1px solid rgba(0,242,254,0.12);display:flex;align-items:center;justify-content:space-between;}
+#sc-widget-header h3{font-size:14px;color:#00F2FE;font-weight:600;letter-spacing:0.05em;margin:0;}
+#sc-widget-header span{font-size:11px;color:#8B949E;}
+#sc-widget-close{background:none;border:none;color:#8B949E;cursor:pointer;font-size:18px;padding:4px 8px;border-radius:6px;}
+#sc-widget-close:hover{background:rgba(255,255,255,0.08);color:#E0E0E0;}
+#sc-widget-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+#sc-widget-msgs::-webkit-scrollbar{width:4px;}
+#sc-widget-msgs::-webkit-scrollbar-thumb{background:rgba(0,242,254,0.2);border-radius:4px;}
+.sc-msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;word-wrap:break-word;}
+.sc-msg.user{align-self:flex-end;background:rgba(0,242,254,0.15);color:#E0E0E0;border-bottom-right-radius:4px;}
+.sc-msg.bot{align-self:flex-start;background:rgba(255,255,255,0.06);color:#E0E0E0;border-bottom-left-radius:4px;}
+.sc-msg.bot strong{color:#00F2FE;}
+.sc-actions{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px;}
+.sc-action-btn{background:rgba(0,242,254,0.08);border:1px solid rgba(0,242,254,0.2);color:#00F2FE;padding:6px 12px;border-radius:20px;font-size:11px;cursor:pointer;transition:all .2s;}
+.sc-action-btn:hover{background:rgba(0,242,254,0.18);border-color:rgba(0,242,254,0.4);}
+#sc-widget-input{display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(0,242,254,0.12);background:rgba(0,0,0,0.3);}
+#sc-widget-input input{flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;color:#E0E0E0;font-size:13px;outline:none;font-family:inherit;}
+#sc-widget-input input:focus{border-color:rgba(0,242,254,0.4);}
+#sc-widget-input input::placeholder{color:#4B5563;}
+#sc-widget-input button{background:linear-gradient(135deg,#00F2FE,#00b4d8);border:none;border-radius:8px;padding:0 16px;cursor:pointer;color:#001117;font-weight:600;font-size:13px;transition:opacity .2s;}
+#sc-widget-input button:disabled{opacity:0.4;cursor:not-allowed;}
+.sc-typing{display:flex;gap:4px;padding:10px 14px;align-self:flex-start;}
+.sc-typing span{width:6px;height:6px;background:rgba(0,242,254,0.4);border-radius:50%;animation:sc-bounce .6s infinite alternate;}
+.sc-typing span:nth-child(2){animation-delay:.15s;}
+.sc-typing span:nth-child(3){animation-delay:.3s;}
+@keyframes sc-bounce{to{opacity:0.3;transform:translateY(-4px);}}
+@media(max-width:480px){
+  #sc-widget-panel{bottom:0;right:0;width:100vw;max-width:100vw;height:100vh;max-height:100vh;border-radius:0;}
+  #sc-widget-btn{bottom:16px;right:16px;width:50px;height:50px;}
+  #sc-widget-btn svg{width:22px;height:22px;}
+  .wa-float{bottom:78px;right:16px;width:50px;height:50px;}
+  .wa-float svg{width:24px;height:24px;}
+}
+</style>
+
+<button id="sc-widget-btn" aria-label="Abrir chat" onclick="toggleWidget()">
+  <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/><path d="M7 9h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/></svg>
+</button>
+
+<div id="sc-widget-panel">
+  <div id="sc-widget-header">
+    <div><h3>StratosCore</h3><span>Agente de ventas</span></div>
+    <button id="sc-widget-close" onclick="toggleWidget()">&times;</button>
+  </div>
+  <div id="sc-widget-msgs"></div>
+  <div class="sc-actions" id="sc-widget-actions"></div>
+  <div id="sc-widget-input">
+    <input type="text" id="sc-input" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter')sendMsg()">
+    <button onclick="sendMsg()">Enviar</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const API='/api/stratoscore/chat';
+  let sessionId='sc_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  let isOpen=false;
+  let sending=false;
+  const msgs=document.getElementById('sc-widget-msgs');
+  const actionsEl=document.getElementById('sc-widget-actions');
+  const input=document.getElementById('sc-input');
+  const sendBtn=document.querySelector('#sc-widget-input button');
+
+  window.toggleWidget=function(){
+    isOpen=!isOpen;
+    document.getElementById('sc-widget-panel').classList.toggle('open',isOpen);
+    if(isOpen&&msgs.children.length===0){
+      addMsg('bot','Hola! Soy el agente de StratosCore. Construimos software empresarial 10x mas rapido con IA. ¿En que puedo ayudarte?');
+      showActions(['Ver casos de exito','Conocer precios','Agendar demo']);
+    }
+    if(isOpen)input.focus();
+  };
+
+  function addMsg(type,text){
+    const div=document.createElement('div');
+    div.className='sc-msg '+type;
+    div.innerHTML=text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    msgs.appendChild(div);
+    msgs.scrollTop=msgs.scrollHeight;
+    return div;
+  }
+
+  function showActions(actions){
+    actionsEl.innerHTML='';
+    if(!actions||!actions.length)return;
+    actions.forEach(a=>{
+      const btn=document.createElement('button');
+      btn.className='sc-action-btn';
+      btn.textContent=a;
+      btn.onclick=()=>{input.value=a;sendMsg();};
+      actionsEl.appendChild(btn);
+    });
+  }
+
+  function showTyping(){
+    const div=document.createElement('div');
+    div.className='sc-typing';
+    div.id='sc-typing';
+    div.innerHTML='<span></span><span></span><span></span>';
+    msgs.appendChild(div);
+    msgs.scrollTop=msgs.scrollHeight;
+  }
+  function hideTyping(){const t=document.getElementById('sc-typing');if(t)t.remove();}
+
+  window.sendMsg=async function(){
+    const text=input.value.trim();
+    if(!text||sending)return;
+    sending=true;
+    sendBtn.disabled=true;
+    input.value='';
+    actionsEl.innerHTML='';
+
+    addMsg('user',text);
+    showTyping();
+
+    try{
+      const res=await fetch(API,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({message:text,sessionId:sessionId,channel:'web'}),
+      });
+      const json=await res.json();
+      hideTyping();
+      if(json.success&&json.data){
+        addMsg('bot',json.data.message);
+        if(json.data.suggestedActions)showActions(json.data.suggestedActions);
+      }else{
+        addMsg('bot','Disculpa, hubo un error. Intenta de nuevo o escribe a carlos@stratoscore.app');
+      }
+    }catch(e){
+      hideTyping();
+      addMsg('bot','No pude conectar con el agente. Intenta de nuevo en un momento.');
+    }
+    sending=false;
+    sendBtn.disabled=false;
+    input.focus();
+  };
+})();
+</script>
+</body>
+</html>
