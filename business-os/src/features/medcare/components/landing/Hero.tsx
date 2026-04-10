@@ -47,10 +47,10 @@ export function Hero() {
           </div>
           <div className="hidden md:block flex-shrink-0">
             <Image
-              src="/medcare/promo-mamografia-3d.jpeg"
-              alt="Mamógrafo FUJIFILM AMULET Sophinity en MedCare — Mamografía 3D + Ultrasonido ₡65,000"
+              src="/medcare/mamografo-paciente-tecnica.jpeg"
+              alt="Paciente realizándose mamografía 3D en FUJIFILM AMULET Sophinity"
               width={420}
-              height={520}
+              height={280}
               className="rounded-2xl shadow-2xl border-2 border-white/10 object-cover"
               priority
             />
