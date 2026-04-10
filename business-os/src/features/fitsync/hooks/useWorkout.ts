@@ -1,7 +1,46 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import type { WorkoutPlan, GenerateWorkoutRequest, LoggedSet } from '../types/training'
+interface WorkoutPlan {
+  name: string
+  description: string
+  split_type: string
+  days: Array<{
+    day_number: number
+    name: string
+    focus: string
+    estimated_duration_min: number
+    exercises: Array<{
+      exercise_id: string
+      exercise_name: string
+      sets: number
+      reps_min: number
+      reps_max: number
+      rest_seconds: number
+      notes?: string
+      sort_order: number
+    }>
+  }>
+  notes?: string
+}
+
+interface GenerateWorkoutRequest {
+  goal: string
+  level: 'beginner' | 'intermediate' | 'advanced'
+  equipment: string[]
+  days_per_week: number
+  preferred_split?: string
+}
+
+interface LoggedSet {
+  id: string
+  exercise_id: string
+  set_number: number
+  reps: number
+  weight_kg: number
+  is_warmup: boolean
+  rpe: number | null
+}
 
 interface UseWorkoutReturn {
   plan: WorkoutPlan | null

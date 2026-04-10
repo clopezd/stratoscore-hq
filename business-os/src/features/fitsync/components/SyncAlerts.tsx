@@ -1,7 +1,12 @@
 'use client'
 
 import { AlertTriangle, Info, CheckCircle, Zap, Loader2, RefreshCw } from 'lucide-react'
-import type { SyncAdjustments } from '../types/sync'
+interface SyncAdjustments {
+  nutrition_adjustments: { calorie_target: number; protein_target_g: number; carbs_target_g: number; fat_target_g: number; reasoning_es: string }
+  training_adjustments: { volume_modifier: number; deload_recommended: boolean; reasoning_es: string }
+  alerts: Array<{ type: 'warning' | 'info' | 'success'; message: string }>
+  training_intensity: string
+}
 
 interface SyncAlertsProps {
   adjustments: SyncAdjustments | null

@@ -11,8 +11,24 @@ import { Paywall } from '@/features/fitsync/components/Paywall'
 import { Onboarding, type OnboardingResult } from '@/features/fitsync/components/Onboarding'
 import { useSyncEngine } from '@/features/fitsync/hooks/useSyncEngine'
 import { useTier } from '@/features/fitsync/hooks/useTier'
-import type { FoodAnalysis, DailyMacros } from '@/features/fitsync/types'
-import type { SyncContext } from '@/features/fitsync/types/sync'
+import type { DailyMacros } from '@/features/fitsync/utils/nutrition-calc'
+
+interface SyncContext {
+  user_profile: { goal: string; tdee: number; current_targets: DailyMacros; weight_kg: number }
+  last_3_days_nutrition: Array<{ date: string; calories_consumed: number; protein_g: number; carbs_g: number; fat_g: number; target_calories: number; deficit_or_surplus: number }>
+  last_3_days_training: Array<{ date: string; day_name: string; focus: string; total_sets: number; avg_rpe: number | null; duration_min: number }>
+  today_training_planned: { day_name: string; focus: string; estimated_intensity: 'rest' | 'light' | 'moderate' | 'heavy' } | null
+}
+
+interface FoodAnalysis {
+  meal_name: string
+  total_calories: number
+  total_protein_g: number
+  total_carbs_g: number
+  total_fat_g: number
+  total_fiber_g: number
+  confidence: number
+}
 import { Flame, Plus } from 'lucide-react'
 
 interface LoggedMeal {

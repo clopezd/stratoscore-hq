@@ -10,7 +10,7 @@ import {
   type Equipment,
   calculateTDEE,
   calculateMacroTargets,
-} from '../types'
+} from '../utils/nutrition-calc'
 
 interface OnboardingProps {
   onComplete: (profile: OnboardingResult) => void

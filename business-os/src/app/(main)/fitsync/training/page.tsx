@@ -5,7 +5,26 @@ import { Dumbbell, Loader2, Play, Square, ChevronDown, ChevronUp, Sparkles, Tras
 import { useWorkoutPlan, useActiveWorkout } from '@/features/fitsync/hooks/useWorkout'
 import { SetLogger } from '@/features/fitsync/components/SetLogger'
 import { RestTimer } from '@/features/fitsync/components/RestTimer'
-import type { Equipment, SplitType, WorkoutDay } from '@/features/fitsync/types/training'
+import type { Equipment } from '@/features/fitsync/utils/nutrition-calc'
+
+type SplitType = 'push_pull_legs' | 'upper_lower' | 'full_body' | 'bro_split' | 'functional'
+
+interface WorkoutDay {
+  day_number: number
+  name: string
+  focus: string
+  estimated_duration_min: number
+  exercises: Array<{
+    exercise_id: string
+    exercise_name: string
+    sets: number
+    reps_min: number
+    reps_max: number
+    rest_seconds: number
+    notes?: string
+    sort_order: number
+  }>
+}
 
 const EQUIPMENT_OPTIONS: { value: Equipment; label: string }[] = [
   { value: 'barbell', label: 'Barra' },

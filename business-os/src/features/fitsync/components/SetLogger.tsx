@@ -2,7 +2,15 @@
 
 import { useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
-import type { LoggedSet } from '../types/training'
+interface LoggedSet {
+  id: string
+  exercise_id: string
+  set_number: number
+  reps: number
+  weight_kg: number
+  is_warmup: boolean
+  rpe: number | null
+}
 
 interface SetLoggerProps {
   exerciseId: string

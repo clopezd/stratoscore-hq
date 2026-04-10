@@ -6,10 +6,9 @@ import {
   type GoalType,
   type ActivityLevel,
   type SexType,
-  type DietaryPreference,
   calculateTDEE,
   calculateMacroTargets,
-} from '@/features/fitsync/types'
+} from '@/features/fitsync/utils/nutrition-calc'
 
 const GOALS: { value: GoalType; label: string }[] = [
   { value: 'muscle_gain', label: 'Ganar músculo' },

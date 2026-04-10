@@ -1,7 +1,19 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import type { FoodAnalysis, MealType } from '../types'
+import type { MealType } from '../utils/nutrition-calc'
+
+interface FoodAnalysis {
+  meal_name: string
+  items: Array<{ name: string; estimated_quantity_g: number; calories: number }>
+  total_calories: number
+  total_protein_g: number
+  total_carbs_g: number
+  total_fat_g: number
+  total_fiber_g: number
+  confidence: number
+  suggestions?: string
+}
 
 interface UseFoodAnalysisReturn {
   analysis: FoodAnalysis | null
