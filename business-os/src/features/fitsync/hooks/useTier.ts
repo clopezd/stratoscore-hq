@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import type { FitSyncTier } from '@/lib/polar'
+import type { FitSyncTier } from '../types/billing'
 
 interface UseTierReturn {
   tier: FitSyncTier

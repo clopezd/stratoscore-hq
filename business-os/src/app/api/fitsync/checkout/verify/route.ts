@@ -9,12 +9,17 @@ export async function GET() {
     return NextResponse.json({ tier: 'free' })
   }
 
-  const { data } = await supabase
-    .from('fs_subscriptions')
-    .select('tier, status')
-    .eq('user_id', user.id)
-    .eq('status', 'active')
-    .single()
+  try {
+    const { data } = await supabase
+      .from('fs_subscriptions')
+      .select('tier, status')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .single()
 
-  return NextResponse.json({ tier: data?.tier || 'free' })
+    return NextResponse.json({ tier: data?.tier || 'free' })
+  } catch {
+    // Table may not exist yet
+    return NextResponse.json({ tier: 'free' })
+  }
 }

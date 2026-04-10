@@ -17,7 +17,8 @@ export const FITSYNC_PRODUCTS = {
   elite_yearly: process.env.FITSYNC_ELITE_YEARLY_ID ?? '',
 } as const
 
-export type FitSyncTier = 'free' | 'pro' | 'elite'
+import type { FitSyncTier } from '@/features/fitsync/types/billing'
+export type { FitSyncTier }
 
 export function getTierFromProductId(productId: string): FitSyncTier {
   if (productId === FITSYNC_PRODUCTS.pro_monthly || productId === FITSYNC_PRODUCTS.pro_yearly) return 'pro'
