@@ -1,12 +1,13 @@
 /**
- * Conversation Engine — Self-contained (no dependency on agent-server)
+ * Conversation Engine — Self-contained, persisted to Supabase
  *
  * Calls OpenRouter directly from Next.js API routes.
- * Sessions stored in-memory with TTL (Vercel serverless = ephemeral).
- * For persistent sessions, upgrade to Supabase table.
+ * Sessions persisted to Supabase chat_sessions table.
+ * In-memory cache for hot sessions (reduces DB reads).
  */
 
 import { AGENT_SYSTEM_PROMPT } from './knowledge-base'
+import { createClient } from '@supabase/supabase-js'
 
 // ============================================================
 // TYPES
@@ -15,12 +16,18 @@ import { AGENT_SYSTEM_PROMPT } from './knowledge-base'
 interface ConversationTurn {
   role: 'user' | 'assistant'
   content: string
+  ts: string
 }
 
 interface Session {
+  id: string
+  channel: 'web' | 'whatsapp'
   messages: ConversationTurn[]
   leadScore: number
-  updatedAt: number
+  leadName: string | null
+  leadEmail: string | null
+  leadPhone: string | null
+  status: 'active' | 'closed' | 'escalated'
 }
 
 export interface EngineResponse {
@@ -29,40 +36,109 @@ export interface EngineResponse {
   shouldNotify: boolean
   notifyReason?: string
   suggestedActions: string[]
+  sessionId: string
 }
 
 // ============================================================
-// IN-MEMORY SESSION STORE (TTL 30 min for serverless)
+// SUPABASE CLIENT (service role — bypasses RLS)
 // ============================================================
 
-const sessions = new Map<string, Session>()
-const SESSION_TTL = 30 * 60 * 1000 // 30 min
-
-function getSession(sessionId: string): Session {
-  const existing = sessions.get(sessionId)
-  if (existing && Date.now() - existing.updatedAt < SESSION_TTL) {
-    return existing
-  }
-  const fresh: Session = { messages: [], leadScore: 0, updatedAt: Date.now() }
-  sessions.set(sessionId, fresh)
-  return fresh
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) return null
+  return createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
 }
 
-function saveSession(sessionId: string, session: Session): void {
-  session.updatedAt = Date.now()
-  // Keep only last 16 turns to control token usage
-  if (session.messages.length > 16) {
-    session.messages = session.messages.slice(-16)
-  }
-  sessions.set(sessionId, session)
+// ============================================================
+// SESSION MANAGEMENT (Supabase + in-memory cache)
+// ============================================================
 
-  // Cleanup expired sessions every 50 calls
-  if (Math.random() < 0.02) {
-    const now = Date.now()
-    for (const [key, s] of sessions) {
-      if (now - s.updatedAt > SESSION_TTL) sessions.delete(key)
+const cache = new Map<string, { session: Session; cachedAt: number }>()
+const CACHE_TTL = 5 * 60 * 1000 // 5 min cache
+
+async function getOrCreateSession(sessionId: string, channel: 'web' | 'whatsapp'): Promise<Session> {
+  // Check cache
+  const cached = cache.get(sessionId)
+  if (cached && Date.now() - cached.cachedAt < CACHE_TTL) {
+    return cached.session
+  }
+
+  // Check Supabase
+  const sb = getSupabase()
+  if (sb) {
+    const { data } = await sb
+      .from('chat_sessions')
+      .select('*')
+      .eq('id', sessionId)
+      .single()
+
+    if (data) {
+      const session: Session = {
+        id: data.id,
+        channel: data.channel,
+        messages: (data.messages || []) as ConversationTurn[],
+        leadScore: data.lead_score || 0,
+        leadName: data.lead_name,
+        leadEmail: data.lead_email,
+        leadPhone: data.lead_phone,
+        status: data.status || 'active',
+      }
+      cache.set(sessionId, { session, cachedAt: Date.now() })
+      return session
     }
   }
+
+  // Create new
+  const session: Session = {
+    id: sessionId,
+    channel,
+    messages: [],
+    leadScore: 0,
+    leadName: null,
+    leadEmail: null,
+    leadPhone: null,
+    status: 'active',
+  }
+
+  if (sb) {
+    await sb.from('chat_sessions').upsert({
+      id: sessionId,
+      channel,
+      messages: [],
+      lead_score: 0,
+      status: 'active',
+    })
+  }
+
+  cache.set(sessionId, { session, cachedAt: Date.now() })
+  return session
+}
+
+async function persistSession(session: Session): Promise<void> {
+  // Keep last 20 turns
+  if (session.messages.length > 20) {
+    session.messages = session.messages.slice(-20)
+  }
+
+  cache.set(session.id, { session, cachedAt: Date.now() })
+
+  const sb = getSupabase()
+  if (!sb) return
+
+  await sb.from('chat_sessions').upsert({
+    id: session.id,
+    channel: session.channel,
+    messages: session.messages,
+    lead_score: session.leadScore,
+    lead_name: session.leadName,
+    lead_email: session.leadEmail,
+    lead_phone: session.leadPhone,
+    status: session.status,
+    updated_at: new Date().toISOString(),
+  })
 }
 
 // ============================================================
@@ -110,7 +186,7 @@ async function callLLM(messages: Array<{ role: string; content: string }>): Prom
 }
 
 // ============================================================
-// LEAD SCORING (BANT)
+// LEAD SCORING (BANT) + CONTACT EXTRACTION
 // ============================================================
 
 function scoreLead(messages: ConversationTurn[]): number {
@@ -134,6 +210,16 @@ function scoreLead(messages: ConversationTurn[]): number {
   return Math.min(score, 100)
 }
 
+function extractContactInfo(messages: ConversationTurn[]): {
+  email?: string; name?: string; phone?: string
+} {
+  const text = messages.filter(m => m.role === 'user').map(m => m.content).join(' ')
+  const email = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0]
+  const phone = text.match(/(?:\+?506)?[\s-]?\d{4}[\s-]?\d{4}/)?.[0]
+  const nameMatch = text.match(/(?:me llamo|soy|mi nombre es)\s+([A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)?)/i)
+  return { email: email || undefined, name: nameMatch?.[1], phone: phone || undefined }
+}
+
 // ============================================================
 // MAIN
 // ============================================================
@@ -141,11 +227,12 @@ function scoreLead(messages: ConversationTurn[]): number {
 export async function processMessage(
   sessionId: string,
   userMessage: string,
+  channel: 'web' | 'whatsapp' = 'web',
 ): Promise<EngineResponse> {
-  const session = getSession(sessionId)
+  const session = await getOrCreateSession(sessionId, channel)
 
   // Add user message
-  session.messages.push({ role: 'user', content: userMessage })
+  session.messages.push({ role: 'user', content: userMessage, ts: new Date().toISOString() })
 
   // Build LLM messages
   const llmMessages = [
@@ -157,12 +244,16 @@ export async function processMessage(
   const reply = await callLLM(llmMessages)
 
   // Save assistant response
-  session.messages.push({ role: 'assistant', content: reply })
+  session.messages.push({ role: 'assistant', content: reply, ts: new Date().toISOString() })
 
-  // Score
+  // Score + extract contact
   const leadScore = scoreLead(session.messages)
   session.leadScore = leadScore
-  saveSession(sessionId, session)
+
+  const contact = extractContactInfo(session.messages)
+  if (contact.email) session.leadEmail = contact.email
+  if (contact.name) session.leadName = contact.name
+  if (contact.phone) session.leadPhone = contact.phone
 
   // Notification check
   const lastUserMsg = userMessage.toLowerCase()
@@ -178,6 +269,11 @@ export async function processMessage(
     notifyReason = 'Pidió cotización/propuesta'
   }
 
+  if (shouldNotify) session.status = 'escalated'
+
+  // Persist to Supabase
+  await persistSession(session)
+
   // Suggested actions
   const userCount = session.messages.filter(m => m.role === 'user').length
   const suggestedActions = userCount <= 1
@@ -186,5 +282,5 @@ export async function processMessage(
       ? ['Agendar llamada con Carlos', 'Enviar specs por email']
       : ['Ver precios', 'Agendar demo']
 
-  return { message: reply, leadScore, shouldNotify, notifyReason, suggestedActions }
+  return { message: reply, leadScore, shouldNotify, notifyReason, suggestedActions, sessionId }
 }

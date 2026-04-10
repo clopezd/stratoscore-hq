@@ -27,6 +27,7 @@ import {
   Calculator,
   HeartPulse,
   Flame,
+  MessageCircle,
 } from 'lucide-react'
 import { Logo } from '@/shared/components/Logo'
 import { VidendumLogo } from '@/shared/components/VidendumLogo'
@@ -70,6 +71,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/fitsync',     label: 'FitSync AI',  icon: Flame,         ownerOnly: true, exact: false, section: 'clientes' },
 
   // Herramientas
+  { href: '/stratoscore-agent', label: 'Sales Agent', icon: MessageCircle, ownerOnly: true, exact: false, section: 'tools' },
   { href: '/agents',   label: 'Agentes',  icon: Cpu,      ownerOnly: true, exact: false, section: 'tools' },
   { href: '/chat',     label: 'Chat IA',  icon: Bot,      ownerOnly: true, section: 'tools' },
   { href: '/draw',     label: 'Draw',     icon: PenLine,  adminOnly: true, section: 'tools' },
