@@ -1,12 +1,9 @@
 /**
- * Logo — componente de imagen de marca unificado.
+ * Logo — componente de marca unificado.
  *
- * Usa el cubo isométrico oficial del brandboard de StratosCore.
- * Cuando hay un logo de tenant (multi-tenant), lo muestra en su lugar.
+ * Default: wordmark "stratos|Core" compacto.
+ * Cuando hay un logo de tenant (multi-tenant), muestra la imagen del tenant.
  */
-
-import Image from 'next/image'
-import logoSrc from '@/shared/assets/images/Logo.png'
 
 interface LogoProps {
   size?: number
@@ -31,13 +28,21 @@ export function Logo({ size = 40, src, className = '', alt = 'StratosCore' }: Lo
   }
 
   return (
-    <Image
-      src={logoSrc}
-      alt={alt}
-      width={size}
-      height={size}
+    <span
       className={className}
-      priority
-    />
+      style={{
+        fontFamily: "'Inter', system-ui, sans-serif",
+        fontWeight: 300,
+        fontSize: Math.max(11, size * 0.35),
+        letterSpacing: '0.08em',
+        color: 'currentColor',
+        display: 'inline-flex',
+        alignItems: 'center',
+        whiteSpace: 'nowrap',
+      }}
+      aria-label={alt}
+    >
+      stratos<span style={{ color: '#00F2FE', fontWeight: 300, margin: '0 1px' }}>|</span>Core
+    </span>
   )
 }

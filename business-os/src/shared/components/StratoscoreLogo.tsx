@@ -1,20 +1,12 @@
 /**
- * StratoscoreLogo — Identidad oficial de StratosCore.
- * Cubo isométrico del brandboard + wordmark "STRATOS | CORE".
- *
- * Variantes:
- * - 'icon'     → Cubo solo
- * - 'wordmark' → Cubo + "STRATOS | CORE" horizontal
- * - 'stacked'  → Cubo arriba + texto abajo
+ * StratoscoreLogo — Wordmark "stratos|Core" puro, sin iconos gráficos.
+ * Brand: Deep Carbon #001117, Electric Cyan #00F2FE
  */
-
-import Image from 'next/image'
-import logoSrc from '@/shared/assets/images/Logo.png'
 
 interface StratoscoreLogoProps {
   className?: string
   width?: number | string
-  variant?: 'icon' | 'wordmark' | 'stacked'
+  variant?: 'wordmark' | 'stacked' | 'compact'
 }
 
 export function StratoscoreLogo({
@@ -23,53 +15,62 @@ export function StratoscoreLogo({
   variant = 'wordmark',
 }: StratoscoreLogoProps) {
   const numWidth = typeof width === 'number' ? width : 200
-  const iconSize = variant === 'stacked' ? 48 : Math.max(24, Math.round(numWidth * 0.16))
+  const fontSize = variant === 'compact' ? 14 : Math.max(12, Math.round(numWidth * 0.085))
 
-  if (variant === 'icon') {
+  if (variant === 'compact') {
     return (
-      <Image
-        src={logoSrc}
-        alt="StratosCore"
-        width={typeof width === 'number' ? width : 40}
-        height={typeof width === 'number' ? width : 40}
+      <span
         className={className}
-        priority
-      />
+        style={{
+          fontFamily: "'Inter', system-ui, sans-serif",
+          fontWeight: 300,
+          fontSize,
+          letterSpacing: '0.08em',
+          color: 'currentColor',
+          whiteSpace: 'nowrap',
+        }}
+        aria-label="StratosCore"
+      >
+        stratos<span style={{ color: '#00F2FE', fontWeight: 300, margin: '0 1px' }}>|</span>Core
+      </span>
     )
   }
 
   if (variant === 'stacked') {
     return (
-      <div className={`flex flex-col items-center gap-2 ${className}`}>
-        <Image src={logoSrc} alt="StratosCore" width={iconSize} height={iconSize} priority />
-        <div className="flex items-center gap-1.5">
-          <span style={{ fontWeight: 700, fontSize: 18, letterSpacing: '0.15em', color: 'currentColor' }}>
-            STRATOS
-          </span>
-          <span style={{ color: '#00F2FE', fontSize: 18, fontWeight: 300 }}>|</span>
-          <span style={{ fontWeight: 700, fontSize: 18, letterSpacing: '0.15em', color: 'currentColor' }}>
-            CORE
-          </span>
-        </div>
+      <div className={`flex flex-col items-center ${className}`}>
+        <span
+          style={{
+            fontFamily: "'Inter', system-ui, sans-serif",
+            fontWeight: 300,
+            fontSize: Math.max(14, fontSize),
+            letterSpacing: '0.12em',
+            color: 'currentColor',
+            whiteSpace: 'nowrap',
+          }}
+          aria-label="StratosCore"
+        >
+          stratos<span style={{ color: '#00F2FE', fontWeight: 300, margin: '0 2px' }}>|</span>Core
+        </span>
       </div>
     )
   }
 
-  // Default: wordmark horizontal
-  const fontSize = Math.round(numWidth * 0.085)
-
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
-      <Image src={logoSrc} alt="StratosCore" width={iconSize} height={iconSize} priority />
-      <div className="flex items-center gap-1.5">
-        <span style={{ fontWeight: 700, fontSize, letterSpacing: '0.15em', color: 'currentColor' }}>
-          STRATOS
-        </span>
-        <span style={{ color: '#00F2FE', fontSize, fontWeight: 300 }}>|</span>
-        <span style={{ fontWeight: 700, fontSize, letterSpacing: '0.15em', color: 'currentColor' }}>
-          CORE
-        </span>
-      </div>
+    <div className={`flex items-center ${className}`}>
+      <span
+        style={{
+          fontFamily: "'Inter', system-ui, sans-serif",
+          fontWeight: 300,
+          fontSize,
+          letterSpacing: '0.12em',
+          color: 'currentColor',
+          whiteSpace: 'nowrap',
+        }}
+        aria-label="StratosCore"
+      >
+        stratos<span style={{ color: '#00F2FE', fontWeight: 300, margin: '0 2px' }}>|</span>Core
+      </span>
     </div>
   )
 }
