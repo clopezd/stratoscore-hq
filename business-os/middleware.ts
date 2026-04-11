@@ -132,6 +132,10 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     'Strict-Transport-Security',
     'max-age=31536000; includeSubDomains; preload'
   )
+  response.headers.set(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://*.supabase.co https://*.vercel-scripts.com https://*.vercel-insights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://openrouter.ai https://*.vercel-insights.com https://*.vercel-scripts.com https://api.huli.io https://wa.me; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+  )
   return response
 }
 
