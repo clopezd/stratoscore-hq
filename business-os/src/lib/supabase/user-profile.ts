@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export interface UserProfile {
   id: string
@@ -16,19 +17,28 @@ export interface UserProfile {
 }
 
 /**
- * Obtiene el perfil completo del usuario autenticado
+ * Obtiene el perfil completo del usuario autenticado.
+ * Acepta un cliente Supabase y userId opcionales para reusar
+ * el cliente existente y evitar contención del lock de cookies.
  */
-export async function getUserProfile(): Promise<UserProfile | null> {
+export async function getUserProfile(
+  existingClient?: SupabaseClient,
+  userId?: string
+): Promise<UserProfile | null> {
   try {
-    const supabase = await createClient()
+    const supabase = existingClient ?? await createClient()
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return null
+    let uid = userId
+    if (!uid) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return null
+      uid = user.id
+    }
 
     const { data, error } = await supabase
       .from('user_profiles')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', uid)
       .single()
 
     if (error) {
@@ -36,9 +46,8 @@ export async function getUserProfile(): Promise<UserProfile | null> {
       return null
     }
 
-    // Si no hay perfil, retornar null sin error
     if (!data) {
-      console.log('No user profile found for user:', user.id)
+      console.log('No user profile found for user:', uid)
       return null
     }
 
@@ -65,7 +74,7 @@ export function getRedirectPath(profile: UserProfile | null): string {
 
   // Admin → Mission Control
   if (profile.role === 'admin') {
-    return '/'
+    return '/dashboard'
   }
 
   // Cliente → Su business unit

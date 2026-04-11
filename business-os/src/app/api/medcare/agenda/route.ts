@@ -44,12 +44,16 @@ export async function GET(request: NextRequest) {
     const from = fromParam ? `${fromParam}T00:00:00Z` : `${date}T00:00:00Z`
     const to = toParam ? `${toParam}T23:59:59Z` : `${date}T23:59:59Z`
 
+    // Determinar limit según rango de fechas
+    const isRange = fromParam && toParam
+    const fetchLimit = isRange ? 200 : 50
+
     // Consultar todos los doctores/equipos en paralelo
     const allSources = [...EQUIPOS_AGENDA, ...DOCTORES_AGENDA]
     const results = await Promise.allSettled(
       allSources.map(async (source) => {
         try {
-          const data = await huli.listDoctorAppointments(source.id, from, to, { limit: 20 })
+          const data = await huli.listDoctorAppointments(source.id, from, to, { limit: fetchLimit })
           return {
             ...source,
             citas: (data.appointments || []).map(a => ({
@@ -59,7 +63,8 @@ export async function GET(request: NextRequest) {
               horaFin: a.timeTo?.substring(0, 5),
               paciente: a.idPatientFile || null,
               estado: a.statusAppointment,
-              notas: a.notes,
+              notas: a.notes || null,
+              colorCita: a.color || null,
               confirmadaPaciente: a.isConfirmedByPatient,
               primeraCita: a.isFirstTimePatient,
               canceladoPorPaciente: a.isStatusModifiedByPatient,

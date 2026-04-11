@@ -15,13 +15,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect(`/login${next}`)
   }
 
-  // Obtener perfil del usuario - manejar errores gracefully
+  // Reusar el mismo cliente Supabase para evitar contención del lock de cookies
   let userProfile = null
   try {
-    userProfile = await getUserProfile()
+    userProfile = await getUserProfile(supabase, user.id)
   } catch (error) {
     console.error('Error loading user profile in layout:', error)
-    // Continuar sin perfil - el DashboardShell puede manejarlo
   }
 
   return <DashboardShell userProfile={userProfile}>{children}</DashboardShell>

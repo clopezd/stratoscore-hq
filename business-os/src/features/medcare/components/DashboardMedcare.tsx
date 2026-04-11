@@ -5,7 +5,6 @@ import { getEstadisticas, getLeads } from '../services/leadsService'
 import { getServicios } from '../services/serviciosService'
 import type { LeadMedcare, ServicioMedcare } from '../types'
 import { GestionLeadsMedcare } from './GestionLeadsMedcare'
-import { ImportarPacientesModal } from './ImportarPacientesModal'
 
 interface Stats {
   total: number
@@ -40,8 +39,7 @@ export function DashboardMedcare() {
   const [servicios, setServicios] = useState<ServicioMedcare[]>([])
   const [huliData, setHuliData] = useState<HuliAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<'dashboard' | 'agenda' | 'inteligencia' | 'leads' | 'pipeline'>('dashboard')
-  const [showImport, setShowImport] = useState(false)
+  const [tab, setTab] = useState<'dashboard' | 'agenda' | 'resonancias' | 'inteligencia' | 'leads' | 'pipeline'>('dashboard')
 
   function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
     return Promise.race([
@@ -99,73 +97,38 @@ export function DashboardMedcare() {
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto bg-white dark:bg-gray-950 min-h-screen text-gray-900 dark:text-white">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div className="flex flex-col gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">MedCare Imagenología</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">Mamografía Digital + Ultrasonido</p>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setShowImport(true)}
-            className="px-4 py-2 rounded-lg text-sm font-medium bg-amber-600 hover:bg-amber-700 text-white transition flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-            Importar CSV
-          </button>
-          <button
-            onClick={() => setTab('dashboard')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              tab === 'dashboard'
-                ? 'bg-cyan-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'
-            }`}
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={() => setTab('agenda')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              tab === 'agenda'
-                ? 'bg-cyan-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'
-            }`}
-          >
-            Agenda
-          </button>
-          <button
-            onClick={() => setTab('inteligencia')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              tab === 'inteligencia'
-                ? 'bg-cyan-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'
-            }`}
-          >
-            Inteligencia
-          </button>
-          <button
-            onClick={() => setTab('pipeline')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              tab === 'pipeline'
-                ? 'bg-cyan-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'
-            }`}
-          >
-            Pipeline
-          </button>
-          <button
-            onClick={() => setTab('leads')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              tab === 'leads'
-                ? 'bg-cyan-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'
-            }`}
-          >
-            Leads {stats && stats.nuevos > 0 && (
-              <span className="ml-1 px-1.5 py-0.5 bg-red-500 text-white text-xs rounded-full">{stats.nuevos}</span>
-            )}
-          </button>
+        {/* Tabs — scrollable en mobile */}
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 min-w-max">
+            {([
+              { key: 'dashboard', label: 'Dashboard' },
+              { key: 'agenda', label: 'Agenda' },
+              { key: 'resonancias', label: 'Resonancias' },
+              { key: 'inteligencia', label: 'Inteligencia' },
+              { key: 'pipeline', label: 'Pipeline' },
+              { key: 'leads', label: 'Leads' },
+            ] as { key: typeof tab; label: string }[]).map(t => (
+              <button key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition whitespace-nowrap ${
+                  tab === t.key
+                    ? t.key === 'resonancias'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                }`}>
+                {t.label}
+                {t.key === 'leads' && stats && stats.nuevos > 0 && (
+                  <span className="ml-1 px-1.5 py-0.5 bg-red-500 text-white text-[10px] rounded-full">{stats.nuevos}</span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -512,6 +475,10 @@ export function DashboardMedcare() {
         <InteligenciaView />
       )}
 
+      {tab === 'resonancias' && (
+        <ResonanciasView />
+      )}
+
       {tab === 'agenda' && (
         <AgendaCompleta />
       )}
@@ -526,15 +493,6 @@ export function DashboardMedcare() {
         }} />
       )}
 
-      {/* Modal de importación */}
-      <ImportarPacientesModal
-        open={showImport}
-        onClose={() => setShowImport(false)}
-        onImportComplete={() => {
-          loadData()
-          setTab('leads')
-        }}
-      />
     </div>
   )
 }
@@ -868,6 +826,7 @@ interface AgendaCita {
   paciente: string | null
   estado: string
   notas: string | null
+  colorCita: string | null
   confirmadaPaciente: boolean
   primeraCita: boolean
   canceladoPorPaciente: boolean
@@ -896,6 +855,25 @@ function AgendaCompleta() {
   const [resumen, setResumen] = useState({ totalCitas: 0, citasPendientes: 0, citasCompletadas: 0 })
   const [filtroTipo, setFiltroTipo] = useState<AgendaFilter>('todos')
   const [filtroEspecialidad, setFiltroEspecialidad] = useState<string>('todas')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  function toggleSource(id: string) {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function selectAll() {
+    const all = [...equipos, ...doctores].map(s => s.id)
+    setSelectedIds(new Set(all))
+  }
+
+  function clearSelection() {
+    setSelectedIds(new Set())
+  }
 
   function getDateRange(): { from: string; to: string } {
     if (vista === 'dia') {
@@ -948,6 +926,7 @@ function AgendaCompleta() {
   }
 
   function renderSource(source: AgendaSource) {
+    const completadas = source.citas.filter(c => c.estado === 'COMPLETED').length
     return (
       <div key={source.id} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between"
@@ -956,9 +935,14 @@ function AgendaCompleta() {
             <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{source.nombre}</h4>
             {source.especialidad && <p className="text-xs text-gray-500">{source.especialidad}</p>}
           </div>
-          <span className="text-xs font-bold px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-            {source.total} citas
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold px-2 py-1 rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">
+              {completadas} realizadas
+            </span>
+            <span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500">
+              {source.total} total
+            </span>
+          </div>
         </div>
         {source.citas.length === 0 ? (
           <p className="px-4 py-3 text-xs text-gray-400">Sin citas para este día</p>
@@ -1097,37 +1081,126 @@ function AgendaCompleta() {
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        {/* Filtro tipo: Todos / Equipos / Doctores */}
-        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-          {([
-            { key: 'todos', label: 'Todos' },
-            { key: 'equipos', label: 'Equipos' },
-            { key: 'doctores', label: 'Doctores' },
-          ] as { key: AgendaFilter; label: string }[]).map(f => (
-            <button key={f.key}
-              onClick={() => setFiltroTipo(f.key)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${
-                filtroTipo === f.key
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-              }`}>
-              {f.label}
-            </button>
-          ))}
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Filtro tipo: Todos / Equipos / Doctores */}
+          <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            {([
+              { key: 'todos', label: 'Todos' },
+              { key: 'equipos', label: 'Equipos' },
+              { key: 'doctores', label: 'Doctores' },
+            ] as { key: AgendaFilter; label: string }[]).map(f => (
+              <button key={f.key}
+                onClick={() => { setFiltroTipo(f.key); clearSelection() }}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${
+                  filtroTipo === f.key
+                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                }`}>
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Filtro por especialidad */}
+          {(filtroTipo === 'todos' || filtroTipo === 'doctores') && (
+            <select value={filtroEspecialidad}
+              onChange={e => setFiltroEspecialidad(e.target.value)}
+              className="px-3 py-1.5 text-xs border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+              <option value="todas">Todas las especialidades</option>
+              {[...new Set(doctores.map(d => d.especialidad).filter(Boolean))].sort().map(esp => (
+                <option key={esp} value={esp!}>{esp}</option>
+              ))}
+            </select>
+          )}
         </div>
 
-        {/* Filtro por especialidad */}
-        {(filtroTipo === 'todos' || filtroTipo === 'doctores') && (
-          <select value={filtroEspecialidad}
-            onChange={e => setFiltroEspecialidad(e.target.value)}
-            className="px-3 py-1.5 text-xs border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-            <option value="todas">Todas las especialidades</option>
-            {[...new Set(doctores.map(d => d.especialidad).filter(Boolean))].sort().map(esp => (
-              <option key={esp} value={esp!}>{esp}</option>
-            ))}
-          </select>
-        )}
+        {/* Multi-select de equipos/doctores individuales */}
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
+              Filtrar por equipo / doctor
+            </span>
+            <div className="flex gap-2">
+              {selectedIds.size > 0 && (
+                <button onClick={clearSelection}
+                  className="text-[10px] text-red-500 hover:text-red-600 font-medium">
+                  Limpiar
+                </button>
+              )}
+              <button onClick={selectAll}
+                className="text-[10px] text-cyan-600 hover:text-cyan-700 font-medium">
+                Todos
+              </button>
+            </div>
+          </div>
+
+          {/* Chips de equipos */}
+          {(filtroTipo === 'todos' || filtroTipo === 'equipos') && equipos.length > 0 && (
+            <div className="mb-2">
+              <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Equipos</span>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {equipos.map(eq => {
+                  const isSelected = selectedIds.has(eq.id)
+                  const completadas = eq.citas.filter(c => c.estado === 'COMPLETED').length
+                  return (
+                    <button key={eq.id} onClick={() => toggleSource(eq.id)}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
+                        isSelected
+                          ? 'border-transparent text-white shadow-sm'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500'
+                      }`}
+                      style={isSelected ? { backgroundColor: `#${eq.color}` } : undefined}>
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? 'bg-white/40' : ''}`}
+                        style={!isSelected ? { backgroundColor: `#${eq.color}` } : undefined} />
+                      {eq.nombre}
+                      <span className={isSelected ? 'text-white/80 text-[10px]' : 'text-[10px] text-gray-500'}>
+                        {completadas}/{eq.total}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Chips de doctores */}
+          {(filtroTipo === 'todos' || filtroTipo === 'doctores') && doctores.length > 0 && (
+            <div>
+              <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Doctores</span>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {doctores
+                  .filter(d => filtroEspecialidad === 'todas' || d.especialidad === filtroEspecialidad)
+                  .map(doc => {
+                    const isSelected = selectedIds.has(doc.id)
+                    const completadas = doc.citas.filter(c => c.estado === 'COMPLETED').length
+                    return (
+                      <button key={doc.id} onClick={() => toggleSource(doc.id)}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
+                          isSelected
+                            ? 'border-transparent text-white shadow-sm'
+                            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500'
+                        }`}
+                        style={isSelected ? { backgroundColor: `#${doc.color}` } : undefined}>
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? 'bg-white/40' : ''}`}
+                          style={!isSelected ? { backgroundColor: `#${doc.color}` } : undefined} />
+                        {doc.nombre}
+                        <span className={isSelected ? 'text-white/80 text-[10px]' : 'text-[10px] text-gray-500'}>
+                          {completadas}/{doc.total}
+                        </span>
+                      </button>
+                    )
+                  })}
+              </div>
+            </div>
+          )}
+
+          {selectedIds.size > 0 && (
+            <p className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-2 font-medium">
+              {selectedIds.size} seleccionado{selectedIds.size !== 1 ? 's' : ''} — KPIs filtrados
+            </p>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -1149,6 +1222,11 @@ function AgendaCompleta() {
           )
         }
 
+        // Filtrar por equipos/doctores seleccionados individualmente
+        if (selectedIds.size > 0) {
+          sourcesVisibles = sourcesVisibles.filter(s => selectedIds.has(s.id))
+        }
+
         const allCitas = sourcesVisibles.flatMap(s => s.citas)
         const kpiTotal = allCitas.length
         const kpiPendientes = allCitas.filter(c => c.estado === 'BOOKED').length
@@ -1156,12 +1234,26 @@ function AgendaCompleta() {
         const kpiCanceladas = allCitas.filter(c => c.estado === 'CANCELLED').length
         const kpiNoShow = allCitas.filter(c => c.estado === 'NOSHOW').length
 
-        const filtroActivo = filtroTipo !== 'todos' || filtroEspecialidad !== 'todas'
+        // Promedio de completadas por equipo/doctor según vista
+        const numSources = sourcesVisibles.length || 1
+        let diasEnRango = 1
+        if (vista === 'mes') {
+          const [y, m] = mes.split('-').map(Number)
+          diasEnRango = new Date(y, m, 0).getDate()
+        } else if (vista === 'año') {
+          diasEnRango = (Number(año) % 4 === 0 && (Number(año) % 100 !== 0 || Number(año) % 400 === 0)) ? 366 : 365
+        }
+        const kpiPromedio = vista === 'dia'
+          ? numSources > 0 ? (kpiCompletadas / numSources).toFixed(1) : '0'
+          : numSources > 0 ? (kpiCompletadas / numSources / diasEnRango).toFixed(1) : '0'
+        const promedioLabel = vista === 'dia' ? 'Prom/equipo' : vista === 'mes' ? 'Prom/equipo/día' : 'Prom/equipo/día'
+
+        const filtroActivo = filtroTipo !== 'todos' || filtroEspecialidad !== 'todas' || selectedIds.size > 0
 
         return (
         <>
-          {/* Resumen del día — reactivo a filtros */}
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+          {/* Resumen — reactivo a filtros */}
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
             <div className="bg-blue-50 dark:bg-blue-950 rounded-xl p-4 text-center">
               <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{kpiTotal}</p>
               <p className="text-xs text-blue-600">Total</p>
@@ -1174,6 +1266,10 @@ function AgendaCompleta() {
               <p className="text-2xl font-bold text-green-700 dark:text-green-300">{kpiCompletadas}</p>
               <p className="text-xs text-green-600">Completadas</p>
             </div>
+            <div className="bg-cyan-50 dark:bg-cyan-950 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-cyan-700 dark:text-cyan-300">{kpiPromedio}</p>
+              <p className="text-xs text-cyan-600">{promedioLabel}</p>
+            </div>
             <div className="bg-red-50 dark:bg-red-950 rounded-xl p-4 text-center hidden sm:block">
               <p className="text-2xl font-bold text-red-700 dark:text-red-300">{kpiCanceladas}</p>
               <p className="text-xs text-red-600">Canceladas</p>
@@ -1185,42 +1281,149 @@ function AgendaCompleta() {
           </div>
           {filtroActivo && (
             <p className="text-xs text-gray-400">
-              Mostrando: {filtroTipo === 'equipos' ? 'Equipos' : filtroTipo === 'doctores' ? 'Doctores' : 'Todos'}
+              Mostrando: {selectedIds.size > 0
+                ? sourcesVisibles.map(s => s.nombre).join(', ')
+                : filtroTipo === 'equipos' ? 'Equipos' : filtroTipo === 'doctores' ? 'Doctores' : 'Todos'}
               {filtroEspecialidad !== 'todas' && ` — ${filtroEspecialidad}`}
-              {' '}({kpiTotal} de {resumen.totalCitas} citas totales del día)
+              {' '}({kpiTotal} de {resumen.totalCitas} citas totales)
             </p>
           )}
 
-          {/* Equipos — filtrado */}
-          {(filtroTipo === 'todos' || filtroTipo === 'equipos') && equipos.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                Equipos
-                <span className="ml-2 text-xs font-normal text-gray-400">
-                  {equipos.reduce((s, e) => s + e.total, 0)} citas
-                </span>
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {equipos.filter(e => e.total > 0).map(renderSource)}
+          {/* Desglose por tipo de estudio por equipo/doctor */}
+          {sourcesVisibles.length > 0 && (() => {
+            // Agrupar citas por source y luego por notas (tipo de estudio)
+            const sourcesConTipos = sourcesVisibles
+              .filter(s => s.citas.length > 0)
+              .map(source => {
+                const porTipo: Record<string, { total: number; completadas: number; pendientes: number; canceladas: number }> = {}
+                for (const cita of source.citas) {
+                  const tipo = cita.notas?.trim() || 'Sin especificar'
+                  if (!porTipo[tipo]) porTipo[tipo] = { total: 0, completadas: 0, pendientes: 0, canceladas: 0 }
+                  porTipo[tipo].total++
+                  if (cita.estado === 'COMPLETED') porTipo[tipo].completadas++
+                  else if (cita.estado === 'BOOKED') porTipo[tipo].pendientes++
+                  else if (cita.estado === 'CANCELLED') porTipo[tipo].canceladas++
+                }
+                return { ...source, porTipo }
+              })
+
+            if (sourcesConTipos.length === 0) return null
+
+            return (
+              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                  Desglose por Tipo de Estudio
+                </h3>
+                <div className="space-y-5">
+                  {sourcesConTipos.map(source => {
+                    const tipos = Object.entries(source.porTipo).sort(([,a], [,b]) => b.total - a.total)
+                    const maxTotal = Math.max(...tipos.map(([,v]) => v.total), 1)
+                    return (
+                      <div key={source.id}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: `#${source.color}` }} />
+                          <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{source.nombre}</span>
+                          {source.especialidad && <span className="text-[10px] text-gray-400">({source.especialidad})</span>}
+                        </div>
+                        <div className="space-y-1.5 pl-5">
+                          {tipos.map(([tipo, counts]) => (
+                            <div key={tipo} className="flex items-center gap-2">
+                              <span className="text-xs text-gray-600 dark:text-gray-400 w-48 truncate shrink-0" title={tipo}>
+                                {tipo}
+                              </span>
+                              <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-4 relative overflow-hidden flex">
+                                {counts.completadas > 0 && (
+                                  <div className="h-4 bg-green-500 transition-all"
+                                    style={{ width: `${(counts.completadas / maxTotal) * 100}%` }} />
+                                )}
+                                {counts.pendientes > 0 && (
+                                  <div className="h-4 bg-amber-400 transition-all"
+                                    style={{ width: `${(counts.pendientes / maxTotal) * 100}%` }} />
+                                )}
+                                {counts.canceladas > 0 && (
+                                  <div className="h-4 bg-red-400 transition-all"
+                                    style={{ width: `${(counts.canceladas / maxTotal) * 100}%` }} />
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="text-[10px] font-bold text-green-600">{counts.completadas}</span>
+                                <span className="text-[10px] text-gray-400">/</span>
+                                <span className="text-[10px] text-gray-500">{counts.total}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+                {/* Leyenda */}
+                <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-sm bg-green-500" />
+                    <span className="text-[10px] text-gray-500">Realizadas</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-sm bg-amber-400" />
+                    <span className="text-[10px] text-gray-500">Pendientes</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-sm bg-red-400" />
+                    <span className="text-[10px] text-gray-500">Canceladas</span>
+                  </div>
+                </div>
               </div>
-              {equipos.every(e => e.total === 0) && (
-                <p className="text-sm text-gray-400">Sin citas en equipos para este día</p>
-              )}
-            </div>
-          )}
+            )
+          })()}
+
+          {/* Equipos — filtrado */}
+          {(filtroTipo === 'todos' || filtroTipo === 'equipos') && equipos.length > 0 && (() => {
+            const filtrados = selectedIds.size > 0
+              ? equipos.filter(e => selectedIds.has(e.id))
+              : equipos
+            const conCitas = filtrados.filter(e => e.total > 0)
+            if (selectedIds.size > 0 && filtrados.length === 0) return null
+            return (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                  Equipos
+                  <span className="ml-2 text-xs font-normal text-green-600">
+                    {filtrados.reduce((s, e) => s + e.citas.filter(c => c.estado === 'COMPLETED').length, 0)} realizadas
+                  </span>
+                  <span className="ml-1 text-xs font-normal text-gray-400">
+                    / {filtrados.reduce((s, e) => s + e.total, 0)} total
+                  </span>
+                </h3>
+                {conCitas.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {conCitas.map(renderSource)}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">Sin citas en equipos para este período</p>
+                )}
+              </div>
+            )
+          })()}
 
           {/* Doctores — filtrado */}
           {(filtroTipo === 'todos' || filtroTipo === 'doctores') && doctores.length > 0 && (() => {
-            const filtrados = filtroEspecialidad === 'todas'
+            let filtrados = filtroEspecialidad === 'todas'
               ? doctores
               : doctores.filter(d => d.especialidad === filtroEspecialidad)
+            if (selectedIds.size > 0) {
+              filtrados = filtrados.filter(d => selectedIds.has(d.id))
+            }
+            if (selectedIds.size > 0 && filtrados.length === 0) return null
             const conCitas = filtrados.filter(d => d.total > 0)
             return (
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                   Doctores {filtroEspecialidad !== 'todas' && `— ${filtroEspecialidad}`}
-                  <span className="ml-2 text-xs font-normal text-gray-400">
-                    {filtrados.reduce((s, d) => s + d.total, 0)} citas
+                  <span className="ml-2 text-xs font-normal text-green-600">
+                    {filtrados.reduce((s, d) => s + d.citas.filter(c => c.estado === 'COMPLETED').length, 0)} realizadas
+                  </span>
+                  <span className="ml-1 text-xs font-normal text-gray-400">
+                    / {filtrados.reduce((s, d) => s + d.total, 0)} total
                   </span>
                 </h3>
                 {conCitas.length > 0 ? (
@@ -1229,7 +1432,7 @@ function AgendaCompleta() {
                   </div>
                 ) : (
                   <p className="text-sm text-gray-400">
-                    Sin consultas {filtroEspecialidad !== 'todas' ? `de ${filtroEspecialidad}` : 'médicas'} para este día
+                    Sin consultas {filtroEspecialidad !== 'todas' ? `de ${filtroEspecialidad}` : 'médicas'} para este período
                   </p>
                 )}
               </div>
@@ -1239,6 +1442,485 @@ function AgendaCompleta() {
         )
       })()}
 
+    </div>
+  )
+}
+
+// ── Resonancias Analytics View ─────────────────────────────────
+
+const RESONANCIA_EQUIPOS = [
+  { id: '79739', nombre: 'Resonancia 1.5T', color: '3498DB' },
+  { id: '27377', nombre: 'Resonancia 0.4T', color: '2980B9' },
+]
+
+interface ResoCita {
+  id: string
+  fecha: string
+  hora: string
+  horaFin: string
+  estado: string
+  notas: string | null
+  colorCita: string | null
+}
+
+interface ResoSource {
+  id: string
+  nombre: string
+  color: string
+  citas: ResoCita[]
+  total: number
+}
+
+interface ResoTipoStats {
+  tipo: string
+  total: number
+  completadas: number
+  pendientes: number
+  canceladas: number
+  noShow: number
+  tasaCompletado: number
+}
+
+function ResonanciasView() {
+  const [vista, setVista] = useState<'semana' | 'mes' | 'año'>('mes')
+  const [mes, setMes] = useState(() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}` })
+  const [año, setAño] = useState(() => String(new Date().getFullYear()))
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<ResoSource[]>([])
+
+  function getDateRange(): { from: string; to: string } {
+    if (vista === 'semana') {
+      const now = new Date()
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      return { from: weekAgo.toISOString().split('T')[0], to: now.toISOString().split('T')[0] }
+    } else if (vista === 'mes') {
+      const [y, m] = mes.split('-').map(Number)
+      const lastDay = new Date(y, m, 0).getDate()
+      return { from: `${mes}-01`, to: `${mes}-${String(lastDay).padStart(2, '0')}` }
+    } else {
+      return { from: `${año}-01-01`, to: `${año}-12-31` }
+    }
+  }
+
+  function loadData() {
+    setLoading(true)
+    const { from, to } = getDateRange()
+    fetch(`/api/medcare/agenda?from=${from}&to=${to}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(result => {
+        if (result?.equipos) {
+          const resonancias = (result.equipos as ResoSource[]).filter(
+            e => RESONANCIA_EQUIPOS.some(r => r.id === e.id)
+          )
+          setData(resonancias)
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { loadData() }, [vista, mes, año])
+
+  // ── Cálculos ──────────────────────────────────────────────
+
+  const allCitas = data.flatMap(s => s.citas)
+  const totalCitas = allCitas.length
+  const completadas = allCitas.filter(c => c.estado === 'COMPLETED').length
+  const pendientes = allCitas.filter(c => c.estado === 'BOOKED').length
+  const canceladas = allCitas.filter(c => c.estado === 'CANCELLED').length
+  const noShow = allCitas.filter(c => c.estado === 'NOSHOW').length
+  const tasaCompletado = totalCitas > 0 ? Math.round((completadas / totalCitas) * 100) : 0
+  const tasaCancelacion = totalCitas > 0 ? Math.round((canceladas / totalCitas) * 100) : 0
+
+  // Días en el rango para promedios
+  let diasRango = 1
+  if (vista === 'semana') diasRango = 7
+  else if (vista === 'mes') { const [y, m] = mes.split('-').map(Number); diasRango = new Date(y, m, 0).getDate() }
+  else diasRango = 365
+
+  const promDiario15T = data.find(d => d.id === '79739')
+    ? (data.find(d => d.id === '79739')!.citas.filter(c => c.estado === 'COMPLETED').length / diasRango).toFixed(1)
+    : '0'
+  const promDiario04T = data.find(d => d.id === '27377')
+    ? (data.find(d => d.id === '27377')!.citas.filter(c => c.estado === 'COMPLETED').length / diasRango).toFixed(1)
+    : '0'
+
+  // Agrupar por tipo de estudio (notas)
+  function getTipoStats(citas: ResoCita[]): ResoTipoStats[] {
+    const map: Record<string, ResoTipoStats> = {}
+    for (const c of citas) {
+      const tipo = c.notas?.trim() || 'Sin especificar'
+      if (!map[tipo]) map[tipo] = { tipo, total: 0, completadas: 0, pendientes: 0, canceladas: 0, noShow: 0, tasaCompletado: 0 }
+      map[tipo].total++
+      if (c.estado === 'COMPLETED') map[tipo].completadas++
+      else if (c.estado === 'BOOKED') map[tipo].pendientes++
+      else if (c.estado === 'CANCELLED') map[tipo].canceladas++
+      else if (c.estado === 'NOSHOW') map[tipo].noShow++
+    }
+    return Object.values(map).map(t => ({
+      ...t,
+      tasaCompletado: t.total > 0 ? Math.round((t.completadas / t.total) * 100) : 0,
+    })).sort((a, b) => b.total - a.total)
+  }
+
+  // Agrupar por día para gráfico de líneas
+  function getCitasPorDia(citas: ResoCita[]): { fecha: string; total: number; completadas: number }[] {
+    const map: Record<string, { total: number; completadas: number }> = {}
+    for (const c of citas) {
+      const f = c.fecha
+      if (!f) continue
+      if (!map[f]) map[f] = { total: 0, completadas: 0 }
+      map[f].total++
+      if (c.estado === 'COMPLETED') map[f].completadas++
+    }
+    return Object.entries(map)
+      .map(([fecha, v]) => ({ fecha, ...v }))
+      .sort((a, b) => a.fecha.localeCompare(b.fecha))
+  }
+
+  // ── Render ──────────────────────────────────────────────
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Analytics de Resonancias</h2>
+          <p className="text-xs text-gray-500">Resonancia 1.5T + Resonancia 0.4T — Comportamiento y tipos de estudio</p>
+        </div>
+        <div className="flex gap-2">
+          {/* Selector de periodo */}
+          <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            {(['semana', 'mes', 'año'] as const).map(v => (
+              <button key={v} onClick={() => setVista(v)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${
+                  vista === v ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500'
+                }`}>
+                {v === 'semana' ? 'Semana' : v === 'mes' ? 'Mes' : 'Año'}
+              </button>
+            ))}
+          </div>
+          {vista === 'mes' && (
+            <input type="month" value={mes} onChange={e => setMes(e.target.value)}
+              className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
+          )}
+          {vista === 'año' && (
+            <select value={año} onChange={e => setAño(e.target.value)}
+              className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+              {[2024, 2025, 2026, 2027].map(y => <option key={y} value={String(y)}>{y}</option>)}
+            </select>
+          )}
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-16">
+          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-gray-500">Cargando datos de resonancias...</p>
+        </div>
+      ) : (
+        <>
+          {/* KPIs generales */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+            <div className="bg-blue-50 dark:bg-blue-950 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{totalCitas}</p>
+              <p className="text-[10px] text-blue-600">Total Citas</p>
+            </div>
+            <div className="bg-green-50 dark:bg-green-950 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-green-700 dark:text-green-300">{completadas}</p>
+              <p className="text-[10px] text-green-600">Realizadas</p>
+            </div>
+            <div className="bg-amber-50 dark:bg-amber-950 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">{pendientes}</p>
+              <p className="text-[10px] text-amber-600">Pendientes</p>
+            </div>
+            <div className="bg-red-50 dark:bg-red-950 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-red-700 dark:text-red-300">{canceladas}</p>
+              <p className="text-[10px] text-red-600">Canceladas</p>
+            </div>
+            <div className="bg-emerald-50 dark:bg-emerald-950 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{tasaCompletado}%</p>
+              <p className="text-[10px] text-emerald-600">Tasa Completado</p>
+            </div>
+            <div className="bg-rose-50 dark:bg-rose-950 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-rose-700 dark:text-rose-300">{tasaCancelacion}%</p>
+              <p className="text-[10px] text-rose-600">Tasa Cancelación</p>
+            </div>
+            <div className="bg-sky-50 dark:bg-sky-950 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-sky-700 dark:text-sky-300">{promDiario15T}</p>
+              <p className="text-[10px] text-sky-600">Prom/día 1.5T</p>
+            </div>
+            <div className="bg-indigo-50 dark:bg-indigo-950 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-indigo-700 dark:text-indigo-300">{promDiario04T}</p>
+              <p className="text-[10px] text-indigo-600">Prom/día 0.4T</p>
+            </div>
+          </div>
+
+          {/* Comparativa 1.5T vs 0.4T — Gráfico de barras */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {data.map(source => {
+              const eq = RESONANCIA_EQUIPOS.find(r => r.id === source.id)
+              const comp = source.citas.filter(c => c.estado === 'COMPLETED').length
+              const pend = source.citas.filter(c => c.estado === 'BOOKED').length
+              const canc = source.citas.filter(c => c.estado === 'CANCELLED').length
+              const ns = source.citas.filter(c => c.estado === 'NOSHOW').length
+              const tasa = source.total > 0 ? Math.round((comp / source.total) * 100) : 0
+              return (
+                <div key={source.id} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="w-4 h-4 rounded-full" style={{ backgroundColor: `#${eq?.color || source.color}` }} />
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">{source.nombre}</h3>
+                    <span className="ml-auto text-xs text-gray-400">{source.total} citas totales</span>
+                  </div>
+                  {/* Barra de distribución por estado */}
+                  <div className="flex rounded-lg overflow-hidden h-8 mb-3">
+                    {comp > 0 && <div className="bg-green-500 flex items-center justify-center" style={{ width: `${(comp / Math.max(source.total, 1)) * 100}%` }}>
+                      <span className="text-[10px] font-bold text-white">{comp}</span>
+                    </div>}
+                    {pend > 0 && <div className="bg-amber-400 flex items-center justify-center" style={{ width: `${(pend / Math.max(source.total, 1)) * 100}%` }}>
+                      <span className="text-[10px] font-bold text-white">{pend}</span>
+                    </div>}
+                    {canc > 0 && <div className="bg-red-400 flex items-center justify-center" style={{ width: `${(canc / Math.max(source.total, 1)) * 100}%` }}>
+                      <span className="text-[10px] font-bold text-white">{canc}</span>
+                    </div>}
+                    {ns > 0 && <div className="bg-orange-400 flex items-center justify-center" style={{ width: `${(ns / Math.max(source.total, 1)) * 100}%` }}>
+                      <span className="text-[10px] font-bold text-white">{ns}</span>
+                    </div>}
+                    {source.total === 0 && <div className="bg-gray-200 dark:bg-gray-700 w-full" />}
+                  </div>
+                  <div className="flex gap-3 text-[10px]">
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-green-500" />Realizadas {comp}</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-amber-400" />Pendientes {pend}</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-red-400" />Canceladas {canc}</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-orange-400" />No Show {ns}</span>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <span className="text-xs text-gray-500">Tasa de completado</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div className="h-2 rounded-full bg-green-500 transition-all" style={{ width: `${tasa}%` }} />
+                      </div>
+                      <span className={`text-sm font-bold ${tasa >= 70 ? 'text-green-600' : tasa >= 40 ? 'text-amber-600' : 'text-red-600'}`}>{tasa}%</span>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Gráfico de líneas — Tendencia diaria */}
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Tendencia Diaria — Estudios Realizados</h3>
+            {(() => {
+              const reso15 = data.find(d => d.id === '79739')
+              const reso04 = data.find(d => d.id === '27377')
+              const dias15 = getCitasPorDia(reso15?.citas || [])
+              const dias04 = getCitasPorDia(reso04?.citas || [])
+
+              // Unificar todas las fechas
+              const allDates = [...new Set([...dias15.map(d => d.fecha), ...dias04.map(d => d.fecha)])].sort()
+              if (allDates.length === 0) {
+                return <p className="text-sm text-gray-400 text-center py-8">Sin datos para el período seleccionado</p>
+              }
+
+              const maxVal = Math.max(
+                ...dias15.map(d => d.completadas),
+                ...dias04.map(d => d.completadas),
+                1
+              )
+              const chartH = 180
+              const barW = Math.max(Math.min(Math.floor(700 / allDates.length) - 4, 28), 6)
+
+              return (
+                <div className="overflow-x-auto">
+                  <div className="min-w-[500px]">
+                    {/* Eje Y labels */}
+                    <div className="flex">
+                      <div className="w-8 flex flex-col justify-between text-[9px] text-gray-400 pr-1" style={{ height: chartH }}>
+                        <span>{maxVal}</span>
+                        <span>{Math.round(maxVal / 2)}</span>
+                        <span>0</span>
+                      </div>
+                      {/* Barras */}
+                      <div className="flex-1 relative" style={{ height: chartH }}>
+                        {/* Grid lines */}
+                        <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                          {[0, 1, 2].map(i => <div key={i} className="border-b border-gray-100 dark:border-gray-800" />)}
+                        </div>
+                        {/* Bars */}
+                        <div className="absolute inset-0 flex items-end justify-around gap-0.5">
+                          {allDates.map(fecha => {
+                            const v15 = dias15.find(d => d.fecha === fecha)?.completadas || 0
+                            const v04 = dias04.find(d => d.fecha === fecha)?.completadas || 0
+                            return (
+                              <div key={fecha} className="flex items-end gap-0.5 group relative" style={{ height: '100%' }}>
+                                <div className="rounded-t transition-all hover:opacity-80"
+                                  style={{
+                                    width: barW / 2,
+                                    height: `${(v15 / maxVal) * 100}%`,
+                                    backgroundColor: '#3498DB',
+                                    minHeight: v15 > 0 ? 4 : 0,
+                                  }} />
+                                <div className="rounded-t transition-all hover:opacity-80"
+                                  style={{
+                                    width: barW / 2,
+                                    height: `${(v04 / maxVal) * 100}%`,
+                                    backgroundColor: '#2980B9',
+                                    minHeight: v04 > 0 ? 4 : 0,
+                                  }} />
+                                {/* Tooltip */}
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10">
+                                  <div className="bg-gray-900 text-white text-[9px] px-2 py-1 rounded shadow-lg whitespace-nowrap">
+                                    <p className="font-medium">{new Date(fecha + 'T12:00:00').toLocaleDateString('es-CR', { day: '2-digit', month: 'short' })}</p>
+                                    <p style={{ color: '#3498DB' }}>1.5T: {v15}</p>
+                                    <p style={{ color: '#93C5FD' }}>0.4T: {v04}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                    {/* Eje X */}
+                    <div className="flex ml-8">
+                      <div className="flex-1 flex justify-around">
+                        {allDates.map((fecha, i) => {
+                          const showLabel = allDates.length <= 14 || i % Math.ceil(allDates.length / 14) === 0
+                          return (
+                            <span key={fecha} className="text-[8px] text-gray-400 text-center" style={{ width: barW + 4 }}>
+                              {showLabel ? new Date(fecha + 'T12:00:00').toLocaleDateString('es-CR', { day: '2-digit', month: 'short' }) : ''}
+                            </span>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+            <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-2 rounded-sm" style={{ backgroundColor: '#3498DB' }} />
+                <span className="text-[10px] text-gray-500">Resonancia 1.5T</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-2 rounded-sm" style={{ backgroundColor: '#2980B9' }} />
+                <span className="text-[10px] text-gray-500">Resonancia 0.4T</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Desglose por tipo de estudio — por cada resonancia */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {data.map(source => {
+              const eq = RESONANCIA_EQUIPOS.find(r => r.id === source.id)
+              const tipos = getTipoStats(source.citas)
+              const maxTipo = Math.max(...tipos.map(t => t.total), 1)
+
+              return (
+                <div key={source.id} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="w-3 h-3 rounded-full" style={{ backgroundColor: `#${eq?.color || source.color}` }} />
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">{source.nombre}</h3>
+                    <span className="ml-auto text-xs text-gray-400">{tipos.length} tipos de estudio</span>
+                  </div>
+
+                  {tipos.length === 0 ? (
+                    <p className="text-sm text-gray-400 text-center py-6">Sin estudios en este período</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {tipos.map(t => (
+                        <div key={t.tipo}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs text-gray-700 dark:text-gray-300 font-medium truncate max-w-[200px]" title={t.tipo}>
+                              {t.tipo}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold text-green-600">{t.completadas}</span>
+                              <span className="text-[10px] text-gray-400">/ {t.total}</span>
+                              <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                                t.tasaCompletado >= 70 ? 'bg-green-100 text-green-700' :
+                                t.tasaCompletado >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
+                              }`}>{t.tasaCompletado}%</span>
+                            </div>
+                          </div>
+                          {/* Barra horizontal apilada */}
+                          <div className="flex rounded h-3 overflow-hidden bg-gray-100 dark:bg-gray-800">
+                            {t.completadas > 0 && <div className="bg-green-500 transition-all" style={{ width: `${(t.completadas / maxTipo) * 100}%` }} />}
+                            {t.pendientes > 0 && <div className="bg-amber-400 transition-all" style={{ width: `${(t.pendientes / maxTipo) * 100}%` }} />}
+                            {t.canceladas > 0 && <div className="bg-red-400 transition-all" style={{ width: `${(t.canceladas / maxTipo) * 100}%` }} />}
+                            {t.noShow > 0 && <div className="bg-orange-400 transition-all" style={{ width: `${(t.noShow / maxTipo) * 100}%` }} />}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Tabla comparativa detallada */}
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Tabla Comparativa — Todos los Tipos de Estudio</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-xs text-gray-500 border-b border-gray-200 dark:border-gray-700">
+                    <th className="pb-2 font-medium">Tipo de Estudio</th>
+                    <th className="pb-2 font-medium text-center">Equipo</th>
+                    <th className="pb-2 font-medium text-right">Total</th>
+                    <th className="pb-2 font-medium text-right">Realizadas</th>
+                    <th className="pb-2 font-medium text-right">Pendientes</th>
+                    <th className="pb-2 font-medium text-right">Canceladas</th>
+                    <th className="pb-2 font-medium text-right">No Show</th>
+                    <th className="pb-2 font-medium text-right">% Completado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {data.flatMap(source => {
+                    const eq = RESONANCIA_EQUIPOS.find(r => r.id === source.id)
+                    return getTipoStats(source.citas).map(t => (
+                      <tr key={`${source.id}-${t.tipo}`} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                        <td className="py-2 text-gray-900 dark:text-white font-medium">{t.tipo}</td>
+                        <td className="py-2 text-center">
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full"
+                            style={{ backgroundColor: `#${eq?.color || source.color}20`, color: `#${eq?.color || source.color}` }}>
+                            {source.nombre}
+                          </span>
+                        </td>
+                        <td className="py-2 text-right font-medium">{t.total}</td>
+                        <td className="py-2 text-right text-green-600 font-medium">{t.completadas}</td>
+                        <td className="py-2 text-right text-amber-600">{t.pendientes}</td>
+                        <td className="py-2 text-right text-red-600">{t.canceladas}</td>
+                        <td className="py-2 text-right text-orange-600">{t.noShow}</td>
+                        <td className="py-2 text-right">
+                          <span className={`font-bold ${
+                            t.tasaCompletado >= 70 ? 'text-green-600' :
+                            t.tasaCompletado >= 40 ? 'text-amber-600' : 'text-red-600'
+                          }`}>{t.tasaCompletado}%</span>
+                        </td>
+                      </tr>
+                    ))
+                  })}
+                  {/* Totales */}
+                  <tr className="font-bold bg-gray-50 dark:bg-gray-800">
+                    <td className="py-2 text-gray-900 dark:text-white" colSpan={2}>Total</td>
+                    <td className="py-2 text-right">{totalCitas}</td>
+                    <td className="py-2 text-right text-green-600">{completadas}</td>
+                    <td className="py-2 text-right text-amber-600">{pendientes}</td>
+                    <td className="py-2 text-right text-red-600">{canceladas}</td>
+                    <td className="py-2 text-right text-orange-600">{noShow}</td>
+                    <td className="py-2 text-right text-green-600">{tasaCompletado}%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
