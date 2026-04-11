@@ -10,11 +10,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <Image
-              src={B.logo.white}
+              src={B.logo.default}
               alt="MedCare"
               width={160}
               height={44}
-              className="h-10 w-auto mb-4"
+              className="h-10 w-auto mb-4 rounded bg-white px-2 py-1"
             />
             <p className="text-sm text-gray-400 leading-relaxed">
               {B.contact.fullName}. Más de 7 años brindando diagnóstico de alta precisión en Costa Rica.
