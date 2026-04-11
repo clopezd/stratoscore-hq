@@ -3,20 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
-  <title>stratos|Core — Software empresarial con IA</title>
-  <meta name="description" content="Fabrica de software acelerada por IA. Lo que otros tardan meses, lo entregamos en semanas. Infraestructura empresarial desde el dia uno.">
+  <title>stratos|Core — Ecosistema Agentico 360°</title>
+  <meta name="description" content="Conectamos toda tu operacion en un ecosistema inteligente. Agenda, CRM, marketing, logistica — todo integrado. De micropymes a medianas empresas.">
   <meta name="theme-color" content="#001117">
-  <meta property="og:title" content="stratos|Core — Software empresarial con IA">
-  <meta property="og:description" content="Fabrica de software acelerada por IA. 10x mas rapido. Seguridad nivel bancario.">
+  <meta property="og:title" content="stratos|Core — Ecosistema Agentico 360°">
+  <meta property="og:description" content="Tu operacion completa, conectada e inteligente. Un equipo de ingenieria dedicado que entrega resultados en semanas.">
   <meta property="og:image" content="/images/stratoscore-social.png">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    /* ══════════════════════════════
+       MOBILE-FIRST: base = mobile
+       min-width queries scale UP
+       ══════════════════════════════ */
     :root {
       --bg: #001117;
-      --bg-surface: #001e30;
+      --bg-surface: rgba(255,255,255,0.025);
       --accent: #00F2FE;
       --accent-2: #a8f0ff;
       --accent-dim: rgba(0,242,254,0.08);
@@ -30,217 +34,256 @@
       --red: #ff6b6b;
       --green: #10b981;
       --wa-green: #25D366;
-      --card: rgba(255,255,255,0.025);
       --radius: 12px;
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html { scroll-behavior:smooth; overflow-x:hidden; }
-    body { font-family:'Inter',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow-x:hidden; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow-x:hidden; line-height:1.6; }
     a { color:inherit; text-decoration:none; }
-    .container { max-width:1060px; margin:0 auto; padding:0 24px; }
+    img { max-width:100%; display:block; }
+    .container { width:100%; max-width:1060px; margin:0 auto; padding:0 20px; }
     :focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-    @media (prefers-reduced-motion:reduce) {
-      *, *::before, *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
-    }
+    @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; } }
 
-    /* ── Subtle grid background ── */
-    body::after {
-      content:'';
-      position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.35;
-      background-image:
-        linear-gradient(rgba(0,242,254,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,242,254,0.03) 1px, transparent 1px);
-      background-size:80px 80px;
-    }
+    /* ── Grid bg ── */
+    body::after { content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.3; background-image:linear-gradient(rgba(0,242,254,0.025) 1px, transparent 1px),linear-gradient(90deg, rgba(0,242,254,0.025) 1px, transparent 1px); background-size:60px 60px; }
 
     /* ── Glow ── */
-    .glow { position:fixed; width:700px; height:700px; border-radius:50%; background:radial-gradient(circle, rgba(0,242,254,0.07) 0%, transparent 65%); pointer-events:none; z-index:0; top:-300px; left:50%; transform:translateX(-50%); filter:blur(60px); }
+    .glow { position:fixed; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle, rgba(0,242,254,0.06) 0%, transparent 65%); pointer-events:none; z-index:0; top:-150px; left:50%; transform:translateX(-50%); filter:blur(60px); }
 
     /* ── Nav ── */
-    nav { position:fixed; top:0; left:0; right:0; z-index:50; padding:18px 0; transition:all 0.3s; }
-    nav.scrolled { background:rgba(0,17,23,0.90); backdrop-filter:blur(24px) saturate(180%); border-bottom:1px solid var(--border); padding:14px 0; }
-    .nav-inner { max-width:1060px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; }
-    .wordmark { font-weight:300; font-size:15px; letter-spacing:0.12em; color:var(--text); }
+    nav { position:fixed; top:0; left:0; right:0; z-index:50; padding:14px 0; transition:all 0.3s; }
+    nav.scrolled { background:rgba(0,17,23,0.92); backdrop-filter:blur(20px) saturate(180%); border-bottom:1px solid var(--border); }
+    .nav-inner { max-width:1060px; margin:0 auto; padding:0 20px; display:flex; align-items:center; justify-content:space-between; }
+    .wordmark { font-weight:300; font-size:15px; letter-spacing:0.12em; color:var(--text); white-space:nowrap; }
     .wordmark b { color:var(--accent); font-weight:300; }
-    .nav-links { display:flex; gap:28px; align-items:center; }
-    .nav-links a { font-size:13px; color:var(--text-muted); transition:color 0.2s; font-weight:400; }
+    .nav-links { display:none; gap:24px; align-items:center; }
+    .nav-links a { font-size:13px; color:var(--text-muted); transition:color 0.2s; }
     .nav-links a:hover { color:var(--text-bright); }
-    .nav-cta { padding:8px 20px; background:var(--accent); color:var(--bg); font-weight:600; font-size:12px; border-radius:6px; border:none; cursor:pointer; transition:all 0.2s; letter-spacing:0.02em; }
-    .nav-cta:hover { box-shadow:0 0 24px var(--accent-glow); }
-
-    /* ── Buttons ── */
-    .btn { display:inline-flex; align-items:center; gap:8px; padding:12px 28px; font-size:14px; font-weight:500; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s; font-family:inherit; }
-    .btn-primary { background:var(--accent); color:var(--bg); font-weight:600; }
-    .btn-primary:hover { box-shadow:0 0 30px var(--accent-glow); transform:translateY(-1px); }
-    .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
-    .btn-ghost:hover { border-color:rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--text-bright); }
-    .btn-wa { background:var(--wa-green); color:#fff; font-weight:600; }
-    .btn-wa:hover { box-shadow:0 4px 24px rgba(37,211,102,0.35); transform:translateY(-1px); }
+    .nav-cta { padding:8px 18px; background:var(--accent); color:var(--bg); font-weight:600; font-size:12px; border-radius:6px; border:none; cursor:pointer; transition:all 0.2s; }
+    .nav-cta:hover { box-shadow:0 0 20px var(--accent-glow); }
 
     /* ── Hamburger ── */
-    .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; }
-    .hamburger span { display:block; width:20px; height:1.5px; background:var(--text-bright); margin:4px 0; border-radius:1px; transition:all 0.3s; }
+    .hamburger { display:flex; background:none; border:none; cursor:pointer; padding:10px; flex-direction:column; gap:4px; }
+    .hamburger span { display:block; width:20px; height:1.5px; background:var(--text-bright); border-radius:1px; transition:all 0.3s; }
     .hamburger.active span:nth-child(1) { transform:rotate(45deg) translate(4px,4px); }
     .hamburger.active span:nth-child(2) { opacity:0; }
     .hamburger.active span:nth-child(3) { transform:rotate(-45deg) translate(4px,-4px); }
 
     /* ── Mobile menu ── */
-    .mobile-menu { display:none; position:fixed; inset:0; background:rgba(0,17,23,0.98); backdrop-filter:blur(30px); z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:28px; }
+    .mobile-menu { display:none; position:fixed; inset:0; background:rgba(0,17,23,0.98); backdrop-filter:blur(30px); z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:24px; padding:20px; }
     .mobile-menu.open { display:flex; }
-    .mobile-menu a { font-size:18px; color:var(--text-bright); font-weight:500; }
+    .mobile-menu a { font-size:18px; color:var(--text-bright); font-weight:500; text-align:center; }
     .mobile-menu a:hover { color:var(--accent); }
-    .mobile-menu .btn { font-size:16px; padding:14px 32px; }
-    .mobile-close { position:absolute; top:16px; right:16px; background:none; border:1px solid var(--border); color:var(--text-muted); font-size:20px; width:40px; height:40px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .mobile-menu .btn { font-size:16px; padding:16px 32px; width:100%; max-width:300px; }
+    .mobile-close { position:absolute; top:16px; right:16px; background:none; border:1px solid var(--border); color:var(--text-muted); font-size:20px; width:44px; height:44px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
     .mobile-close:hover { border-color:var(--accent); color:var(--accent); }
 
+    /* ── Buttons ── */
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 28px; font-size:15px; font-weight:500; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s; font-family:inherit; width:100%; -webkit-tap-highlight-color:transparent; }
+    .btn-primary { background:var(--accent); color:var(--bg); font-weight:600; }
+    .btn-primary:hover { box-shadow:0 0 30px var(--accent-glow); transform:translateY(-1px); }
+    .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
+    .btn-ghost:hover { border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.03); color:var(--text-bright); }
+    .btn-wa { background:var(--wa-green); color:#fff; font-weight:600; }
+    .btn-wa:hover { box-shadow:0 4px 24px rgba(37,211,102,0.35); transform:translateY(-1px); }
+
     /* ── Hero ── */
-    .hero { min-height:100vh; display:flex; align-items:center; position:relative; z-index:1; padding:120px 0 60px; }
-    .hero-inner { text-align:center; max-width:680px; margin:0 auto; }
-    .hero-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; background:var(--accent-dim); border:1px solid rgba(0,242,254,0.12); border-radius:100px; font-size:12px; color:var(--accent); font-weight:500; margin-bottom:32px; letter-spacing:0.03em; }
+    .hero { min-height:100svh; display:flex; align-items:center; position:relative; z-index:1; padding:100px 0 48px; }
+    .hero-inner { text-align:center; }
+    .hero-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; background:var(--accent-dim); border:1px solid rgba(0,242,254,0.15); border-radius:100px; font-size:11px; color:var(--accent); font-weight:600; margin-bottom:24px; letter-spacing:0.08em; text-transform:uppercase; }
     .hero-badge .dot { width:5px; height:5px; background:var(--accent); border-radius:50%; animation:pulse 2.5s ease infinite; }
-    .hero h1 { font-size:clamp(36px,6vw,60px); font-weight:800; line-height:1.06; color:var(--text-bright); margin-bottom:24px; letter-spacing:-0.03em; }
+    .hero h1 { font-size:32px; font-weight:800; line-height:1.1; color:var(--text-bright); margin-bottom:20px; letter-spacing:-0.03em; }
     .hero h1 em { font-style:normal; background:linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .hero .lead { font-size:clamp(16px,2vw,18px); color:var(--text-muted); line-height:1.7; margin-bottom:40px; max-width:520px; margin-left:auto; margin-right:auto; }
+    .hero .lead { font-size:16px; color:var(--text-muted); line-height:1.65; margin-bottom:32px; }
     .hero .lead strong { color:var(--text); font-weight:500; }
-    .hero-ctas { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:56px; }
-
-    /* ── Trust bar ── */
-    .trust { display:flex; align-items:center; justify-content:center; gap:24px; flex-wrap:wrap; }
+    .hero-ctas { display:flex; flex-direction:column; gap:10px; margin-bottom:40px; }
+    .trust { display:flex; flex-direction:column; gap:8px; align-items:center; }
     .trust-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-muted); }
-    .trust-item .icon { color:var(--accent); font-size:14px; }
-    .trust-sep { width:1px; height:16px; background:var(--border); }
-
-    /* ── Metrics ── */
-    .metrics { position:relative; z-index:1; padding:40px 0 100px; }
-    .metrics-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
-    .metric { text-align:center; padding:40px 16px; background:var(--bg); }
-    .metric-number { font-size:clamp(36px,5vw,52px); font-weight:800; line-height:1; margin-bottom:8px; letter-spacing:-0.02em; background:linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .metric-desc { font-size:12px; color:var(--text-muted); font-weight:400; line-height:1.4; }
+    .trust-icon { color:var(--accent); }
+    .trust-sep { display:none; }
 
     /* ── Section shared ── */
-    .section { padding:100px 0; position:relative; z-index:1; }
-    .section-eyebrow { font-size:11px; text-transform:uppercase; letter-spacing:0.2em; font-weight:600; margin-bottom:12px; }
-    .section-title { font-size:clamp(28px,4vw,38px); font-weight:700; color:var(--text-bright); margin-bottom:16px; line-height:1.15; letter-spacing:-0.02em; }
-    .section-desc { font-size:15px; color:var(--text-muted); margin-bottom:48px; max-width:520px; line-height:1.65; }
+    .section { padding:64px 0; position:relative; z-index:1; }
+    .section-eyebrow { font-size:11px; text-transform:uppercase; letter-spacing:0.2em; font-weight:600; margin-bottom:10px; }
+    .section-title { font-size:26px; font-weight:700; color:var(--text-bright); margin-bottom:14px; line-height:1.15; letter-spacing:-0.02em; }
+    .section-desc { font-size:15px; color:var(--text-muted); margin-bottom:32px; line-height:1.65; }
 
     /* ── Pain ── */
-    .pain-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-    .pain-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; transition:border-color 0.3s; position:relative; overflow:hidden; }
-    .pain-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--red); opacity:0.5; }
+    .pain-grid { display:flex; flex-direction:column; gap:10px; }
+    .pain-card { background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; position:relative; overflow:hidden; transition:border-color 0.3s; }
+    .pain-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--red); opacity:0.4; }
     .pain-card:hover { border-color:rgba(255,107,107,0.15); }
-    .pain-card h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:6px; }
+    .pain-card h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:4px; }
     .pain-card p { font-size:13px; color:var(--text-muted); line-height:1.6; }
 
     /* ── Divider ── */
-    .divider { padding:64px 0; text-align:center; position:relative; z-index:1; }
-    .divider-line { width:1px; height:56px; background:linear-gradient(to bottom, transparent, var(--accent), transparent); margin:0 auto 20px; }
-    .divider h2 { font-size:clamp(22px,3.5vw,32px); font-weight:700; color:var(--text-bright); letter-spacing:-0.02em; }
+    .divider { padding:48px 0; text-align:center; position:relative; z-index:1; }
+    .divider-line { width:1px; height:48px; background:linear-gradient(to bottom, transparent, var(--accent), transparent); margin:0 auto 16px; }
+    .divider h2 { font-size:22px; font-weight:700; color:var(--text-bright); letter-spacing:-0.02em; line-height:1.2; }
     .divider em { font-style:normal; color:var(--accent); }
 
     /* ── Solution ── */
-    .sol-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-    .sol-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:28px 22px; transition:all 0.3s; }
-    .sol-card:hover { border-color:var(--border-hover); transform:translateY(-3px); }
-    .sol-card .sol-icon { width:40px; height:40px; background:var(--accent-dim); border:1px solid rgba(0,242,254,0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:18px; font-size:18px; }
-    .sol-card h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:6px; }
+    .sol-grid { display:flex; flex-direction:column; gap:10px; }
+    .sol-card { background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px 20px; transition:all 0.3s; }
+    .sol-card:hover { border-color:var(--border-hover); }
+    .sol-card .sol-icon { width:40px; height:40px; background:var(--accent-dim); border:1px solid rgba(0,242,254,0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; font-size:18px; }
+    .sol-card h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:4px; }
     .sol-card p { font-size:13px; color:var(--text-muted); line-height:1.6; }
     .sol-card.featured { border-color:rgba(0,242,254,0.12); background:rgba(0,242,254,0.02); }
-    .sol-card.featured:hover { border-color:rgba(0,242,254,0.3); box-shadow:0 8px 40px rgba(0,242,254,0.06); }
+    .sol-card.featured:hover { border-color:rgba(0,242,254,0.3); }
 
-    /* ── How it works ── */
-    .how-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-    .how-step { position:relative; padding:32px 24px 28px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); }
-    .how-number { font-size:11px; font-weight:700; color:var(--accent); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:14px; }
-    .how-step h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:8px; }
+    /* ── How ── */
+    .how-grid { display:flex; flex-direction:column; gap:12px; }
+    .how-step { padding:24px 20px; background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius); }
+    .how-number { font-size:11px; font-weight:700; color:var(--accent); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:10px; }
+    .how-step h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:6px; }
     .how-step p { font-size:13px; color:var(--text-muted); line-height:1.6; }
 
     /* ── Proof ── */
-    .proof-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-    .proof-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:28px 24px; position:relative; overflow:hidden; }
+    .proof-grid { display:flex; flex-direction:column; gap:12px; }
+    .proof-card { background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 20px; position:relative; overflow:hidden; }
     .proof-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg, var(--accent), var(--accent-2)); }
     .proof-card .client { font-size:18px; font-weight:700; color:var(--text-bright); margin-bottom:2px; }
-    .proof-card .industry { font-size:12px; color:var(--accent); margin-bottom:14px; font-weight:500; letter-spacing:0.03em; }
-    .proof-card .result { font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:20px; }
-    .proof-card .stat { font-size:36px; font-weight:800; background:linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:-0.02em; }
-    .proof-card .stat-label { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .proof-card .industry { font-size:12px; color:var(--accent); margin-bottom:12px; font-weight:500; letter-spacing:0.03em; }
+    .proof-card .result { font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:16px; }
+    .proof-card .metric-row { display:flex; align-items:baseline; gap:6px; }
+    .proof-card .stat { font-size:32px; font-weight:800; background:linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:-0.02em; line-height:1; }
+    .proof-card .stat-label { font-size:12px; color:var(--text-muted); }
+
+    /* ── Team ── */
+    .team-bar { padding:48px 0; text-align:center; position:relative; z-index:1; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .team-bar p { font-size:14px; color:var(--text-muted); line-height:1.6; max-width:480px; margin:0 auto; }
+    .team-bar strong { color:var(--text-bright); font-weight:600; }
+    .team-bar .accent { color:var(--accent); }
 
     /* ── Stack ── */
-    .stack-bar { display:flex; align-items:center; justify-content:center; gap:32px; flex-wrap:wrap; padding:40px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin:0 auto; position:relative; z-index:1; }
-    .stack-item { font-size:12px; color:var(--text-muted); font-weight:500; letter-spacing:0.04em; display:flex; align-items:center; gap:6px; }
-    .stack-dot { width:4px; height:4px; background:var(--accent); border-radius:50%; }
+    .stack-bar { display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; padding:24px 20px; position:relative; z-index:1; }
+    .stack-item { font-size:11px; color:var(--text-muted); font-weight:500; letter-spacing:0.04em; display:flex; align-items:center; gap:5px; }
+    .stack-dot { width:3px; height:3px; background:var(--accent); border-radius:50%; }
 
-    /* ── CTA Final ── */
-    .cta-section { padding:120px 0; text-align:center; position:relative; z-index:1; }
-    .cta-section::before { content:''; position:absolute; bottom:10%; left:50%; transform:translateX(-50%); width:500px; height:500px; background:radial-gradient(circle, rgba(0,242,254,0.06) 0%, transparent 65%); pointer-events:none; filter:blur(80px); }
-    .cta-section h2 { font-size:clamp(28px,4.5vw,42px); font-weight:800; color:var(--text-bright); margin-bottom:16px; line-height:1.1; letter-spacing:-0.02em; }
+    /* ── CTA ── */
+    .cta-section { padding:80px 0; text-align:center; position:relative; z-index:1; }
+    .cta-section::before { content:''; position:absolute; bottom:10%; left:50%; transform:translateX(-50%); width:400px; height:400px; background:radial-gradient(circle, rgba(0,242,254,0.05) 0%, transparent 65%); pointer-events:none; filter:blur(60px); }
+    .cta-section h2 { font-size:26px; font-weight:800; color:var(--text-bright); margin-bottom:14px; line-height:1.15; letter-spacing:-0.02em; }
     .cta-section em { font-style:normal; color:var(--accent); }
-    .cta-section .sub { font-size:16px; color:var(--text-muted); margin-bottom:36px; max-width:440px; margin-left:auto; margin-right:auto; line-height:1.6; }
-    .cta-section .ctas { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+    .cta-section .sub { font-size:15px; color:var(--text-muted); margin-bottom:28px; line-height:1.6; }
+    .cta-section .ctas { display:flex; flex-direction:column; gap:10px; max-width:400px; margin:0 auto 14px; }
     .cta-section .micro { font-size:12px; color:var(--text-subtle); }
 
     /* ── Lead form ── */
-    .lead-form { max-width:400px; margin:48px auto 0; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:28px; text-align:left; }
+    .lead-form { max-width:400px; margin:36px auto 0; background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 20px; text-align:left; }
     .lead-form h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:4px; }
-    .lead-form .form-sub { font-size:13px; color:var(--text-muted); margin-bottom:18px; }
-    .lead-form input, .lead-form textarea { width:100%; padding:11px 14px; background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:8px; color:var(--text-bright); font-size:13px; font-family:inherit; margin-bottom:10px; transition:border 0.2s; }
+    .lead-form .form-sub { font-size:13px; color:var(--text-muted); margin-bottom:16px; }
+    .lead-form input, .lead-form textarea { width:100%; padding:12px 14px; background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:8px; color:var(--text-bright); font-size:15px; font-family:inherit; margin-bottom:10px; transition:border 0.2s; -webkit-appearance:none; }
     .lead-form input:focus, .lead-form textarea:focus { outline:none; border-color:rgba(0,242,254,0.4); }
     .lead-form input::placeholder, .lead-form textarea::placeholder { color:var(--text-muted); }
-    .lead-form textarea { resize:vertical; min-height:72px; }
-    .lead-form .btn { width:100%; justify-content:center; }
+    .lead-form textarea { resize:vertical; min-height:80px; }
+    .lead-form .btn { width:100%; }
 
     /* ── Footer ── */
-    footer { border-top:1px solid var(--border); padding:28px 0; position:relative; z-index:1; }
-    .footer-inner { max-width:1060px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; align-items:center; }
+    footer { border-top:1px solid var(--border); padding:24px 0; position:relative; z-index:1; }
+    .footer-inner { max-width:1060px; margin:0 auto; padding:0 20px; display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; }
     .footer-text { font-size:11px; color:var(--text-subtle); }
 
-    /* ── WhatsApp float ── */
-    .wa-float { position:fixed; bottom:96px; right:24px; width:52px; height:52px; background:var(--wa-green); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(37,211,102,0.35); z-index:99; transition:all 0.2s; }
-    .wa-float:hover { transform:scale(1.08); box-shadow:0 6px 24px rgba(37,211,102,0.45); }
+    /* ── WA float ── */
+    .wa-float { position:fixed; bottom:80px; right:16px; width:50px; height:50px; background:var(--wa-green); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(37,211,102,0.4); z-index:99; transition:all 0.2s; -webkit-tap-highlight-color:transparent; }
+    .wa-float:hover { transform:scale(1.08); }
     .wa-float svg { width:24px; height:24px; fill:white; }
 
     /* ── Animations ── */
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-    .reveal { opacity:0; transform:translateY(24px); transition:all 0.7s cubic-bezier(0.4,0,0.2,1); }
+    .reveal { opacity:0; transform:translateY(20px); transition:all 0.6s cubic-bezier(0.4,0,0.2,1); }
     .reveal.visible { opacity:1; transform:translateY(0); }
     .reveal.d1 { transition-delay:0.1s; }
-    .reveal.d2 { transition-delay:0.2s; }
-    .reveal.d3 { transition-delay:0.3s; }
-    .reveal.d4 { transition-delay:0.4s; }
+    .reveal.d2 { transition-delay:0.15s; }
+    .reveal.d3 { transition-delay:0.2s; }
+    .reveal.d4 { transition-delay:0.25s; }
 
     /* ══════════════════════════════
-       RESPONSIVE
+       TABLET (min 640px)
        ══════════════════════════════ */
-    @media (max-width:1023px) {
-      .nav-links { display:none; }
-      .hamburger { display:block; }
-      .hero { min-height:auto; padding:120px 0 60px; }
-      .metrics-grid { grid-template-columns:repeat(2,1fr); }
-      .sol-grid, .proof-grid { grid-template-columns:repeat(2,1fr); }
-      .how-grid { grid-template-columns:repeat(2,1fr); }
-      .section { padding:72px 0; }
-      .cta-section { padding:80px 0; }
-      .stack-bar { gap:20px; }
+    @media (min-width:640px) {
+      .container { padding:0 32px; }
+      .nav-inner { padding:0 32px; }
+      .hero h1 { font-size:42px; }
+      .hero .lead { font-size:17px; max-width:520px; margin-left:auto; margin-right:auto; }
+      .hero-ctas { flex-direction:row; justify-content:center; }
+      .hero-ctas .btn { width:auto; }
+      .trust { flex-direction:row; gap:20px; }
+      .trust-sep { display:block; width:1px; height:14px; background:var(--border); }
+      .section { padding:80px 0; }
+      .section-title { font-size:30px; }
+      .pain-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+      .sol-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+      .how-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+      .proof-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+      .divider h2 { font-size:28px; }
+      .cta-section { padding:100px 0; }
+      .cta-section h2 { font-size:32px; }
+      .cta-section .ctas { flex-direction:row; justify-content:center; max-width:none; }
+      .cta-section .ctas .btn { width:auto; }
+      .footer-inner { flex-direction:row; justify-content:space-between; }
+      .btn { width:auto; font-size:14px; padding:12px 28px; }
+      .wa-float { bottom:96px; right:24px; width:52px; height:52px; }
     }
-    @media (max-width:639px) {
-      .container { padding:0 16px; }
-      .nav-inner { padding:0 16px; }
-      .hero h1 { font-size:32px; }
-      .hero .lead { font-size:15px; }
-      .hero-ctas { flex-direction:column; align-items:center; }
-      .hero-ctas .btn { width:100%; justify-content:center; }
-      .trust { flex-direction:column; gap:10px; }
-      .trust-sep { display:none; }
-      .metrics-grid { grid-template-columns:1fr; }
-      .pain-grid, .sol-grid, .proof-grid, .how-grid { grid-template-columns:1fr; }
-      .section { padding:56px 0; }
-      .section-title { font-size:24px; }
-      .cta-section h2 { font-size:26px; }
-      .cta-section .ctas .btn { width:100%; justify-content:center; }
-      .footer-inner { flex-direction:column; gap:8px; text-align:center; }
-      .wa-float { bottom:80px; right:16px; width:48px; height:48px; }
-      .wa-float svg { width:22px; height:22px; }
-      .stack-bar { gap:14px; padding:28px 16px; }
-      .stack-item { font-size:11px; }
+
+    /* ══════════════════════════════
+       DESKTOP (min 1024px)
+       ══════════════════════════════ */
+    @media (min-width:1024px) {
+      .nav-links { display:flex; }
+      .hamburger { display:none; }
+      nav { padding:16px 0; }
+      .hero { padding:140px 0 80px; }
+      .hero h1 { font-size:54px; }
+      .hero-inner { max-width:680px; margin:0 auto; }
+      .section { padding:100px 0; }
+      .section-title { font-size:36px; }
+      .sol-grid { grid-template-columns:repeat(3,1fr); }
+      .proof-grid { grid-template-columns:repeat(3,1fr); }
+      .cta-section h2 { font-size:38px; }
+      .sol-card:hover { transform:translateY(-3px); }
+    }
+
+    /* ══════════════════════════════
+       CHAT WIDGET
+       ══════════════════════════════ */
+    #sc-widget-btn{position:fixed;bottom:16px;right:16px;z-index:9999;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#00F2FE,#00b4d8);border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,242,254,0.25);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;-webkit-tap-highlight-color:transparent;}
+    #sc-widget-btn:hover{transform:scale(1.08);}
+    #sc-widget-btn svg{width:22px;height:22px;fill:#001117;}
+    #sc-widget-panel{position:fixed;bottom:0;right:0;z-index:9999;width:100vw;max-width:100vw;height:100vh;max-height:100vh;background:#071218;border:1px solid rgba(0,242,254,0.12);border-radius:0;display:none;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.5);}
+    #sc-widget-panel.open{display:flex;}
+    #sc-widget-header{padding:14px 16px;background:rgba(0,242,254,0.04);border-bottom:1px solid rgba(0,242,254,0.08);display:flex;align-items:center;justify-content:space-between;}
+    #sc-widget-header h3{font-size:13px;color:var(--accent);font-weight:600;letter-spacing:0.04em;margin:0;}
+    #sc-widget-header span{font-size:11px;color:var(--text-muted);}
+    #sc-widget-close{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:22px;padding:6px 10px;border-radius:6px;-webkit-tap-highlight-color:transparent;}
+    #sc-widget-close:hover{background:rgba(255,255,255,0.06);color:var(--text-bright);}
+    #sc-widget-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;}
+    #sc-widget-msgs::-webkit-scrollbar{width:3px;}
+    #sc-widget-msgs::-webkit-scrollbar-thumb{background:rgba(0,242,254,0.15);border-radius:3px;}
+    .sc-msg{max-width:85%;padding:10px 14px;border-radius:10px;font-size:14px;line-height:1.5;word-wrap:break-word;}
+    .sc-msg.user{align-self:flex-end;background:rgba(0,242,254,0.12);color:var(--text-bright);border-bottom-right-radius:4px;}
+    .sc-msg.bot{align-self:flex-start;background:rgba(255,255,255,0.04);color:var(--text);border-bottom-left-radius:4px;}
+    .sc-msg.bot strong{color:var(--accent);}
+    .sc-actions{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px;}
+    .sc-action-btn{background:rgba(0,242,254,0.06);border:1px solid rgba(0,242,254,0.15);color:var(--accent);padding:8px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+    .sc-action-btn:hover{background:rgba(0,242,254,0.15);}
+    #sc-widget-input{display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(0,242,254,0.08);background:rgba(0,0,0,0.2);}
+    #sc-widget-input input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 14px;color:var(--text-bright);font-size:15px;outline:none;font-family:inherit;-webkit-appearance:none;}
+    #sc-widget-input input:focus{border-color:rgba(0,242,254,0.3);}
+    #sc-widget-input input::placeholder{color:var(--text-muted);}
+    #sc-widget-input button{background:linear-gradient(135deg,#00F2FE,#00b4d8);border:none;border-radius:8px;padding:0 18px;cursor:pointer;color:#001117;font-weight:600;font-size:14px;transition:opacity .2s;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+    #sc-widget-input button:disabled{opacity:0.4;cursor:not-allowed;}
+    .sc-typing{display:flex;gap:4px;padding:10px 14px;align-self:flex-start;}
+    .sc-typing span{width:5px;height:5px;background:rgba(0,242,254,0.35);border-radius:50%;animation:sc-bounce .6s infinite alternate;}
+    .sc-typing span:nth-child(2){animation-delay:.15s;}
+    .sc-typing span:nth-child(3){animation-delay:.3s;}
+    @keyframes sc-bounce{to{opacity:0.3;transform:translateY(-3px);}}
+    @media(min-width:640px){
+      #sc-widget-btn{bottom:24px;right:24px;width:52px;height:52px;}
+      #sc-widget-btn svg{width:24px;height:24px;}
+      #sc-widget-panel{bottom:88px;right:24px;width:380px;max-width:calc(100vw - 48px);height:520px;max-height:calc(100vh - 120px);border-radius:12px;}
     }
   </style>
 </head>
@@ -284,17 +327,17 @@
     <div class="hero-inner">
       <div class="hero-badge reveal">
         <span class="dot"></span>
-        Ingenieria de software empresarial
+        Ecosistema Agentico 360&deg;
       </div>
       <h1 class="reveal d1">
-        Software que funciona<br><em>desde el dia uno.</em>
+        Tu operacion completa.<br><em>Conectada e inteligente.</em>
       </h1>
       <p class="lead reveal d2">
-        Un equipo de ingenieria dedicado que construye, integra y opera los sistemas que tu negocio necesita. Entrega por fases &mdash; cada una aporta valor. <strong>Sistema completo en 3-4 semanas.</strong>
+        Somos un equipo de ingenieria que conecta <strong>toda tu operacion</strong> en un solo ecosistema: agenda, CRM, marketing, logistica, inventario. Eliminamos los silos de informacion que te hacen perder ventas y operar a ciegas.
       </p>
       <div class="hero-ctas reveal d3">
         <a href="#contacto" class="btn btn-primary">
-          Agendar diagnostico gratis
+          Diagnostico gratis
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
         <a href="https://wa.me/50664220701" class="btn btn-ghost">
@@ -303,44 +346,11 @@
         </a>
       </div>
       <div class="trust reveal d4">
-        <div class="trust-item">
-          <span class="icon">&#x2713;</span>
-          Seguridad nivel bancario
-        </div>
+        <div class="trust-item"><span class="trust-icon">&#x2713;</span> Entrega por fases</div>
         <div class="trust-sep"></div>
-        <div class="trust-item">
-          <span class="icon">&#x2713;</span>
-          99.99% uptime
-        </div>
+        <div class="trust-item"><span class="trust-icon">&#x2713;</span> 3-4 semanas listo</div>
         <div class="trust-sep"></div>
-        <div class="trust-item">
-          <span class="icon">&#x2713;</span>
-          Clientes en produccion
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ METRICS ═══ -->
-<section class="metrics">
-  <div class="container">
-    <div class="metrics-grid reveal">
-      <div class="metric">
-        <div class="metric-number" data-count="4">0</div>
-        <div class="metric-desc">ingenieros senior dedicados</div>
-      </div>
-      <div class="metric">
-        <div class="metric-number" data-count="3">0</div>
-        <div class="metric-desc">industrias en produccion</div>
-      </div>
-      <div class="metric">
-        <div class="metric-number">3-4</div>
-        <div class="metric-desc">semanas &mdash; sistema completo</div>
-      </div>
-      <div class="metric">
-        <div class="metric-number">99.9%</div>
-        <div class="metric-desc">uptime garantizado</div>
+        <div class="trust-item"><span class="trust-icon">&#x2713;</span> Seguridad empresarial</div>
       </div>
     </div>
   </div>
@@ -349,25 +359,25 @@
 <!-- ═══ PAIN ═══ -->
 <section class="section" id="problema">
   <div class="container">
-    <p class="section-eyebrow reveal" style="color:var(--red)">El problema</p>
-    <h2 class="section-title reveal d1">Tu operacion funciona.<br>Pero podria dar el doble.</h2>
-    <p class="section-desc reveal d2">No es que no vendas. Es que pierdes dinero todos los dias por operar con sistemas que no se hablan entre si.</p>
+    <p class="section-eyebrow reveal" style="color:var(--red)">Esto te cuesta dinero todos los dias</p>
+    <h2 class="section-title reveal d1">Tu negocio crece.<br>Pero tu operacion no puede seguirle el paso.</h2>
+    <p class="section-desc reveal d2">Cuando tus sistemas no se hablan entre si, pierdes ventas, desperdicias capacidad y tomas decisiones a ciegas.</p>
     <div class="pain-grid">
       <div class="pain-card reveal d1">
-        <h3>Sistemas desconectados</h3>
-        <p>Web por un lado. Agenda por otro. CRM por otro. Cada uno en su isla. La data se pierde entre ellos y nadie tiene la foto completa.</p>
+        <h3>Silos de informacion</h3>
+        <p>Tu web, tu agenda, tu CRM, tu inventario &mdash; cada uno vive en su isla. Nadie tiene la foto completa. Los datos se pierden entre sistemas.</p>
       </div>
       <div class="pain-card reveal d2">
-        <h3>Desarrollo lento y caro</h3>
-        <p>4-6 meses para lanzar algo. $40,000+ en desarrollo. Y cuando necesitas un cambio, otro ciclo de meses y facturas.</p>
+        <h3>Procesos manuales</h3>
+        <p>Confirmaciones por telefono, seguimiento en Excel, reportes a mano. Tu equipo pierde horas en tareas que deberian ser automaticas.</p>
       </div>
       <div class="pain-card reveal d3">
-        <h3>Capacidad desperdiciada</h3>
-        <p>Tu equipo, tu planta, tu agenda dan para el doble. Pero operas a media capacidad porque no llegas al cliente correcto en el momento correcto.</p>
+        <h3>Ventas que se pierden</h3>
+        <p>Clientes que no reciben seguimiento, agendas con huecos, oportunidades que nadie ve. Cada dia sin sistema es dinero que se escapa.</p>
       </div>
       <div class="pain-card reveal d4">
-        <h3>Sin inteligencia de datos</h3>
-        <p>Tomas decisiones con el instinto porque no tienes dashboards, predicciones ni alertas. Reaccionas en vez de anticipar.</p>
+        <h3>Planeamiento a ciegas</h3>
+        <p>Sin datos consolidados no podes anticipar demanda, optimizar capacidad ni tomar decisiones informadas. Reaccionas en vez de planear.</p>
       </div>
     </div>
   </div>
@@ -377,82 +387,79 @@
 <div class="divider">
   <div class="container">
     <div class="divider-line"></div>
-    <h2 class="reveal">Y si pudieras tener todo eso <em>en semanas?</em></h2>
+    <h2 class="reveal">Y si toda tu operacion estuviera<br><em>conectada en un solo lugar?</em></h2>
   </div>
 </div>
 
 <!-- ═══ SOLUTION ═══ -->
 <section class="section" id="solucion">
   <div class="container">
-    <p class="section-eyebrow reveal" style="color:var(--accent)">La solucion</p>
-    <h2 class="section-title reveal d1">Un equipo de ingenieria dedicado<br>a tu operacion.</h2>
-    <p class="section-desc reveal d2">Construimos por fases. Cada entrega ya funciona y aporta valor. En 3-4 semanas tienes el sistema completo.</p>
+    <p class="section-eyebrow reveal" style="color:var(--accent)">Ecosistema Agentico 360&deg;</p>
+    <h2 class="section-title reveal d1">Todo conectado. Todo inteligente.<br>Un equipo dedicado a tu operacion.</h2>
+    <p class="section-desc reveal d2">Construimos por fases &mdash; cada entrega ya funciona y aporta valor. En 3 a 4 semanas tienes el ecosistema completo operando.</p>
     <div class="sol-grid">
       <div class="sol-card featured reveal d1">
-        <div class="sol-icon">&#x26A1;</div>
-        <h3>Entrega por fases</h3>
-        <p>No esperas meses para ver resultados. Cada fase es funcional &mdash; empiezas a operar desde la primera semana.</p>
+        <div class="sol-icon">&#x1F517;</div>
+        <h3>Integracion 360&deg;</h3>
+        <p>Conectamos web, agenda, CRM, inventario, marketing y logistica en un solo ecosistema. Se acabaron los silos.</p>
       </div>
       <div class="sol-card reveal d2">
-        <div class="sol-icon">&#x1F512;</div>
-        <h3>Seguridad empresarial</h3>
-        <p>Autenticacion de nivel bancario, base de datos cifrada, respaldos cada hora. Infraestructura certificada SOC 2 e ISO 27001.</p>
+        <div class="sol-icon">&#x1F4C5;</div>
+        <h3>Agendamiento inteligente</h3>
+        <p>Tus clientes agendan online. Confirmacion automatica por WhatsApp. Seguimiento a cancelaciones. Tu capacidad se llena al 90%+.</p>
       </div>
       <div class="sol-card reveal d3">
         <div class="sol-icon">&#x1F4CA;</div>
         <h3>Inteligencia de negocio</h3>
-        <p>Dashboards en vivo, prediccion de demanda, analisis de varianza. Datos que se convierten en decisiones accionables.</p>
+        <p>Dashboards en vivo, prediccion de demanda, alertas accionables. Tomas decisiones con datos, no con intuicion.</p>
       </div>
       <div class="sol-card reveal d1">
-        <div class="sol-icon">&#x1F517;</div>
-        <h3>Todo conectado</h3>
-        <p>Web, agenda, CRM, inventario, WhatsApp, marketing &mdash; un solo ecosistema. Un dato entra una vez y fluye a todos lados.</p>
+        <div class="sol-icon">&#x1F512;</div>
+        <h3>Seguridad empresarial</h3>
+        <p>Cifrado, respaldos cada hora, autenticacion de nivel bancario. Infraestructura certificada SOC 2 e ISO 27001.</p>
       </div>
       <div class="sol-card reveal d2">
         <div class="sol-icon">&#x1F504;</div>
-        <h3>Crece contigo</h3>
-        <p>Agregar funcionalidades o ajustar el sistema no requiere reescribir nada. Tu software evoluciona con tu negocio.</p>
+        <h3>Crece con tu negocio</h3>
+        <p>Agregar funcionalidades o ajustar el sistema no requiere empezar de cero. Tu ecosistema evoluciona contigo.</p>
       </div>
       <div class="sol-card reveal d3">
         <div class="sol-icon">&#x1F6E0;</div>
-        <h3>Operacion y soporte</h3>
-        <p>No te entregamos y desaparecemos. Monitoreamos, mantenemos y mejoramos tu sistema de forma continua.</p>
+        <h3>Soporte continuo</h3>
+        <p>No te entregamos y desaparecemos. Nuestro equipo monitorea, mantiene y mejora tu ecosistema de forma permanente.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ STACK BAR ═══ -->
-<div class="stack-bar reveal">
-  <div class="stack-item"><span class="stack-dot"></span>Next.js</div>
-  <div class="stack-item"><span class="stack-dot"></span>React</div>
-  <div class="stack-item"><span class="stack-dot"></span>PostgreSQL</div>
-  <div class="stack-item"><span class="stack-dot"></span>Supabase</div>
-  <div class="stack-item"><span class="stack-dot"></span>Vercel</div>
-  <div class="stack-item"><span class="stack-dot"></span>TypeScript</div>
+<!-- ═══ TEAM ═══ -->
+<div class="team-bar reveal">
+  <div class="container">
+    <p><strong>4 ingenieros senior</strong> dedicados a tu proyecto. Usamos las herramientas mas avanzadas del mercado &mdash; incluyendo inteligencia artificial &mdash; para entregar en <span class="accent">semanas</span> lo que tipicamente toma meses.</p>
+  </div>
 </div>
 
-<!-- ═══ HOW IT WORKS ═══ -->
+<!-- ═══ HOW ═══ -->
 <section class="section">
   <div class="container">
     <p class="section-eyebrow reveal" style="color:var(--accent)">Como funciona</p>
-    <h2 class="section-title reveal d1" style="text-align:center;max-width:100%">Tres pasos. Resultados reales.</h2>
-    <p class="section-desc reveal d2" style="text-align:center;margin-left:auto;margin-right:auto">Sin drama, sin ciclos de meses, sin sorpresas en la factura.</p>
+    <h2 class="section-title reveal d1">Tres fases. Cada una aporta valor.</h2>
+    <p class="section-desc reveal d2">No esperas meses para ver resultados. Desde la primera entrega tu operacion mejora.</p>
     <div class="how-grid">
       <div class="how-step reveal d1">
-        <div class="how-number">Paso 01</div>
-        <h3>Diagnostico gratis</h3>
-        <p>15 minutos. Analizamos tu operacion, tus sistemas actuales y tus cuellos de botella. Te decimos exactamente donde pierdes eficiencia y como resolverlo.</p>
+        <div class="how-number">Fase 01</div>
+        <h3>Diagnostico</h3>
+        <p>Analizamos tu operacion, identificamos cuellos de botella y disenamos el ecosistema. Gratis, sin compromiso.</p>
       </div>
       <div class="how-step reveal d2">
-        <div class="how-number">Paso 02</div>
-        <h3>Entrega por fases</h3>
-        <p>Construimos e integramos tu sistema en fases. Cada entrega ya funciona y aporta valor. En 3-4 semanas tienes la operacion completa.</p>
+        <div class="how-number">Fase 02</div>
+        <h3>Entregas progresivas</h3>
+        <p>Construimos e integramos por fases. Cada entrega ya funciona y aporta valor real a tu operacion. Sin disrumpir lo que ya tienes.</p>
       </div>
       <div class="how-step reveal d3">
-        <div class="how-number">Paso 03</div>
-        <h3>Operacion continua</h3>
-        <p>Tu equipo opera con el nuevo sistema. Nosotros monitoreamos, mantenemos y mejoramos. Vos tomas las decisiones, el sistema ejecuta.</p>
+        <div class="how-number">Fase 03</div>
+        <h3>Ecosistema completo</h3>
+        <p>En 3-4 semanas tienes todo operando: sistemas conectados, automatizaciones activas, dashboards en vivo y soporte continuo.</p>
       </div>
     </div>
   </div>
@@ -462,45 +469,61 @@
 <section class="section" id="resultados">
   <div class="container">
     <p class="section-eyebrow reveal" style="color:var(--accent)">Resultados reales</p>
-    <h2 class="section-title reveal d1">Clientes en produccion. Industrias diferentes.</h2>
+    <h2 class="section-title reveal d1">Empresas que dejaron de operar con piezas sueltas.</h2>
     <div class="proof-grid">
       <div class="proof-card reveal d1">
-        <p class="client">MedCare</p>
-        <p class="industry">Salud &mdash; Centro medico</p>
-        <p class="result">Agenda de equipos medicos integrada con su EHR. Pacientes agendan online, confirman por WhatsApp. Dashboard de inteligencia en vivo.</p>
-        <div class="stat" data-count="48">0</div>
-        <p class="stat-label">horas de implementacion</p>
-      </div>
-      <div class="proof-card reveal d2">
         <p class="client">Videndum</p>
         <p class="industry">Manufactura &mdash; Produccion industrial</p>
-        <p class="result">Forecast de demanda con machine learning. Planificacion automatizada. Analisis de varianza en tiempo real. Dejaron de producir a ciegas.</p>
-        <div class="stat" data-count="40">0</div>
-        <p class="stat-label">% mas precision en forecast</p>
+        <p class="result">Dejaron de producir a ciegas. Ahora predicen demanda, planifican produccion automaticamente y analizan varianza en tiempo real.</p>
+        <div class="metric-row">
+          <div class="stat">+40%</div>
+          <p class="stat-label">precision en forecast de demanda</p>
+        </div>
+      </div>
+      <div class="proof-card reveal d2">
+        <p class="client">MedCare</p>
+        <p class="industry">Salud &mdash; Centro medico</p>
+        <p class="result">Equipos medicos con agendas al 90%+ de capacidad. Pacientes agendan online, confirman por WhatsApp. Dashboard de inteligencia en vivo.</p>
+        <div class="metric-row">
+          <div class="stat">90%+</div>
+          <p class="stat-label">capacidad de equipos ocupada</p>
+        </div>
       </div>
       <div class="proof-card reveal d3">
         <p class="client">Mobility</p>
-        <p class="industry">Servicios &mdash; Rehabilitacion fisica</p>
-        <p class="result">Calendario de especialistas, evaluaciones, seguimiento de pacientes y comunicacion automatizada. Toda la operacion centralizada.</p>
-        <div class="stat">3x</div>
-        <p class="stat-label">mas eficiente en coordinacion</p>
+        <p class="industry">Rehabilitacion fisica</p>
+        <p class="result">Toda la operacion centralizada: calendario de especialistas, evaluaciones, seguimiento de pacientes y comunicacion automatizada.</p>
+        <div class="metric-row">
+          <div class="stat">3x</div>
+          <p class="stat-label">mas eficiente en coordinacion</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ═══ STACK ═══ -->
+<div class="stack-bar reveal">
+  <div class="stack-item"><span class="stack-dot"></span>Next.js</div>
+  <div class="stack-item"><span class="stack-dot"></span>React</div>
+  <div class="stack-item"><span class="stack-dot"></span>PostgreSQL</div>
+  <div class="stack-item"><span class="stack-dot"></span>Supabase</div>
+  <div class="stack-item"><span class="stack-dot"></span>Vercel</div>
+  <div class="stack-item"><span class="stack-dot"></span>TypeScript</div>
+</div>
+
 <!-- ═══ CTA FINAL ═══ -->
 <section class="cta-section" id="contacto">
   <div class="container">
-    <h2 class="reveal">Tu operacion merece<br>un <em>equipo dedicado.</em></h2>
-    <p class="sub reveal d1">15 minutos. Diagnostico gratis. Te mostramos exactamente como mejorar tu operacion.</p>
+    <h2 class="reveal">Cada dia con silos de informacion<br>es dinero <em>que se escapa.</em></h2>
+    <p class="sub reveal d1">15 minutos. Diagnostico gratis. Te mostramos exactamente como conectar tu operacion.</p>
     <div class="ctas reveal d2">
       <a href="https://wa.me/50664220701?text=Hola%2C%20quiero%20mi%20diagnostico%20gratis%20de%20StratosCore" class="btn btn-wa">
         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
         Diagnostico gratis por WhatsApp
       </a>
     </div>
-    <p class="micro reveal d3">Sin costo. Sin compromiso. Sin vendedores insistentes.</p>
+    <p class="micro reveal d3">Sin costo. Sin compromiso. Sin vendedores.</p>
 
     <div class="lead-form reveal d4">
       <h3>O dejanos tus datos</h3>
@@ -509,7 +532,7 @@
         <input type="text" name="nombre" placeholder="Tu nombre" required>
         <input type="email" name="email" placeholder="tu@email.com" required>
         <input type="tel" name="telefono" placeholder="+506 0000 0000">
-        <textarea name="negocio" placeholder="Que hace tu negocio y que te frustra de tu operacion actual?"></textarea>
+        <textarea name="negocio" placeholder="Que hace tu negocio y que te gustaria mejorar?"></textarea>
         <button type="submit" class="btn btn-primary" id="lead-submit">Enviar</button>
         <p id="lead-status" style="display:none;text-align:center;margin-top:10px;font-size:13px;"></p>
       </form>
@@ -548,7 +571,7 @@ function closeMobile(){
 }
 
 // Reveal on scroll
-const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -30px 0px'});
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -20px 0px'});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
 // Smooth scroll
@@ -575,59 +598,15 @@ document.getElementById('lead-form').addEventListener('submit',async function(e)
   }
   btn.disabled=false;btn.textContent='Enviar';
 });
-
-// Count-up
-const countObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const target=parseInt(e.target.dataset.count);if(!target)return;let current=0;const step=Math.ceil(target/30);const timer=setInterval(()=>{current+=step;if(current>=target){current=target;clearInterval(timer);}e.target.textContent=current+(e.target.closest('.metric-number')?.textContent.includes('x')?'x':'');},35);countObs.unobserve(e.target);}});},{threshold:0.5});
-document.querySelectorAll('[data-count]').forEach(el=>countObs.observe(el));
 </script>
 
-<!-- StratosCore Chat Widget -->
-<style>
-#sc-widget-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#00F2FE,#00b4d8);border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,242,254,0.25);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;}
-#sc-widget-btn:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(0,242,254,0.4);}
-#sc-widget-btn svg{width:24px;height:24px;fill:#001117;}
-#sc-widget-panel{position:fixed;bottom:88px;right:24px;z-index:9999;width:380px;max-width:calc(100vw - 32px);height:500px;max-height:calc(100vh - 120px);background:#071218;border:1px solid rgba(0,242,254,0.12);border-radius:12px;display:none;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.5);}
-#sc-widget-panel.open{display:flex;}
-#sc-widget-header{padding:14px 16px;background:rgba(0,242,254,0.04);border-bottom:1px solid rgba(0,242,254,0.08);display:flex;align-items:center;justify-content:space-between;}
-#sc-widget-header h3{font-size:13px;color:var(--accent);font-weight:600;letter-spacing:0.04em;margin:0;}
-#sc-widget-header span{font-size:11px;color:var(--text-muted);}
-#sc-widget-close{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px 8px;border-radius:6px;}
-#sc-widget-close:hover{background:rgba(255,255,255,0.06);color:var(--text-bright);}
-#sc-widget-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
-#sc-widget-msgs::-webkit-scrollbar{width:3px;}
-#sc-widget-msgs::-webkit-scrollbar-thumb{background:rgba(0,242,254,0.15);border-radius:3px;}
-.sc-msg{max-width:85%;padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.5;word-wrap:break-word;}
-.sc-msg.user{align-self:flex-end;background:rgba(0,242,254,0.12);color:var(--text-bright);border-bottom-right-radius:4px;}
-.sc-msg.bot{align-self:flex-start;background:rgba(255,255,255,0.04);color:var(--text);border-bottom-left-radius:4px;}
-.sc-msg.bot strong{color:var(--accent);}
-.sc-actions{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px;}
-.sc-action-btn{background:rgba(0,242,254,0.06);border:1px solid rgba(0,242,254,0.15);color:var(--accent);padding:5px 12px;border-radius:20px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit;}
-.sc-action-btn:hover{background:rgba(0,242,254,0.15);border-color:rgba(0,242,254,0.3);}
-#sc-widget-input{display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(0,242,254,0.08);background:rgba(0,0,0,0.2);}
-#sc-widget-input input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;color:var(--text-bright);font-size:13px;outline:none;font-family:inherit;}
-#sc-widget-input input:focus{border-color:rgba(0,242,254,0.3);}
-#sc-widget-input input::placeholder{color:var(--text-muted);}
-#sc-widget-input button{background:linear-gradient(135deg,#00F2FE,#00b4d8);border:none;border-radius:8px;padding:0 16px;cursor:pointer;color:#001117;font-weight:600;font-size:13px;transition:opacity .2s;font-family:inherit;}
-#sc-widget-input button:disabled{opacity:0.4;cursor:not-allowed;}
-.sc-typing{display:flex;gap:4px;padding:10px 14px;align-self:flex-start;}
-.sc-typing span{width:5px;height:5px;background:rgba(0,242,254,0.35);border-radius:50%;animation:sc-bounce .6s infinite alternate;}
-.sc-typing span:nth-child(2){animation-delay:.15s;}
-.sc-typing span:nth-child(3){animation-delay:.3s;}
-@keyframes sc-bounce{to{opacity:0.3;transform:translateY(-3px);}}
-@media(max-width:639px){
-  #sc-widget-panel{bottom:0;right:0;width:100vw;max-width:100vw;height:100vh;max-height:100vh;border-radius:0;}
-  #sc-widget-btn{bottom:16px;right:16px;width:48px;height:48px;}
-  #sc-widget-btn svg{width:20px;height:20px;}
-}
-</style>
-
+<!-- Chat Widget -->
 <button id="sc-widget-btn" aria-label="Abrir chat" onclick="toggleWidget()">
   <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/><path d="M7 9h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/></svg>
 </button>
-
 <div id="sc-widget-panel">
   <div id="sc-widget-header">
-    <div><h3>stratos|Core</h3><span>Agente de ventas</span></div>
+    <div><h3>stratos|Core</h3><span>Asistente</span></div>
     <button id="sc-widget-close" onclick="toggleWidget()">&times;</button>
   </div>
   <div id="sc-widget-msgs"></div>
@@ -637,75 +616,33 @@ document.querySelectorAll('[data-count]').forEach(el=>countObs.observe(el));
     <button onclick="sendMsg()">Enviar</button>
   </div>
 </div>
-
 <script>
 (function(){
   const API='/api/stratoscore/chat';
   let sessionId='sc_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
-  let isOpen=false;
-  let sending=false;
+  let isOpen=false,sending=false;
   const msgs=document.getElementById('sc-widget-msgs');
   const actionsEl=document.getElementById('sc-widget-actions');
   const input=document.getElementById('sc-input');
   const sendBtn=document.querySelector('#sc-widget-input button');
-
   window.toggleWidget=function(){
     isOpen=!isOpen;
     document.getElementById('sc-widget-panel').classList.toggle('open',isOpen);
     if(isOpen&&msgs.children.length===0){
-      addMsg('bot','Hola! Construimos software empresarial 10x mas rapido con IA. En que puedo ayudarte?');
-      showActions(['Ver casos de exito','Conocer precios','Agendar diagnostico']);
+      addMsg('bot','Hola! Soy el asistente de stratos|Core. En que puedo ayudarte?');
+      showActions(['Ver casos de exito','Conocer como trabajamos','Agendar diagnostico']);
     }
     if(isOpen)input.focus();
   };
-
-  function addMsg(type,text){
-    const div=document.createElement('div');
-    div.className='sc-msg '+type;
-    div.innerHTML=text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-    msgs.appendChild(div);
-    msgs.scrollTop=msgs.scrollHeight;
-    return div;
-  }
-
-  function showActions(actions){
-    actionsEl.innerHTML='';
-    if(!actions||!actions.length)return;
-    actions.forEach(a=>{
-      const btn=document.createElement('button');
-      btn.className='sc-action-btn';
-      btn.textContent=a;
-      btn.onclick=()=>{input.value=a;sendMsg();};
-      actionsEl.appendChild(btn);
-    });
-  }
-
-  function showTyping(){
-    const div=document.createElement('div');
-    div.className='sc-typing';
-    div.id='sc-typing';
-    div.innerHTML='<span></span><span></span><span></span>';
-    msgs.appendChild(div);
-    msgs.scrollTop=msgs.scrollHeight;
-  }
+  function addMsg(type,text){const div=document.createElement('div');div.className='sc-msg '+type;div.innerHTML=text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return div;}
+  function showActions(actions){actionsEl.innerHTML='';if(!actions||!actions.length)return;actions.forEach(a=>{const btn=document.createElement('button');btn.className='sc-action-btn';btn.textContent=a;btn.onclick=()=>{input.value=a;sendMsg();};actionsEl.appendChild(btn);});}
+  function showTyping(){const div=document.createElement('div');div.className='sc-typing';div.id='sc-typing';div.innerHTML='<span></span><span></span><span></span>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;}
   function hideTyping(){const t=document.getElementById('sc-typing');if(t)t.remove();}
-
   window.sendMsg=async function(){
-    const text=input.value.trim();
-    if(!text||sending)return;
-    sending=true;
-    sendBtn.disabled=true;
-    input.value='';
-    actionsEl.innerHTML='';
-    addMsg('user',text);
-    showTyping();
-    try{
-      const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,sessionId,channel:'web'})});
-      const json=await res.json();
-      hideTyping();
-      if(json.success&&json.data){addMsg('bot',json.data.message);if(json.data.suggestedActions)showActions(json.data.suggestedActions);}
-      else addMsg('bot','Disculpa, hubo un error. Escribe a carlos@stratoscore.app');
-    }catch(e){hideTyping();addMsg('bot','No pude conectar. Intenta de nuevo.');}
+    const text=input.value.trim();if(!text||sending)return;
+    sending=true;sendBtn.disabled=true;input.value='';actionsEl.innerHTML='';
+    addMsg('user',text);showTyping();
+    try{const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,sessionId,channel:'web'})});const json=await res.json();hideTyping();if(json.success&&json.data){addMsg('bot',json.data.message);if(json.data.suggestedActions)showActions(json.data.suggestedActions);}else addMsg('bot','Disculpa, hubo un error. Escribe a carlos@stratoscore.app');}catch(e){hideTyping();addMsg('bot','No pude conectar. Intenta de nuevo.');}
     sending=false;sendBtn.disabled=false;input.focus();
   };
 })();
