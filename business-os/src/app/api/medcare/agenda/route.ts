@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/supabase/auth-guard'
 import { HuliConnector } from '@/features/medcare/lib/huli-connector'
+import type { HuliAppointment } from '@/features/medcare/lib/huli-types'
 
 // Doctores y equipos de MedCare organizados por categoría
 const EQUIPOS_AGENDA = [
@@ -44,19 +45,36 @@ export async function GET(request: NextRequest) {
     const from = fromParam ? `${fromParam}T00:00:00Z` : `${date}T00:00:00Z`
     const to = toParam ? `${toParam}T23:59:59Z` : `${date}T23:59:59Z`
 
-    // Determinar limit según rango de fechas
-    const isRange = fromParam && toParam
-    const fetchLimit = isRange ? 200 : 50
+    // Fetch paginado: Huli limita a ~200 por request, pero puede haber 500+
+    const PAGE_SIZE = 200
+
+    async function fetchAllAppointments(sourceId: string, fromDate: string, toDate: string) {
+      const allAppts: HuliAppointment[] = []
+      let offset = 0
+      let totalCount = 0
+
+      do {
+        const data = await huli.listDoctorAppointments(sourceId, fromDate, toDate, { limit: PAGE_SIZE, offset })
+        const appts = data.appointments || []
+        allAppts.push(...appts)
+        totalCount = Number(data.total) || 0
+        offset += appts.length
+        // Si recibimos menos de PAGE_SIZE, ya no hay más
+        if (appts.length < PAGE_SIZE) break
+      } while (offset < totalCount)
+
+      return { appointments: allAppts, total: totalCount }
+    }
 
     // Consultar todos los doctores/equipos en paralelo
     const allSources = [...EQUIPOS_AGENDA, ...DOCTORES_AGENDA]
     const results = await Promise.allSettled(
       allSources.map(async (source) => {
         try {
-          const data = await huli.listDoctorAppointments(source.id, from, to, { limit: fetchLimit })
+          const data = await fetchAllAppointments(source.id, from, to)
           return {
             ...source,
-            citas: (data.appointments || []).map(a => ({
+            citas: data.appointments.map(a => ({
               id: a.idEvent,
               fecha: a.startDate,
               hora: a.timeFrom?.substring(0, 5),
@@ -69,7 +87,7 @@ export async function GET(request: NextRequest) {
               primeraCita: a.isFirstTimePatient,
               canceladoPorPaciente: a.isStatusModifiedByPatient,
             })),
-            total: Number(data.total) || 0,
+            total: data.total,
           }
         } catch {
           return { ...source, citas: [], total: 0 }
