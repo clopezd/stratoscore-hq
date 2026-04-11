@@ -12,8 +12,8 @@ export function HowItWorks() {
           {[
             {
               step: '1',
-              title: 'Escoge tu estudio',
-              desc: 'Selecciona mamografía, ultrasonido o el combo promo y elige la fecha.',
+              title: 'Escogé tu estudio',
+              desc: 'Seleccioná mamografía, ultrasonido o el combo promo y elegí la fecha.',
               color: 'bg-red-600',
             },
             {

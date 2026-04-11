@@ -25,11 +25,11 @@ const faqs = [
   },
   {
     q: '¿Aceptan seguros médicos?',
-    a: 'Sí, trabajamos con las principales aseguradoras del país. Contactanos por WhatsApp para verificar tu cobertura antes de la cita.',
+    a: 'Sí, trabajamos con las principales aseguradoras del país. Escribinos por WhatsApp para verificar tu cobertura antes de la cita.',
   },
   {
     q: '¿Qué preparación necesito?',
-    a: 'Para mamografía: no usar desodorante, talco ni cremas el día del estudio. Vestir ropa de dos piezas para mayor comodidad. Para ultrasonido abdominal: ayuno de 6-8 horas.',
+    a: 'Para mamografía: no usar desodorante, talco ni cremas el día del estudio. Vestir ropa de dos piezas para mayor comodidad. Para ultrasonido mamario: no se requiere ayuno ni preparación especial, solo evitar cremas en la zona.',
   },
 ]
 
