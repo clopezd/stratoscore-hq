@@ -20,9 +20,9 @@ export const metadata: Metadata = {
   description: 'Business Operations Platform — Powered by StratosCore',
   manifest: '/manifest.json',
   icons: {
-    icon: [{ url: '/favicon.png', type: 'image/png' }],
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
     apple: '/apple-touch-icon.png',
-    shortcut: '/favicon.png',
+    shortcut: '/favicon.svg',
   },
   appleWebApp: {
     capable: true,

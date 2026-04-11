@@ -11,9 +11,9 @@
   "categories": ["productivity", "business", "utilities"],
   "icons": [
     {
-      "src": "/favicon.png",
-      "sizes": "64x64",
-      "type": "image/png",
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
