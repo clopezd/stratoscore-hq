@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
   <title>stratos|Core — Software empresarial con IA</title>
-  <meta name="description" content="Construimos ecosistemas de software con IA que conectan tu operacion completa. Lo que otros tardan meses, nosotros lo entregamos en dias.">
-  <meta name="theme-color" content="#050a0e">
+  <meta name="description" content="Fabrica de software acelerada por IA. Lo que otros tardan meses, lo entregamos en semanas. Infraestructura empresarial desde el dia uno.">
+  <meta name="theme-color" content="#001117">
   <meta property="og:title" content="stratos|Core — Software empresarial con IA">
-  <meta property="og:description" content="Ecosistemas de software con IA. Tu operacion completa, conectada e inteligente.">
+  <meta property="og:description" content="Fabrica de software acelerada por IA. 10x mas rapido. Seguridad nivel bancario.">
   <meta property="og:image" content="/images/stratoscore-social.png">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,63 +15,67 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #050a0e;
-      --bg-subtle: #0a1118;
+      --bg: #001117;
+      --bg-surface: #001e30;
       --accent: #00F2FE;
-      --accent-2: #38bdf8;
+      --accent-2: #a8f0ff;
       --accent-dim: rgba(0,242,254,0.08);
       --accent-glow: rgba(0,242,254,0.20);
-      --text: #b0bec5;
-      --text-bright: #eceff1;
-      --text-muted: #607d8b;
+      --text: #E0EDE0;
+      --text-bright: #ffffff;
+      --text-muted: #8B949E;
+      --text-subtle: rgba(139,148,158,0.5);
       --border: rgba(255,255,255,0.06);
-      --border-hover: rgba(0,242,254,0.20);
+      --border-hover: rgba(0,242,254,0.25);
       --red: #ff6b6b;
       --green: #10b981;
       --wa-green: #25D366;
-      --card: rgba(255,255,255,0.02);
+      --card: rgba(255,255,255,0.025);
       --radius: 12px;
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { scroll-behavior:smooth; overflow-x:hidden; }
     body { font-family:'Inter',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow-x:hidden; }
     a { color:inherit; text-decoration:none; }
-    .container { max-width:1100px; margin:0 auto; padding:0 24px; }
-
-    /* ── Focus ── */
+    .container { max-width:1060px; margin:0 auto; padding:0 24px; }
     :focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-
-    /* ── Reduced motion ── */
     @media (prefers-reduced-motion:reduce) {
       *, *::before, *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
     }
 
-    /* ── Grain overlay ── */
-    body::before { content:''; position:fixed; inset:0; z-index:999; pointer-events:none; opacity:0.03; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+    /* ── Subtle grid background ── */
+    body::after {
+      content:'';
+      position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.35;
+      background-image:
+        linear-gradient(rgba(0,242,254,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,242,254,0.03) 1px, transparent 1px);
+      background-size:80px 80px;
+    }
 
-    /* ── Glow orb ── */
-    .glow-orb { position:fixed; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle, rgba(0,242,254,0.06) 0%, transparent 70%); pointer-events:none; z-index:0; top:-200px; left:50%; transform:translateX(-50%); filter:blur(80px); }
+    /* ── Glow ── */
+    .glow { position:fixed; width:700px; height:700px; border-radius:50%; background:radial-gradient(circle, rgba(0,242,254,0.07) 0%, transparent 65%); pointer-events:none; z-index:0; top:-300px; left:50%; transform:translateX(-50%); filter:blur(60px); }
 
     /* ── Nav ── */
-    nav { position:fixed; top:0; left:0; right:0; z-index:50; padding:16px 0; transition:all 0.3s ease; }
-    nav.scrolled { background:rgba(5,10,14,0.85); backdrop-filter:blur(20px) saturate(180%); border-bottom:1px solid var(--border); }
-    .nav-inner { max-width:1100px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; }
-    .wordmark { font-weight:300; font-size:15px; letter-spacing:0.1em; color:var(--text-bright); }
+    nav { position:fixed; top:0; left:0; right:0; z-index:50; padding:18px 0; transition:all 0.3s; }
+    nav.scrolled { background:rgba(0,17,23,0.90); backdrop-filter:blur(24px) saturate(180%); border-bottom:1px solid var(--border); padding:14px 0; }
+    .nav-inner { max-width:1060px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; }
+    .wordmark { font-weight:300; font-size:15px; letter-spacing:0.12em; color:var(--text); }
     .wordmark b { color:var(--accent); font-weight:300; }
-    .nav-links { display:flex; gap:32px; align-items:center; }
+    .nav-links { display:flex; gap:28px; align-items:center; }
     .nav-links a { font-size:13px; color:var(--text-muted); transition:color 0.2s; font-weight:400; }
     .nav-links a:hover { color:var(--text-bright); }
-    .nav-cta { padding:8px 18px; background:var(--accent); color:var(--bg); font-weight:600; font-size:12px; border-radius:6px; border:none; cursor:pointer; transition:all 0.2s; letter-spacing:0.02em; }
-    .nav-cta:hover { box-shadow:0 0 20px var(--accent-glow); }
+    .nav-cta { padding:8px 20px; background:var(--accent); color:var(--bg); font-weight:600; font-size:12px; border-radius:6px; border:none; cursor:pointer; transition:all 0.2s; letter-spacing:0.02em; }
+    .nav-cta:hover { box-shadow:0 0 24px var(--accent-glow); }
 
     /* ── Buttons ── */
     .btn { display:inline-flex; align-items:center; gap:8px; padding:12px 28px; font-size:14px; font-weight:500; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s; font-family:inherit; }
     .btn-primary { background:var(--accent); color:var(--bg); font-weight:600; }
-    .btn-primary:hover { box-shadow:0 4px 24px var(--accent-glow); transform:translateY(-1px); }
-    .btn-ghost { background:transparent; color:var(--text-bright); border:1px solid var(--border); }
-    .btn-ghost:hover { border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.03); }
+    .btn-primary:hover { box-shadow:0 0 30px var(--accent-glow); transform:translateY(-1px); }
+    .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
+    .btn-ghost:hover { border-color:rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--text-bright); }
     .btn-wa { background:var(--wa-green); color:#fff; font-weight:600; }
-    .btn-wa:hover { box-shadow:0 4px 20px rgba(37,211,102,0.35); transform:translateY(-1px); }
+    .btn-wa:hover { box-shadow:0 4px 24px rgba(37,211,102,0.35); transform:translateY(-1px); }
 
     /* ── Hamburger ── */
     .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; }
@@ -81,98 +85,104 @@
     .hamburger.active span:nth-child(3) { transform:rotate(-45deg) translate(4px,-4px); }
 
     /* ── Mobile menu ── */
-    .mobile-menu { display:none; position:fixed; inset:0; background:rgba(5,10,14,0.98); backdrop-filter:blur(30px); z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:28px; }
+    .mobile-menu { display:none; position:fixed; inset:0; background:rgba(0,17,23,0.98); backdrop-filter:blur(30px); z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:28px; }
     .mobile-menu.open { display:flex; }
-    .mobile-menu a { font-size:18px; color:var(--text-bright); font-weight:500; letter-spacing:0.01em; }
+    .mobile-menu a { font-size:18px; color:var(--text-bright); font-weight:500; }
     .mobile-menu a:hover { color:var(--accent); }
     .mobile-menu .btn { font-size:16px; padding:14px 32px; }
-    .mobile-close { position:absolute; top:16px; right:16px; background:none; border:1px solid var(--border); color:var(--text-muted); font-size:20px; width:40px; height:40px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+    .mobile-close { position:absolute; top:16px; right:16px; background:none; border:1px solid var(--border); color:var(--text-muted); font-size:20px; width:40px; height:40px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
     .mobile-close:hover { border-color:var(--accent); color:var(--accent); }
 
     /* ── Hero ── */
-    .hero { min-height:100vh; display:flex; align-items:center; position:relative; z-index:1; padding:120px 0 80px; }
-    .hero-inner { text-align:center; max-width:720px; margin:0 auto; }
-    .hero-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; background:var(--accent-dim); border:1px solid rgba(0,242,254,0.12); border-radius:100px; font-size:12px; color:var(--accent); font-weight:500; margin-bottom:32px; letter-spacing:0.02em; }
+    .hero { min-height:100vh; display:flex; align-items:center; position:relative; z-index:1; padding:120px 0 60px; }
+    .hero-inner { text-align:center; max-width:680px; margin:0 auto; }
+    .hero-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; background:var(--accent-dim); border:1px solid rgba(0,242,254,0.12); border-radius:100px; font-size:12px; color:var(--accent); font-weight:500; margin-bottom:32px; letter-spacing:0.03em; }
     .hero-badge .dot { width:5px; height:5px; background:var(--accent); border-radius:50%; animation:pulse 2.5s ease infinite; }
-    .hero h1 { font-size:clamp(36px,6vw,64px); font-weight:800; line-height:1.05; color:var(--text-bright); margin-bottom:24px; letter-spacing:-0.03em; }
+    .hero h1 { font-size:clamp(36px,6vw,60px); font-weight:800; line-height:1.06; color:var(--text-bright); margin-bottom:24px; letter-spacing:-0.03em; }
     .hero h1 em { font-style:normal; background:linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .hero .sub { font-size:clamp(16px,2vw,19px); color:var(--text); line-height:1.7; margin-bottom:40px; max-width:520px; margin-left:auto; margin-right:auto; font-weight:400; }
-    .hero-ctas { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:48px; }
-    .hero-proof { display:flex; align-items:center; justify-content:center; gap:12px; }
-    .hero-proof .pills { display:flex; gap:6px; }
-    .hero-proof .pill { padding:4px 12px; background:var(--card); border:1px solid var(--border); border-radius:100px; font-size:11px; color:var(--text-muted); font-weight:500; }
-    .hero-proof .label { font-size:12px; color:var(--text-muted); }
+    .hero .lead { font-size:clamp(16px,2vw,18px); color:var(--text-muted); line-height:1.7; margin-bottom:40px; max-width:520px; margin-left:auto; margin-right:auto; }
+    .hero .lead strong { color:var(--text); font-weight:500; }
+    .hero-ctas { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:56px; }
+
+    /* ── Trust bar ── */
+    .trust { display:flex; align-items:center; justify-content:center; gap:24px; flex-wrap:wrap; }
+    .trust-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-muted); }
+    .trust-item .icon { color:var(--accent); font-size:14px; }
+    .trust-sep { width:1px; height:16px; background:var(--border); }
 
     /* ── Metrics ── */
-    .metrics { position:relative; z-index:1; padding:0 0 100px; }
-    .metrics-grid { display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
-    .metric { text-align:center; padding:36px 20px; position:relative; }
-    .metric:not(:last-child) { border-right:1px solid var(--border); }
-    .metric-number { font-size:clamp(32px,4vw,48px); font-weight:800; color:var(--text-bright); line-height:1; margin-bottom:6px; letter-spacing:-0.02em; }
-    .metric-number span { background:linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .metric-desc { font-size:13px; color:var(--text-muted); font-weight:400; }
+    .metrics { position:relative; z-index:1; padding:40px 0 100px; }
+    .metrics-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    .metric { text-align:center; padding:40px 16px; background:var(--bg); }
+    .metric-number { font-size:clamp(36px,5vw,52px); font-weight:800; line-height:1; margin-bottom:8px; letter-spacing:-0.02em; background:linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .metric-desc { font-size:12px; color:var(--text-muted); font-weight:400; line-height:1.4; }
 
     /* ── Section shared ── */
     .section { padding:100px 0; position:relative; z-index:1; }
-    .section-label { font-size:12px; text-transform:uppercase; letter-spacing:0.15em; font-weight:600; margin-bottom:12px; }
-    .section-title { font-size:clamp(28px,4vw,40px); font-weight:700; color:var(--text-bright); margin-bottom:16px; line-height:1.15; letter-spacing:-0.02em; }
-    .section-lead { font-size:16px; color:var(--text-muted); margin-bottom:48px; max-width:560px; line-height:1.65; }
+    .section-eyebrow { font-size:11px; text-transform:uppercase; letter-spacing:0.2em; font-weight:600; margin-bottom:12px; }
+    .section-title { font-size:clamp(28px,4vw,38px); font-weight:700; color:var(--text-bright); margin-bottom:16px; line-height:1.15; letter-spacing:-0.02em; }
+    .section-desc { font-size:15px; color:var(--text-muted); margin-bottom:48px; max-width:520px; line-height:1.65; }
 
     /* ── Pain ── */
-    .pain-label { color:var(--red); }
     .pain-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-    .pain-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; transition:all 0.3s; }
-    .pain-card:hover { border-color:rgba(255,107,107,0.2); background:rgba(255,107,107,0.02); }
+    .pain-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; transition:border-color 0.3s; position:relative; overflow:hidden; }
+    .pain-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--red); opacity:0.5; }
+    .pain-card:hover { border-color:rgba(255,107,107,0.15); }
     .pain-card h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:6px; }
     .pain-card p { font-size:13px; color:var(--text-muted); line-height:1.6; }
 
-    /* ── Transition ── */
-    .transition-block { padding:64px 0; text-align:center; position:relative; z-index:1; }
-    .transition-block h2 { font-size:clamp(24px,3.5vw,34px); font-weight:700; color:var(--text-bright); letter-spacing:-0.02em; }
-    .transition-block em { font-style:normal; color:var(--accent); }
-    .transition-line { width:1px; height:48px; background:linear-gradient(to bottom, var(--border), var(--accent-glow), var(--border)); margin:0 auto 16px; }
+    /* ── Divider ── */
+    .divider { padding:64px 0; text-align:center; position:relative; z-index:1; }
+    .divider-line { width:1px; height:56px; background:linear-gradient(to bottom, transparent, var(--accent), transparent); margin:0 auto 20px; }
+    .divider h2 { font-size:clamp(22px,3.5vw,32px); font-weight:700; color:var(--text-bright); letter-spacing:-0.02em; }
+    .divider em { font-style:normal; color:var(--accent); }
 
     /* ── Solution ── */
     .sol-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
     .sol-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:28px 22px; transition:all 0.3s; }
-    .sol-card:hover { border-color:var(--border-hover); transform:translateY(-4px); }
-    .sol-card .sol-icon { width:36px; height:36px; background:var(--accent-dim); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; font-size:16px; }
+    .sol-card:hover { border-color:var(--border-hover); transform:translateY(-3px); }
+    .sol-card .sol-icon { width:40px; height:40px; background:var(--accent-dim); border:1px solid rgba(0,242,254,0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:18px; font-size:18px; }
     .sol-card h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:6px; }
     .sol-card p { font-size:13px; color:var(--text-muted); line-height:1.6; }
-    .sol-card.featured { border-color:rgba(0,242,254,0.15); background:rgba(0,242,254,0.03); }
-    .sol-card.featured:hover { border-color:rgba(0,242,254,0.3); box-shadow:0 8px 32px rgba(0,242,254,0.08); }
+    .sol-card.featured { border-color:rgba(0,242,254,0.12); background:rgba(0,242,254,0.02); }
+    .sol-card.featured:hover { border-color:rgba(0,242,254,0.3); box-shadow:0 8px 40px rgba(0,242,254,0.06); }
+
+    /* ── How it works ── */
+    .how-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .how-step { position:relative; padding:32px 24px 28px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); }
+    .how-number { font-size:11px; font-weight:700; color:var(--accent); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:14px; }
+    .how-step h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:8px; }
+    .how-step p { font-size:13px; color:var(--text-muted); line-height:1.6; }
 
     /* ── Proof ── */
     .proof-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
     .proof-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:28px 24px; position:relative; overflow:hidden; }
     .proof-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg, var(--accent), var(--accent-2)); }
     .proof-card .client { font-size:18px; font-weight:700; color:var(--text-bright); margin-bottom:2px; }
-    .proof-card .industry { font-size:12px; color:var(--accent); margin-bottom:14px; font-weight:500; }
-    .proof-card .result { font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:18px; }
-    .proof-card .stat { font-size:32px; font-weight:800; background:linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .proof-card .stat-label { font-size:11px; color:var(--text-muted); }
+    .proof-card .industry { font-size:12px; color:var(--accent); margin-bottom:14px; font-weight:500; letter-spacing:0.03em; }
+    .proof-card .result { font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:20px; }
+    .proof-card .stat { font-size:36px; font-weight:800; background:linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:-0.02em; }
+    .proof-card .stat-label { font-size:11px; color:var(--text-muted); margin-top:2px; }
 
-    /* ── Steps ── */
-    .steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; counter-reset:step; }
-    .step { counter-increment:step; position:relative; padding:32px 24px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); }
-    .step::before { content:counter(step); font-size:44px; font-weight:800; color:rgba(0,242,254,0.08); line-height:1; position:absolute; top:20px; right:20px; }
-    .step h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:8px; }
-    .step p { font-size:13px; color:var(--text-muted); line-height:1.6; }
+    /* ── Stack ── */
+    .stack-bar { display:flex; align-items:center; justify-content:center; gap:32px; flex-wrap:wrap; padding:40px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin:0 auto; position:relative; z-index:1; }
+    .stack-item { font-size:12px; color:var(--text-muted); font-weight:500; letter-spacing:0.04em; display:flex; align-items:center; gap:6px; }
+    .stack-dot { width:4px; height:4px; background:var(--accent); border-radius:50%; }
 
     /* ── CTA Final ── */
     .cta-section { padding:120px 0; text-align:center; position:relative; z-index:1; }
-    .cta-section::before { content:''; position:absolute; bottom:20%; left:50%; transform:translateX(-50%); width:500px; height:500px; background:radial-gradient(circle, rgba(0,242,254,0.05) 0%, transparent 70%); pointer-events:none; filter:blur(60px); }
+    .cta-section::before { content:''; position:absolute; bottom:10%; left:50%; transform:translateX(-50%); width:500px; height:500px; background:radial-gradient(circle, rgba(0,242,254,0.06) 0%, transparent 65%); pointer-events:none; filter:blur(80px); }
     .cta-section h2 { font-size:clamp(28px,4.5vw,42px); font-weight:800; color:var(--text-bright); margin-bottom:16px; line-height:1.1; letter-spacing:-0.02em; }
     .cta-section em { font-style:normal; color:var(--accent); }
-    .cta-section .sub { font-size:17px; color:var(--text-muted); margin-bottom:36px; max-width:460px; margin-left:auto; margin-right:auto; line-height:1.6; }
-    .cta-section .ctas { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
-    .cta-section .micro { font-size:12px; color:var(--text-muted); opacity:0.6; }
+    .cta-section .sub { font-size:16px; color:var(--text-muted); margin-bottom:36px; max-width:440px; margin-left:auto; margin-right:auto; line-height:1.6; }
+    .cta-section .ctas { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+    .cta-section .micro { font-size:12px; color:var(--text-subtle); }
 
     /* ── Lead form ── */
     .lead-form { max-width:400px; margin:48px auto 0; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:28px; text-align:left; }
-    .lead-form h3 { font-size:16px; font-weight:600; color:var(--text-bright); margin-bottom:4px; }
+    .lead-form h3 { font-size:15px; font-weight:600; color:var(--text-bright); margin-bottom:4px; }
     .lead-form .form-sub { font-size:13px; color:var(--text-muted); margin-bottom:18px; }
-    .lead-form input, .lead-form textarea { width:100%; padding:11px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; color:var(--text-bright); font-size:13px; font-family:inherit; margin-bottom:10px; transition:border 0.2s; }
+    .lead-form input, .lead-form textarea { width:100%; padding:11px 14px; background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:8px; color:var(--text-bright); font-size:13px; font-family:inherit; margin-bottom:10px; transition:border 0.2s; }
     .lead-form input:focus, .lead-form textarea:focus { outline:none; border-color:rgba(0,242,254,0.4); }
     .lead-form input::placeholder, .lead-form textarea::placeholder { color:var(--text-muted); }
     .lead-form textarea { resize:vertical; min-height:72px; }
@@ -180,8 +190,8 @@
 
     /* ── Footer ── */
     footer { border-top:1px solid var(--border); padding:28px 0; position:relative; z-index:1; }
-    .footer-inner { max-width:1100px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; align-items:center; }
-    .footer-text { font-size:11px; color:var(--text-muted); opacity:0.5; }
+    .footer-inner { max-width:1060px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; align-items:center; }
+    .footer-text { font-size:11px; color:var(--text-subtle); }
 
     /* ── WhatsApp float ── */
     .wa-float { position:fixed; bottom:96px; right:24px; width:52px; height:52px; background:var(--wa-green); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(37,211,102,0.35); z-index:99; transition:all 0.2s; }
@@ -190,7 +200,7 @@
 
     /* ── Animations ── */
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-    .reveal { opacity:0; transform:translateY(30px); transition:all 0.7s cubic-bezier(0.4,0,0.2,1); }
+    .reveal { opacity:0; transform:translateY(24px); transition:all 0.7s cubic-bezier(0.4,0,0.2,1); }
     .reveal.visible { opacity:1; transform:translateY(0); }
     .reveal.d1 { transition-delay:0.1s; }
     .reveal.d2 { transition-delay:0.2s; }
@@ -205,28 +215,23 @@
       .hamburger { display:block; }
       .hero { min-height:auto; padding:120px 0 60px; }
       .metrics-grid { grid-template-columns:repeat(2,1fr); }
-      .metric:nth-child(2) { border-right:none; }
-      .metric:nth-child(1), .metric:nth-child(2) { border-bottom:1px solid var(--border); }
-      .sol-grid { grid-template-columns:repeat(2,1fr); }
-      .proof-grid { grid-template-columns:repeat(2,1fr); }
-      .steps-grid { grid-template-columns:repeat(2,1fr); }
+      .sol-grid, .proof-grid { grid-template-columns:repeat(2,1fr); }
+      .how-grid { grid-template-columns:repeat(2,1fr); }
       .section { padding:72px 0; }
       .cta-section { padding:80px 0; }
+      .stack-bar { gap:20px; }
     }
-
     @media (max-width:639px) {
       .container { padding:0 16px; }
       .nav-inner { padding:0 16px; }
       .hero h1 { font-size:32px; }
-      .hero .sub { font-size:15px; }
+      .hero .lead { font-size:15px; }
       .hero-ctas { flex-direction:column; align-items:center; }
       .hero-ctas .btn { width:100%; justify-content:center; }
-      .hero-proof { flex-direction:column; gap:8px; }
-      .hero-proof .pills { flex-wrap:wrap; justify-content:center; }
+      .trust { flex-direction:column; gap:10px; }
+      .trust-sep { display:none; }
       .metrics-grid { grid-template-columns:1fr; }
-      .metric { border-right:none !important; border-bottom:1px solid var(--border); }
-      .metric:last-child { border-bottom:none; }
-      .pain-grid, .sol-grid, .proof-grid, .steps-grid { grid-template-columns:1fr; }
+      .pain-grid, .sol-grid, .proof-grid, .how-grid { grid-template-columns:1fr; }
       .section { padding:56px 0; }
       .section-title { font-size:24px; }
       .cta-section h2 { font-size:26px; }
@@ -234,12 +239,14 @@
       .footer-inner { flex-direction:column; gap:8px; text-align:center; }
       .wa-float { bottom:80px; right:16px; width:48px; height:48px; }
       .wa-float svg { width:22px; height:22px; }
+      .stack-bar { gap:14px; padding:28px 16px; }
+      .stack-item { font-size:11px; }
     }
   </style>
 </head>
 <body>
 
-<div class="glow-orb"></div>
+<div class="glow"></div>
 
 <!-- WhatsApp Float -->
 <a href="https://wa.me/50664220701?text=Hola%2C%20quiero%20saber%20mas%20sobre%20StratosCore" class="wa-float" aria-label="WhatsApp">
@@ -252,7 +259,7 @@
   <a href="#problema" onclick="closeMobile()">El problema</a>
   <a href="#solucion" onclick="closeMobile()">Solucion</a>
   <a href="#resultados" onclick="closeMobile()">Resultados</a>
-  <a href="#contacto" class="btn btn-primary" onclick="closeMobile()">Agendar diagnostico</a>
+  <a href="#contacto" class="btn btn-primary" onclick="closeMobile()">Hablar con nosotros</a>
 </div>
 
 <!-- Nav -->
@@ -266,7 +273,7 @@
       <a href="#problema">El problema</a>
       <a href="#solucion">Solucion</a>
       <a href="#resultados">Resultados</a>
-      <a href="#contacto" class="nav-cta">Agendar diagnostico</a>
+      <a href="#contacto" class="nav-cta">Hablar con nosotros</a>
     </div>
   </div>
 </nav>
@@ -277,17 +284,17 @@
     <div class="hero-inner">
       <div class="hero-badge reveal">
         <span class="dot"></span>
-        Software empresarial con IA
+        Fabrica de software con IA
       </div>
       <h1 class="reveal d1">
-        Tu operacion completa.<br><em>Conectada e inteligente.</em>
+        Construimos tu software<br><em>10x mas rapido.</em>
       </h1>
-      <p class="sub reveal d2">
-        Construimos ecosistemas de software que integran agenda, CRM, marketing y logistica con inteligencia artificial. Lo que otros tardan meses, nosotros lo entregamos en dias.
+      <p class="lead reveal d2">
+        Usamos IA generativa como arquitecto de software. Lo que otros tardan <strong>meses</strong>, nosotros lo entregamos en <strong>semanas</strong> &mdash; con seguridad de nivel bancario desde el dia uno.
       </p>
       <div class="hero-ctas reveal d3">
         <a href="#contacto" class="btn btn-primary">
-          Diagnostico gratis
+          Agendar diagnostico gratis
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
         <a href="https://wa.me/50664220701" class="btn btn-ghost">
@@ -295,12 +302,20 @@
           WhatsApp directo
         </a>
       </div>
-      <div class="hero-proof reveal d4">
-        <span class="label">Ya operan con nosotros:</span>
-        <div class="pills">
-          <span class="pill">Salud</span>
-          <span class="pill">Manufactura</span>
-          <span class="pill">Rehabilitacion</span>
+      <div class="trust reveal d4">
+        <div class="trust-item">
+          <span class="icon">&#x2713;</span>
+          Seguridad nivel bancario
+        </div>
+        <div class="trust-sep"></div>
+        <div class="trust-item">
+          <span class="icon">&#x2713;</span>
+          99.99% uptime
+        </div>
+        <div class="trust-sep"></div>
+        <div class="trust-item">
+          <span class="icon">&#x2713;</span>
+          Clientes en produccion
         </div>
       </div>
     </div>
@@ -312,20 +327,20 @@
   <div class="container">
     <div class="metrics-grid reveal">
       <div class="metric">
-        <div class="metric-number"><span data-count="10">0</span>x</div>
+        <div class="metric-number" data-count="10">0x</div>
         <div class="metric-desc">mas rapido que desarrollo tradicional</div>
       </div>
       <div class="metric">
-        <div class="metric-number"><span data-count="11">0</span></div>
+        <div class="metric-number">&lt;3</div>
+        <div class="metric-desc">semanas de implementacion</div>
+      </div>
+      <div class="metric">
+        <div class="metric-number">$50</div>
+        <div class="metric-desc">por mes de infraestructura</div>
+      </div>
+      <div class="metric">
+        <div class="metric-number" data-count="11">0</div>
         <div class="metric-desc">agentes IA operando 24/7</div>
-      </div>
-      <div class="metric">
-        <div class="metric-number"><span>360</span>&deg;</div>
-        <div class="metric-desc">cobertura de tu operacion</div>
-      </div>
-      <div class="metric">
-        <div class="metric-number"><span>&lt;48</span>h</div>
-        <div class="metric-desc">primer sistema en produccion</div>
       </div>
     </div>
   </div>
@@ -334,73 +349,110 @@
 <!-- ═══ PAIN ═══ -->
 <section class="section" id="problema">
   <div class="container">
-    <p class="section-label pain-label reveal">Te suena familiar?</p>
-    <h2 class="section-title reveal d1">Tu operacion funciona.<br>Pero al 50% de lo que podria.</h2>
-    <p class="section-lead reveal d2">No es que no vendas. Es que pierdes dinero todos los dias por operar con piezas sueltas.</p>
+    <p class="section-eyebrow reveal" style="color:var(--red)">El problema</p>
+    <h2 class="section-title reveal d1">Tu operacion funciona.<br>Pero podria dar el doble.</h2>
+    <p class="section-desc reveal d2">No es que no vendas. Es que pierdes dinero todos los dias por operar con sistemas que no se hablan entre si.</p>
     <div class="pain-grid">
       <div class="pain-card reveal d1">
-        <h3>Sistemas que no se hablan</h3>
-        <p>Tu pagina web por un lado. Tu agenda por otro. Tu CRM por otro. Cada uno vive en su isla. La data se pierde entre ellos.</p>
+        <h3>Sistemas desconectados</h3>
+        <p>Web por un lado. Agenda por otro. CRM por otro. Cada uno en su isla. La data se pierde entre ellos y nadie tiene la foto completa.</p>
       </div>
       <div class="pain-card reveal d2">
-        <h3>Proyecciones que no se cumplen</h3>
-        <p>Planificas ventas que no llegan. Produces de mas o de menos. No sabes cuanta demanda vas a tener la proxima semana.</p>
+        <h3>Desarrollo lento y caro</h3>
+        <p>4-6 meses para lanzar algo. $40,000+ en desarrollo. Y cuando necesitas un cambio, otro ciclo de meses y facturas.</p>
       </div>
       <div class="pain-card reveal d3">
         <h3>Capacidad desperdiciada</h3>
-        <p>Tu agenda, tu equipo, tu planta dan para el doble. Pero operas a media capacidad porque no llegas al cliente correcto.</p>
+        <p>Tu equipo, tu planta, tu agenda dan para el doble. Pero operas a media capacidad porque no llegas al cliente correcto en el momento correcto.</p>
       </div>
       <div class="pain-card reveal d4">
-        <h3>Inventario y logistica a ciegas</h3>
-        <p>No sabes que tienes, que necesitas, ni cuando. El control es una hoja de Excel que nadie actualiza a tiempo.</p>
+        <h3>Sin inteligencia de datos</h3>
+        <p>Tomas decisiones con el instinto porque no tienes dashboards, predicciones ni alertas. Reaccionas en vez de anticipar.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ Transition ═══ -->
-<div class="transition-block">
+<!-- ═══ Divider ═══ -->
+<div class="divider">
   <div class="container">
-    <div class="transition-line"></div>
-    <h2 class="reveal">Y si todo eso <em>se conectara?</em></h2>
+    <div class="divider-line"></div>
+    <h2 class="reveal">Y si pudieras tener todo eso <em>en semanas?</em></h2>
   </div>
 </div>
 
 <!-- ═══ SOLUTION ═══ -->
 <section class="section" id="solucion">
   <div class="container">
-    <p class="section-label reveal" style="color:var(--accent)">Ecosistema completo</p>
-    <h2 class="section-title reveal d1">Todo tu negocio. Conectado, automatizado e inteligente.</h2>
+    <p class="section-eyebrow reveal" style="color:var(--accent)">La solucion</p>
+    <h2 class="section-title reveal d1">Software empresarial completo.<br>En semanas, no meses.</h2>
+    <p class="section-desc reveal d2">IA generativa como arquitecto. Infraestructura de nivel bancario. Adaptable sin reescribir desde cero.</p>
     <div class="sol-grid">
       <div class="sol-card featured reveal d1">
-        <div class="sol-icon">&#x1F517;</div>
-        <h3>Integracion total</h3>
-        <p>Web, agenda, CRM, ERP, logistica y marketing en un solo sistema. Un dato entra una vez y fluye a todos lados.</p>
+        <div class="sol-icon">&#x26A1;</div>
+        <h3>Velocidad 10x</h3>
+        <p>Lo que toma 4-6 meses de desarrollo tradicional, lo entregamos en 3 semanas. Con la misma calidad y seguridad.</p>
       </div>
       <div class="sol-card reveal d2">
-        <div class="sol-icon">&#x1F4CA;</div>
-        <h3>Forecast inteligente</h3>
-        <p>Prediccion de demanda con IA. Sabe cuanto vas a vender, cuanto producir, cuanto necesitas en inventario.</p>
+        <div class="sol-icon">&#x1F512;</div>
+        <h3>Seguridad desde dia uno</h3>
+        <p>Autenticacion bancaria, base de datos cifrada, respaldos cada hora, 99.99% uptime. Certificaciones SOC 2 e ISO 27001.</p>
       </div>
       <div class="sol-card reveal d3">
         <div class="sol-icon">&#x1F916;</div>
-        <h3>Automatizacion con IA</h3>
-        <p>Confirmaciones, seguimiento, reportes, alertas. Agentes de IA que ejecutan por vos. 24/7. Sin errores humanos.</p>
+        <h3>Agentes de IA</h3>
+        <p>11 agentes que confirman citas, hacen seguimiento, generan reportes y alertas. Trabajan 24/7 sin errores humanos.</p>
       </div>
       <div class="sol-card reveal d1">
-        <div class="sol-icon">&#x1F4C5;</div>
-        <h3>Agendamiento y CRM</h3>
-        <p>Tus clientes agendan online, confirman por WhatsApp, los que cancelan reciben seguimiento automatico.</p>
+        <div class="sol-icon">&#x1F4CA;</div>
+        <h3>Inteligencia de negocio</h3>
+        <p>Dashboards en vivo, prediccion de demanda con ML, analisis de varianza. Datos que se convierten en decisiones.</p>
       </div>
       <div class="sol-card reveal d2">
-        <div class="sol-icon">&#x1F4E6;</div>
-        <h3>Inventario y logistica</h3>
-        <p>Stock en tiempo real, rutas optimizadas, alertas de reposicion. Todo visible desde un solo dashboard.</p>
+        <div class="sol-icon">&#x1F517;</div>
+        <h3>Todo conectado</h3>
+        <p>Web, agenda, CRM, inventario, WhatsApp, marketing &mdash; un solo ecosistema. Un dato entra una vez y fluye a todos lados.</p>
       </div>
       <div class="sol-card reveal d3">
-        <div class="sol-icon">&#x1F4A1;</div>
-        <h3>Inteligencia de negocio</h3>
-        <p>Dashboards en vivo, alertas accionables, oportunidades detectadas automaticamente.</p>
+        <div class="sol-icon">&#x1F504;</div>
+        <h3>Adaptable al instante</h3>
+        <p>Modificar o agregar funcionalidades no requiere reescribir desde cero. Cambios en dias, no meses.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STACK BAR ═══ -->
+<div class="stack-bar reveal">
+  <div class="stack-item"><span class="stack-dot"></span>Next.js 16</div>
+  <div class="stack-item"><span class="stack-dot"></span>React 19</div>
+  <div class="stack-item"><span class="stack-dot"></span>Supabase</div>
+  <div class="stack-item"><span class="stack-dot"></span>Vercel Edge</div>
+  <div class="stack-item"><span class="stack-dot"></span>Claude AI</div>
+  <div class="stack-item"><span class="stack-dot"></span>PostgreSQL</div>
+</div>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="section">
+  <div class="container">
+    <p class="section-eyebrow reveal" style="color:var(--accent)">Como funciona</p>
+    <h2 class="section-title reveal d1" style="text-align:center;max-width:100%">Tres pasos. Resultados reales.</h2>
+    <p class="section-desc reveal d2" style="text-align:center;margin-left:auto;margin-right:auto">Sin drama, sin ciclos de meses, sin sorpresas en la factura.</p>
+    <div class="how-grid">
+      <div class="how-step reveal d1">
+        <div class="how-number">Paso 01</div>
+        <h3>Diagnostico gratis</h3>
+        <p>15 minutos. Analizamos tu operacion, tus sistemas actuales y tus cuellos de botella. Te decimos exactamente donde pierdes dinero y como resolverlo.</p>
+      </div>
+      <div class="how-step reveal d2">
+        <div class="how-number">Paso 02</div>
+        <h3>Construccion rapida</h3>
+        <p>Conectamos e integramos todo con IA. Tu agenda, CRM, logistica, web. En semanas, no meses. Sin disrumpir tu operacion actual.</p>
+      </div>
+      <div class="how-step reveal d3">
+        <div class="how-number">Paso 03</div>
+        <h3>Piloto automatico</h3>
+        <p>Tu negocio opera con agentes de IA. Vos tomas las decisiones estrategicas. Los agentes ejecutan, monitorean y reportan.</p>
       </div>
     </div>
   </div>
@@ -409,8 +461,8 @@
 <!-- ═══ PROOF ═══ -->
 <section class="section" id="resultados">
   <div class="container">
-    <p class="section-label reveal" style="color:var(--accent)">Resultados reales</p>
-    <h2 class="section-title reveal d1">Negocios que dejaron de operar con piezas sueltas.</h2>
+    <p class="section-eyebrow reveal" style="color:var(--accent)">Resultados reales</p>
+    <h2 class="section-title reveal d1">Clientes en produccion. Industrias diferentes.</h2>
     <div class="proof-grid">
       <div class="proof-card reveal d1">
         <p class="client">MedCare</p>
@@ -422,37 +474,16 @@
       <div class="proof-card reveal d2">
         <p class="client">Videndum</p>
         <p class="industry">Manufactura &mdash; Produccion industrial</p>
-        <p class="result">Forecast de demanda con ML. Planificacion de produccion automatizada. Analisis de varianza en tiempo real.</p>
+        <p class="result">Forecast de demanda con machine learning. Planificacion automatizada. Analisis de varianza en tiempo real. Dejaron de producir a ciegas.</p>
         <div class="stat" data-count="40">0</div>
         <p class="stat-label">% mas precision en forecast</p>
       </div>
       <div class="proof-card reveal d3">
         <p class="client">Mobility</p>
         <p class="industry">Servicios &mdash; Rehabilitacion fisica</p>
-        <p class="result">Calendario de especialistas, evaluaciones, seguimiento de clientes y comunicacion automatizada en un solo lugar.</p>
+        <p class="result">Calendario de especialistas, evaluaciones, seguimiento de pacientes y comunicacion automatizada. Toda la operacion centralizada.</p>
         <div class="stat">3x</div>
         <p class="stat-label">mas eficiente en coordinacion</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ HOW ═══ -->
-<section class="section">
-  <div class="container">
-    <h2 class="section-title reveal" style="text-align:center;margin-bottom:48px">Tres pasos. Sin drama.</h2>
-    <div class="steps-grid">
-      <div class="step reveal d1">
-        <h3>Diagnostico gratis</h3>
-        <p>15 minutos. Analizamos tu operacion, tus sistemas actuales y tus cuellos de botella. Te decimos donde pierdes dinero.</p>
-      </div>
-      <div class="step reveal d2">
-        <h3>Construccion rapida</h3>
-        <p>Conectamos e integramos todo. Tu agenda, CRM, logistica, web. En dias, no meses. Sin disrumpir tu operacion.</p>
-      </div>
-      <div class="step reveal d3">
-        <h3>Piloto automatico</h3>
-        <p>Tu negocio opera con inteligencia artificial. Vos tomas las decisiones estrategicas. El sistema ejecuta el resto.</p>
       </div>
     </div>
   </div>
@@ -461,8 +492,8 @@
 <!-- ═══ CTA FINAL ═══ -->
 <section class="cta-section" id="contacto">
   <div class="container">
-    <h2 class="reveal">Cada dia sin integracion<br>es dinero <em>que se pierde.</em></h2>
-    <p class="sub reveal d1">Agenda tu diagnostico gratuito. 15 minutos que pueden transformar tu operacion.</p>
+    <h2 class="reveal">Lo que otros tardan meses,<br>nosotros lo hacemos en <em>semanas.</em></h2>
+    <p class="sub reveal d1">15 minutos. Diagnostico gratis. Te decimos exactamente como transformar tu operacion.</p>
     <div class="ctas reveal d2">
       <a href="https://wa.me/50664220701?text=Hola%2C%20quiero%20mi%20diagnostico%20gratis%20de%20StratosCore" class="btn btn-wa">
         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
@@ -523,7 +554,7 @@ document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});});});
 
 // Count-up
-const countObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const target=parseInt(e.target.dataset.count);if(!target)return;let current=0;const step=Math.ceil(target/30);const timer=setInterval(()=>{current+=step;if(current>=target){current=target;clearInterval(timer);}e.target.textContent=current;},35);countObs.unobserve(e.target);}});},{threshold:0.5});
+const countObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const target=parseInt(e.target.dataset.count);if(!target)return;let current=0;const step=Math.ceil(target/30);const timer=setInterval(()=>{current+=step;if(current>=target){current=target;clearInterval(timer);}e.target.textContent=current+(e.target.closest('.metric-number')?.textContent.includes('x')?'x':'');},35);countObs.unobserve(e.target);}});},{threshold:0.5});
 document.querySelectorAll('[data-count]').forEach(el=>countObs.observe(el));
 </script>
 
@@ -531,10 +562,10 @@ document.querySelectorAll('[data-count]').forEach(el=>countObs.observe(el));
 <style>
 #sc-widget-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#00F2FE,#00b4d8);border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,242,254,0.25);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;}
 #sc-widget-btn:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(0,242,254,0.4);}
-#sc-widget-btn svg{width:24px;height:24px;fill:#050a0e;}
-#sc-widget-panel{position:fixed;bottom:88px;right:24px;z-index:9999;width:380px;max-width:calc(100vw - 32px);height:500px;max-height:calc(100vh - 120px);background:#080e14;border:1px solid rgba(0,242,254,0.15);border-radius:12px;display:none;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.6);}
+#sc-widget-btn svg{width:24px;height:24px;fill:#001117;}
+#sc-widget-panel{position:fixed;bottom:88px;right:24px;z-index:9999;width:380px;max-width:calc(100vw - 32px);height:500px;max-height:calc(100vh - 120px);background:#071218;border:1px solid rgba(0,242,254,0.12);border-radius:12px;display:none;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.5);}
 #sc-widget-panel.open{display:flex;}
-#sc-widget-header{padding:14px 16px;background:rgba(0,242,254,0.04);border-bottom:1px solid rgba(0,242,254,0.1);display:flex;align-items:center;justify-content:space-between;}
+#sc-widget-header{padding:14px 16px;background:rgba(0,242,254,0.04);border-bottom:1px solid rgba(0,242,254,0.08);display:flex;align-items:center;justify-content:space-between;}
 #sc-widget-header h3{font-size:13px;color:var(--accent);font-weight:600;letter-spacing:0.04em;margin:0;}
 #sc-widget-header span{font-size:11px;color:var(--text-muted);}
 #sc-widget-close{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px 8px;border-radius:6px;}
@@ -549,11 +580,11 @@ document.querySelectorAll('[data-count]').forEach(el=>countObs.observe(el));
 .sc-actions{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px;}
 .sc-action-btn{background:rgba(0,242,254,0.06);border:1px solid rgba(0,242,254,0.15);color:var(--accent);padding:5px 12px;border-radius:20px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit;}
 .sc-action-btn:hover{background:rgba(0,242,254,0.15);border-color:rgba(0,242,254,0.3);}
-#sc-widget-input{display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(0,242,254,0.1);background:rgba(0,0,0,0.2);}
+#sc-widget-input{display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(0,242,254,0.08);background:rgba(0,0,0,0.2);}
 #sc-widget-input input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;color:var(--text-bright);font-size:13px;outline:none;font-family:inherit;}
 #sc-widget-input input:focus{border-color:rgba(0,242,254,0.3);}
 #sc-widget-input input::placeholder{color:var(--text-muted);}
-#sc-widget-input button{background:linear-gradient(135deg,#00F2FE,#00b4d8);border:none;border-radius:8px;padding:0 16px;cursor:pointer;color:#050a0e;font-weight:600;font-size:13px;transition:opacity .2s;font-family:inherit;}
+#sc-widget-input button{background:linear-gradient(135deg,#00F2FE,#00b4d8);border:none;border-radius:8px;padding:0 16px;cursor:pointer;color:#001117;font-weight:600;font-size:13px;transition:opacity .2s;font-family:inherit;}
 #sc-widget-input button:disabled{opacity:0.4;cursor:not-allowed;}
 .sc-typing{display:flex;gap:4px;padding:10px 14px;align-self:flex-start;}
 .sc-typing span{width:5px;height:5px;background:rgba(0,242,254,0.35);border-radius:50%;animation:sc-bounce .6s infinite alternate;}
@@ -599,8 +630,8 @@ document.querySelectorAll('[data-count]').forEach(el=>countObs.observe(el));
     isOpen=!isOpen;
     document.getElementById('sc-widget-panel').classList.toggle('open',isOpen);
     if(isOpen&&msgs.children.length===0){
-      addMsg('bot','Hola! Soy el agente de stratos|Core. Construimos software empresarial 10x mas rapido con IA. En que puedo ayudarte?');
-      showActions(['Ver casos de exito','Conocer precios','Agendar demo']);
+      addMsg('bot','Hola! Construimos software empresarial 10x mas rapido con IA. En que puedo ayudarte?');
+      showActions(['Ver casos de exito','Conocer precios','Agendar diagnostico']);
     }
     if(isOpen)input.focus();
   };
@@ -643,31 +674,16 @@ document.querySelectorAll('[data-count]').forEach(el=>countObs.observe(el));
     sendBtn.disabled=true;
     input.value='';
     actionsEl.innerHTML='';
-
     addMsg('user',text);
     showTyping();
-
     try{
-      const res=await fetch(API,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({message:text,sessionId:sessionId,channel:'web'}),
-      });
+      const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,sessionId,channel:'web'})});
       const json=await res.json();
       hideTyping();
-      if(json.success&&json.data){
-        addMsg('bot',json.data.message);
-        if(json.data.suggestedActions)showActions(json.data.suggestedActions);
-      }else{
-        addMsg('bot','Disculpa, hubo un error. Intenta de nuevo o escribe a carlos@stratoscore.app');
-      }
-    }catch(e){
-      hideTyping();
-      addMsg('bot','No pude conectar con el agente. Intenta de nuevo en un momento.');
-    }
-    sending=false;
-    sendBtn.disabled=false;
-    input.focus();
+      if(json.success&&json.data){addMsg('bot',json.data.message);if(json.data.suggestedActions)showActions(json.data.suggestedActions);}
+      else addMsg('bot','Disculpa, hubo un error. Escribe a carlos@stratoscore.app');
+    }catch(e){hideTyping();addMsg('bot','No pude conectar. Intenta de nuevo.');}
+    sending=false;sendBtn.disabled=false;input.focus();
   };
 })();
 </script>
