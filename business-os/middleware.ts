@@ -23,7 +23,8 @@ const PUBLIC_PATHS = [
   '/videndum/discovery',
   '/encuesta',
   '/demo-landing',
-  '/fitsync-landing'
+  '/fitsync-landing',
+  '/medcare/agendar-estudio'
 ]
 
 function isPublicPath(pathname: string): boolean {
@@ -66,30 +67,26 @@ export function middleware(request: NextRequest) {
   // ── 0. Subdominio fitsync → rewrite a /fitsync-landing y /fitsync ────────
   if (isFitSyncSubdomain(hostname)) {
     if (pathname.startsWith('/_next') || pathname.startsWith('/api')) {
-      return NextResponse.next({ request: { headers: requestHeaders } })
+      return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
     }
-    // Root → landing page
     if (pathname === '/') {
-      return NextResponse.rewrite(new URL('/fitsync-landing', request.url), { request: { headers: requestHeaders } })
+      return addSecurityHeaders(NextResponse.rewrite(new URL('/fitsync-landing', request.url), { request: { headers: requestHeaders } }))
     }
-    // /app → the authenticated app
     if (pathname === '/app' || pathname.startsWith('/app/')) {
       const appPath = pathname === '/app' ? '/fitsync' : `/fitsync${pathname.slice(4)}`
-      return NextResponse.rewrite(new URL(appPath, request.url), { request: { headers: requestHeaders } })
+      return addSecurityHeaders(NextResponse.rewrite(new URL(appPath, request.url), { request: { headers: requestHeaders } }))
     }
-    // Auth pages pass through
     if (pathname === '/login' || pathname === '/signup' || pathname.startsWith('/fitsync')) {
-      return NextResponse.next({ request: { headers: requestHeaders } })
+      return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
     }
-    // Everything else → landing
-    return NextResponse.rewrite(new URL('/fitsync-landing', request.url), { request: { headers: requestHeaders } })
+    return addSecurityHeaders(NextResponse.rewrite(new URL('/fitsync-landing', request.url), { request: { headers: requestHeaders } }))
   }
 
   // ── 1. Subdominio lavanderia → rewrite a /lavanderia ─────────────────────
   if (isLavanderiaSubdomain(hostname)) {
-    if (pathname.startsWith('/_next') || pathname.startsWith('/api')) return NextResponse.next({ request: { headers: requestHeaders } })
+    if (pathname.startsWith('/_next') || pathname.startsWith('/api')) return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
     const rewritePath = pathname === '/' ? '/lavanderia' : `/lavanderia${pathname}`
-    return NextResponse.rewrite(new URL(rewritePath, request.url))
+    return addSecurityHeaders(NextResponse.rewrite(new URL(rewritePath, request.url)))
   }
 
   // ── 2. Preview URLs de lavanderia-logistica → forzar landing ─────────────
@@ -97,36 +94,49 @@ export function middleware(request: NextRequest) {
     if (pathname !== '/') {
       const url = request.nextUrl.clone()
       url.pathname = '/'
-      return NextResponse.rewrite(url)
+      return addSecurityHeaders(NextResponse.rewrite(url))
     }
-    return NextResponse.next({ request: { headers: requestHeaders } })
+    return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
   }
 
   // ── 3. Dominios raíz (stratoscore.app, www.) ─────────────────────────────
   if (MAIN_HOSTNAMES.has(hostname)) {
-    // Landing: / SIEMPRE muestra el landing público (con o sin sesión)
     if (pathname === '/') {
-      return NextResponse.rewrite(new URL('/landing.html', request.url), { request: { headers: requestHeaders } })
+      return addSecurityHeaders(NextResponse.rewrite(new URL('/landing.html', request.url), { request: { headers: requestHeaders } }))
     }
-    // Rutas públicas: siempre accesibles
     if (isPublicPath(pathname) || pathname === '/landing.html' || pathname.startsWith('/api/') || pathname.startsWith('/lavanderia')) {
-      return NextResponse.next({ request: { headers: requestHeaders } })
+      return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
     }
-    // Rutas protegidas: redirigir a login si no hay sesión (preserva la ruta original)
     if (!hasSession(request)) {
       const loginUrl = new URL('/login', request.url)
       if (pathname !== '/') loginUrl.searchParams.set('next', pathname)
-      return NextResponse.redirect(loginUrl)
+      return addSecurityHeaders(NextResponse.redirect(loginUrl))
     }
-    return NextResponse.next({ request: { headers: requestHeaders } })
+    return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
   }
 
   // ── 4. Cualquier otro host (incluyendo localhost) → pasar con headers ────
-  return NextResponse.next({ request: { headers: requestHeaders } })
+  return addSecurityHeaders(
+    NextResponse.next({ request: { headers: requestHeaders } })
+  )
+}
+
+// ── Security Headers (OWASP best practices) ───────────────────────────────
+function addSecurityHeaders(response: NextResponse): NextResponse {
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-XSS-Protection', '1; mode=block')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  response.headers.set(
+    'Strict-Transport-Security',
+    'max-age=31536000; includeSubDomains; preload'
+  )
+  return response
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|manifest\\.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|manifest\\.json|sw\\.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
