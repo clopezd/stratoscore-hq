@@ -9,10 +9,6 @@ export function Hero() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
           <div className="max-w-2xl flex-1">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-400/30 rounded-full text-xs text-yellow-200 mb-6">
-              <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
-              Promo Abril — Mamografía + Ultrasonido ₡65,000
-            </div>
             <h1 className="text-3xl sm:text-5xl font-bold leading-tight mb-4">
               Mamografía 3D con<br />
               <span className="text-red-400">Inteligencia Artificial.</span>
@@ -22,7 +18,7 @@ export function Hero() {
               Adquisición 3D en 10 segundos con menos dolor.
             </p>
             <p className="text-base text-gray-400 mb-8">
-              Detectar a tiempo lo cambia todo. Agenda tu mamografía + ultrasonido mamario por solo <strong className="text-white">₡65,000</strong>.
+              Detectar a tiempo lo cambia todo. Agenda hoy y recibí resultados el mismo día.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <a
@@ -45,12 +41,24 @@ export function Hero() {
               </a>
             </div>
           </div>
+          {/* Móvil: imagen visible */}
+          <div className="w-full md:hidden flex justify-center">
+            <Image
+              src="/medcare/promo-mamografia-3d.jpeg"
+              alt="Mamografía 3D + Ultrasonido — ₡65,000 en MedCare"
+              width={340}
+              height={420}
+              className="rounded-2xl shadow-2xl border-2 border-white/10 object-cover"
+              priority
+            />
+          </div>
+          {/* Desktop: imagen lateral */}
           <div className="hidden md:block flex-shrink-0">
             <Image
-              src="/medcare/mamografo-paciente-tecnica.jpeg"
-              alt="Paciente realizándose mamografía 3D en FUJIFILM AMULET Sophinity"
+              src="/medcare/promo-mamografia-3d.jpeg"
+              alt="Mamografía 3D + Ultrasonido — ₡65,000 en MedCare"
               width={420}
-              height={280}
+              height={520}
               className="rounded-2xl shadow-2xl border-2 border-white/10 object-cover"
               priority
             />
