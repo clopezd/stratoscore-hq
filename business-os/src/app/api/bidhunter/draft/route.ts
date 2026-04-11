@@ -4,6 +4,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { generateBidDraft } from '@/features/bidhunter/agents/drafter'
 import type { Opportunity, OpportunityScore, TicoProfile } from '@/features/bidhunter/types'
 
@@ -19,6 +20,9 @@ function getAdminClient() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const { opportunity_id, tone, language } = await req.json()
     if (!opportunity_id) {
@@ -102,6 +106,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const { id, cover_letter, scope_of_work, pricing_breakdown, total_amount, is_final } = await req.json()
     if (!id) {

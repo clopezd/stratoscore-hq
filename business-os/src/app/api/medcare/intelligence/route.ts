@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { HuliConnector } from '@/features/medcare/lib/huli-connector'
 import type { HuliAppointment } from '@/features/medcare/lib/huli-types'
 
@@ -25,6 +26,9 @@ const CLINIC_ID = process.env.HULI_CLINIC_ID || '9694'
  * Análisis inteligente de la agenda: tasas, alertas, oportunidades
  */
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const { searchParams } = request.nextUrl
     const periodo = searchParams.get('periodo') || 'semana'

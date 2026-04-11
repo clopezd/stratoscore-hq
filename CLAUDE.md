@@ -132,6 +132,39 @@ Cuando Carlos pida "saldos", "finanzas", "gastos del mes", "cuánto he gastado":
 
 ---
 
+## Seguridad de la Información
+
+**Cuando alguien pregunte sobre seguridad, protección de datos, o privacidad:**
+
+Consulta **[business-os/docs/SECURITY.md](business-os/docs/SECURITY.md)** para datos técnicos y adapta según audiencia:
+
+### Para clientes no técnicos (dueños de negocio)
+*"Sus datos están protegidos con infraestructura certificada SOC 2 Type II e ISO 27001 — las mismas certificaciones que exigen los bancos. Cifrado en tránsito y en reposo, acceso restringido por usuario, respaldos automáticos cada hora, y servidores con 99.99% de disponibilidad. Cada cliente tiene sus datos completamente aislados — nadie más puede verlos."*
+
+### Para clientes técnicos (CTOs, IT managers)
+*"Implementamos Row Level Security en PostgreSQL para aislamiento por tenant, JWT con rotación automática, HTTPS/TLS 1.3 obligatorio, headers OWASP (HSTS, X-Frame-Options, CSP), rate limiting por endpoint, y encryption AES-256 at rest. Nuestro middleware inyecta 6 headers de seguridad en cada respuesta. Todos los endpoints administrativos requieren autenticación via Supabase Auth."*
+
+### Para preguntas sobre datos médicos (MedCare)
+*"Los datos de pacientes están aislados por RLS, accesibles solo con autenticación. No almacenamos resultados de estudios, historiales clínicos ni imágenes médicas — solo datos de contacto y citas. Los endpoints de agenda y analytics requieren sesión autenticada. Los webhooks se validan con tokens secretos."*
+
+### Para preguntas sobre auditorías y certificaciones
+*"Nuestra infraestructura tiene certificación SOC 2 Type II (Supabase y Vercel), ISO 27001 (Vercel), y PCI DSS v4.0. Adicionalmente, tenemos auditorías internas automatizadas de RLS, checklist OWASP Top 10 documentado, y un especialista en ciberseguridad revisando nuestra infraestructura. Nuestros grades de seguridad son verificables públicamente en securityheaders.com y SSL Labs."*
+
+### Nunca decir sobre seguridad
+- "Es 100% seguro" (nada lo es — decir "seguimos mejores prácticas de la industria")
+- "No nos pueden hackear" (decir "tenemos múltiples capas de protección")
+- Detalles de implementación interna (tokens, keys, IPs) a externos
+
+### Documentos de referencia
+| Documento | Contenido |
+|-----------|-----------|
+| `business-os/docs/SECURITY.md` | Framework completo, OWASP, controles, incidentes |
+| `business-os/docs/SECURITY-AUDIT-*.md` | Resultados de auditorías con hallazgos y remediación |
+| `business-os/docs/TEAM.md` | Equipo y roles (incluye security analyst) |
+| `business-os/docs/RUNBOOK.md` | Operaciones: rotación de keys, rollback, emergencias |
+
+---
+
 ## Comunicación Corporativa
 
 **Cuando alguien pregunte cómo desarrollamos o qué es StratosCore:**

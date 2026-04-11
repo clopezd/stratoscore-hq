@@ -15,10 +15,12 @@ import { applyEnrichment } from '@/features/bidhunter/services/enrichmentService
 
 export const runtime = 'nodejs'
 
+const EXTENSION_API_KEY = process.env.BIDHUNTER_EXTENSION_KEY || ''
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Extension-Key',
 }
 
 function corsJson(data: unknown, init?: { status?: number }) {
@@ -77,6 +79,14 @@ interface ExtensionOpportunity {
 }
 
 export async function POST(req: NextRequest) {
+  if (!EXTENSION_API_KEY) {
+    return corsJson({ error: 'Extension auth not configured' }, { status: 500 })
+  }
+  const key = req.headers.get('x-extension-key')
+  if (key !== EXTENSION_API_KEY) {
+    return corsJson({ error: 'Invalid extension key' }, { status: 401 })
+  }
+
   try {
     const body = await req.json()
     const opportunities: ExtensionOpportunity[] = body.opportunities

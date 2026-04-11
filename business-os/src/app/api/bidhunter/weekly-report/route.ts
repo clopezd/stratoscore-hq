@@ -5,6 +5,7 @@
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { getKPIs, snapshotCurrentWeek, getRecentActivity } from '@/features/bidhunter/services/kpiService'
 
 export const runtime = 'nodejs'
@@ -18,6 +19,9 @@ function getAdminClient() {
 }
 
 export async function POST() {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     // Snapshot first
     await snapshotCurrentWeek()

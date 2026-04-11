@@ -5,6 +5,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 
 export const runtime = 'nodejs'
 
@@ -17,6 +18,9 @@ function getAdminClient() {
 }
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const { searchParams } = req.nextUrl
     const status = searchParams.get('status')
@@ -70,6 +74,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const body = await req.json()
     const { id, ...updates } = body

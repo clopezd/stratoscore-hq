@@ -9,6 +9,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { getAggregatedExtraction } from '@/features/bidhunter/services/pdfService'
 import { buildBidFormData, generateBidForm } from '@/features/bidhunter/services/bidFormService'
 import type { Opportunity, BidEstimate } from '@/features/bidhunter/types'
@@ -24,6 +25,9 @@ function getAdmin() {
 }
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   const opportunityId = req.nextUrl.searchParams.get('opportunity_id')
   if (!opportunityId) {
     return NextResponse.json({ error: 'opportunity_id required' }, { status: 400 })

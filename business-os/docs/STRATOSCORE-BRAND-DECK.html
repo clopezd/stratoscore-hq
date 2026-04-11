@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StratosCore — Brand Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'Satoshi';
+      src: url('../public/fonts/Satoshi-Regular.woff2') format('woff2');
+      font-weight: 400; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'Satoshi';
+      src: url('../public/fonts/Satoshi-Medium.woff2') format('woff2');
+      font-weight: 500; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'Satoshi';
+      src: url('../public/fonts/Satoshi-Bold.woff2') format('woff2');
+      font-weight: 700; font-style: normal; font-display: swap;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --carbon: #001117;
+      --carbon-deep: #000a0e;
+      --platinum: #E0EDE0;
+      --cyan: #00F2FE;
+      --cyan-dim: rgba(0,242,254,0.12);
+      --cyan-glow: rgba(0,242,254,0.25);
+      --stellar: #8B949E;
+      --surface: #001e30;
+      --white: #ffffff;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: 'Satoshi', 'Inter', system-ui, sans-serif;
+      background: var(--carbon);
+      color: var(--platinum);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Slide Engine ──────────────────────────────────────────── */
+    .deck {
+      width: 100%; height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 80px;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .slide.active {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: all;
+      z-index: 1;
+    }
+    .slide.exit-left {
+      opacity: 0;
+      transform: translateX(-80px) scale(0.92);
+    }
+    .slide.exit-right {
+      opacity: 0;
+      transform: translateX(80px) scale(0.92);
+    }
+
+    /* ── Navigation ────────────────────────────────────────────── */
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 20px 40px;
+      background: linear-gradient(to top, rgba(0,11,17,0.95) 0%, transparent 100%);
+    }
+    .nav-btn {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,242,254,0.2);
+      background: rgba(0,242,254,0.06);
+      color: var(--cyan);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .nav-btn:hover {
+      background: rgba(0,242,254,0.15);
+      border-color: var(--cyan);
+      box-shadow: 0 0 16px rgba(0,242,254,0.3);
+    }
+    .nav-btn:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .nav-btn:disabled:hover {
+      background: rgba(0,242,254,0.06);
+      border-color: rgba(0,242,254,0.2);
+    }
+    .slide-counter {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 13px;
+      color: var(--stellar);
+      min-width: 60px;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cyan), #a8f0ff);
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+      z-index: 101;
+      box-shadow: 0 0 12px rgba(0,242,254,0.5);
+    }
+    .slide-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .dot.active {
+      background: var(--cyan);
+      box-shadow: 0 0 8px rgba(0,242,254,0.6);
+      width: 24px;
+      border-radius: 4px;
+    }
+    .dot:hover:not(.active) {
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* ── Tooltips ──────────────────────────────────────────────── */
+    [data-tooltip] {
+      position: relative;
+    }
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: var(--surface);
+      border: 1px solid rgba(0,242,254,0.15);
+      color: var(--platinum);
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      padding: 6px 12px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 200;
+    }
+    [data-tooltip]:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Keyboard hint ─────────────────────────────────────────── */
+    .kbd-hint {
+      position: fixed;
+      bottom: 80px;
+      right: 40px;
+      font-size: 11px;
+      color: rgba(139,148,158,0.4);
+      font-family: 'Space Grotesk', monospace;
+      z-index: 100;
+      letter-spacing: 0.03em;
+    }
+    .kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      border: 1px solid rgba(139,148,158,0.2);
+      border-radius: 3px;
+      font-size: 10px;
+      margin: 0 2px;
+    }
+
+    /* ── Shared slide elements ─────────────────────────────────── */
+    .wordmark {
+      font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.35em;
+      color: var(--platinum);
+    }
+    .wordmark .pipe { color: var(--cyan); font-weight: 300; }
+    .monogram {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--platinum);
+    }
+    .slide-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .slide-heading {
+      font-family: 'Satoshi', 'Inter', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.15;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .slide-subheading {
+      font-size: 1.1rem;
+      color: var(--stellar);
+      text-align: center;
+      max-width: 640px;
+      line-height: 1.6;
+    }
+    .text-cyan { color: var(--cyan); }
+    .text-gradient {
+      background: linear-gradient(135deg, #00F2FE 0%, #a8f0ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Orb / glow decorations ────────────────────────────────── */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(80px);
+    }
+    .orb-cyan {
+      background: radial-gradient(circle, rgba(0,242,254,0.15), transparent 70%);
+    }
+    .orb-purple {
+      background: radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%);
+    }
+
+    /* ── Starfield canvas ──────────────────────────────────────── */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.5;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       SLIDE-SPECIFIC STYLES
+       ══════════════════════════════════════════════════════════════ */
+
+    /* ── Slide 1: INTRO CINEMATIC ──────────────────────────────── */
+    .intro-ring {
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,242,254,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 40px;
+    }
+    .intro-ring::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--cyan);
+      animation: ring-spin 4s linear infinite;
+    }
+    .intro-ring::after {
+      content: '';
+      position: absolute;
+      width: 340px; height: 340px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,242,254,0.04);
+      animation: ring-spin 8s linear infinite reverse;
+    }
+    @keyframes ring-spin {
+      to { transform: rotate(360deg); }
+    }
+    .intro-monogram {
+      font-size: 100px;
+      text-shadow: 0 0 60px rgba(0,242,254,0.3), 0 0 120px rgba(0,242,254,0.1);
+    }
+    .intro-wordmark {
+      font-size: 28px;
+      animation: intro-reveal 1.5s 0.5s ease both;
+    }
+    .intro-tagline {
+      font-size: 15px;
+      color: var(--stellar);
+      letter-spacing: 0.12em;
+      margin-top: 16px;
+      animation: intro-reveal 1.5s 1s ease both;
+    }
+    @keyframes intro-reveal {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 40px rgba(0,242,254,0.1); }
+      50% { box-shadow: 0 0 80px rgba(0,242,254,0.25); }
+    }
+    .intro-ring { animation: pulse-glow 3s ease-in-out infinite; }
+
+    /* ── Letter cycling animation ──────────────────────────────── */
+    .letter-cycle {
+      display: inline-block;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .letter-cycle.flip-out {
+      opacity: 0;
+      transform: rotateX(90deg) scale(0.8);
+      filter: blur(4px);
+    }
+    .letter-cycle.flip-in {
+      animation: letter-flip-in 0.4s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+    }
+    @keyframes letter-flip-in {
+      0% { opacity: 0; transform: rotateX(-90deg) scale(0.8); filter: blur(4px); }
+      60% { opacity: 1; transform: rotateX(5deg) scale(1.05); filter: blur(0); }
+      100% { opacity: 1; transform: rotateX(0) scale(1); filter: blur(0); }
+    }
+
+    /* ── Slide 2: MISSION ──────────────────────────────────────── */
+    .mission-quote {
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: var(--white);
+      text-align: center;
+      max-width: 700px;
+      line-height: 1.5;
+      position: relative;
+    }
+    .mission-quote::before {
+      content: '\201C';
+      font-size: 6rem;
+      color: rgba(0,242,254,0.15);
+      position: absolute;
+      top: -50px;
+      left: -30px;
+      font-family: Georgia, serif;
+      line-height: 1;
+    }
+
+    /* ── Slide 3: VALUES ───────────────────────────────────────── */
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      max-width: 800px;
+      width: 100%;
+    }
+    .value-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(0,242,254,0.08);
+      border-radius: 16px;
+      padding: 28px 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .value-card:hover {
+      border-color: rgba(0,242,254,0.25);
+      background: rgba(0,242,254,0.04);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0,242,254,0.1);
+    }
+    .value-icon {
+      font-size: 36px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .value-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .value-desc {
+      font-size: 12px;
+      color: var(--stellar);
+      line-height: 1.5;
+    }
+
+    /* ── Slide 4: LOGO ─────────────────────────────────────────── */
+    .logo-showcase {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 720px;
+      width: 100%;
+    }
+    .logo-box {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 160px;
+      transition: all 0.3s ease;
+    }
+    .logo-box:hover {
+      border-color: rgba(0,242,254,0.15);
+      background: rgba(0,242,254,0.02);
+    }
+    .logo-box-label {
+      font-size: 11px;
+      color: var(--stellar);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 16px;
+    }
+
+    /* ── Slide 5: COLORS ───────────────────────────────────────── */
+    .color-showcase {
+      display: flex;
+      gap: 20px;
+      max-width: 700px;
+    }
+    .color-block {
+      flex: 1;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    .color-block:hover { transform: scale(1.03); }
+    .color-fill {
+      height: 120px;
+      display: flex;
+      align-items: flex-end;
+      padding: 12px 16px;
+    }
+    .color-fill span {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 11px;
+      opacity: 0.7;
+    }
+    .color-meta {
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.03);
+    }
+    .color-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+    }
+    .color-hex {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 12px;
+      color: var(--stellar);
+      margin-top: 4px;
+    }
+
+    /* ── Slide 6: TYPOGRAPHY ───────────────────────────────────── */
+    .type-showcase {
+      text-align: center;
+      max-width: 700px;
+    }
+    .type-row {
+      margin-bottom: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .type-row:last-child { border: none; margin-bottom: 0; padding-bottom: 0; }
+    .type-font-name {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 10px;
+    }
+    .type-sample {
+      color: var(--white);
+      line-height: 1.2;
+    }
+    .type-note {
+      font-size: 12px;
+      color: var(--stellar);
+      margin-top: 8px;
+    }
+
+    /* ── Slide 7: UI EFFECTS ───────────────────────────────────── */
+    .fx-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 680px;
+      width: 100%;
+    }
+    .fx-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(0,242,254,0.08);
+      border-radius: 16px;
+      padding: 28px 20px;
+      text-align: center;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .fx-label {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 11px;
+      color: var(--stellar);
+      margin-top: 12px;
+    }
+    .fx-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: default;
+    }
+
+    /* ── Slide 8: VOICE ────────────────────────────────────────── */
+    .voice-showcase {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 720px;
+      width: 100%;
+    }
+    .voice-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+    .voice-item:hover {
+      border-color: rgba(0,242,254,0.15);
+    }
+    .voice-item-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .voice-item-text {
+      font-size: 13px;
+      color: var(--stellar);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    /* ── Slide 9: CLIENTS ──────────────────────────────────────── */
+    .clients-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 760px;
+      width: 100%;
+    }
+    .client-pill {
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    .client-pill:hover { transform: translateY(-4px); }
+    .client-pill-header {
+      padding: 28px 20px;
+      text-align: center;
+    }
+    .client-pill-header h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--white);
+    }
+    .client-pill-body {
+      background: rgba(255,255,255,0.03);
+      padding: 16px 20px;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-top: none;
+      border-radius: 0 0 16px 16px;
+    }
+    .client-pill-body p {
+      font-size: 12px;
+      color: var(--stellar);
+      line-height: 1.5;
+      margin-bottom: 4px;
+    }
+
+    /* ── Slide 10: FINALE ──────────────────────────────────────── */
+    .finale-container {
+      text-align: center;
+      position: relative;
+    }
+    .finale-monogram {
+      font-size: 140px;
+      line-height: 1;
+      margin-bottom: 24px;
+      position: relative;
+      display: inline-block;
+    }
+    .finale-monogram::before {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,242,254,0.2), transparent 70%);
+      animation: finale-pulse 2s ease-in-out infinite;
+    }
+    @keyframes finale-pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+      50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+    }
+    .finale-wordmark {
+      font-size: 32px;
+      margin-bottom: 32px;
+    }
+    .finale-line {
+      width: 60px;
+      height: 2px;
+      background: var(--cyan);
+      margin: 0 auto 32px;
+    }
+    .finale-cta {
+      font-size: 1.1rem;
+      color: var(--stellar);
+      margin-bottom: 40px;
+    }
+    .finale-metrics {
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      margin-bottom: 48px;
+    }
+    .finale-metric {
+      text-align: center;
+    }
+    .finale-metric-value {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--cyan);
+      line-height: 1;
+    }
+    .finale-metric-label {
+      font-size: 12px;
+      color: var(--stellar);
+      margin-top: 8px;
+      letter-spacing: 0.05em;
+    }
+    .finale-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 40px;
+      border: 1px solid rgba(0,242,254,0.2);
+      background: rgba(0,242,254,0.06);
+      color: var(--cyan);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      animation: finale-badge-glow 2s ease-in-out infinite;
+    }
+    @keyframes finale-badge-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,242,254,0.1); }
+      50% { box-shadow: 0 0 40px rgba(0,242,254,0.3), 0 0 80px rgba(0,242,254,0.1); }
+    }
+
+    /* ── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .slide { padding: 40px 24px; }
+      .slide-heading { font-size: 1.8rem; }
+      .values-grid { grid-template-columns: repeat(2, 1fr); }
+      .logo-showcase { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .color-showcase { flex-direction: column; }
+      .fx-grid { grid-template-columns: repeat(2, 1fr); }
+      .voice-showcase { grid-template-columns: 1fr; }
+      .clients-grid { grid-template-columns: 1fr; }
+      .finale-metrics { flex-direction: column; gap: 24px; }
+      .kbd-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Starfield background -->
+  <canvas id="starfield"></canvas>
+
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+
+  <!-- DECK -->
+  <div class="deck" id="deck">
+
+    <!-- ═══════ SLIDE 1: CINEMATIC INTRO ═══════ -->
+    <div class="slide active" data-slide="0">
+      <div class="orb orb-cyan" style="width: 500px; height: 500px; top: 30%; left: 50%; transform: translate(-50%,-50%);"></div>
+      <div class="orb orb-purple" style="width: 300px; height: 300px; top: 60%; left: 30%;"></div>
+      <div class="intro-ring">
+        <span class="monogram intro-monogram" id="introLetter">S</span>
+      </div>
+      <div class="wordmark intro-wordmark">
+        S T R A T O S <span class="pipe">|</span> C O R E
+      </div>
+      <div class="intro-tagline">BRAND GUIDELINES &mdash; 2026</div>
+    </div>
+
+    <!-- ═══════ SLIDE 2: MISSION ═══════ -->
+    <div class="slide" data-slide="1">
+      <div class="orb orb-cyan" style="width: 400px; height: 400px; top: 20%; right: -100px;"></div>
+      <div class="slide-label">Mision</div>
+      <div class="mission-quote">
+        Construimos soluciones empresariales usando <span class="text-gradient">IA generativa</span> como arquitecto de software. Lo que otros tardan meses, nosotros lo entregamos en semanas.
+      </div>
+      <div style="margin-top: 40px; font-size: 18px; letter-spacing: 0.08em; color: var(--stellar);">
+        "Tu negocio en piloto automatico"
+      </div>
+    </div>
+
+    <!-- ═══════ SLIDE 3: VALUES ═══════ -->
+    <div class="slide" data-slide="2">
+      <div class="slide-label">Valores</div>
+      <h2 class="slide-heading">Lo que nos define</h2>
+      <div class="values-grid">
+        <div class="value-card" data-tooltip="3 semanas vs 4-6 meses de desarrollo tradicional">
+          <span class="value-icon" style="color: var(--cyan);">&#9889;</span>
+          <div class="value-title">Velocidad</div>
+          <div class="value-desc">10x mas rapido que desarrollo tradicional</div>
+        </div>
+        <div class="value-card" data-tooltip="RLS, JWT, encryption at rest, 99.99% uptime SLA">
+          <span class="value-icon" style="color: var(--cyan);">&#9737;</span>
+          <div class="value-title">Seguridad</div>
+          <div class="value-desc">Nivel bancario desde el dia uno</div>
+        </div>
+        <div class="value-card" data-tooltip="~$50/mes de infraestructura vs $500-2K en equipos tradicionales">
+          <span class="value-icon" style="color: var(--cyan);">&#9830;</span>
+          <div class="value-title">Accesibilidad</div>
+          <div class="value-desc">5x mas economico que equipos tradicionales</div>
+        </div>
+        <div class="value-card" data-tooltip="Modificar funcionalidades sin reescribir desde cero">
+          <span class="value-icon" style="color: var(--cyan);">&#8644;</span>
+          <div class="value-title">Adaptabilidad</div>
+          <div class="value-desc">Cambios sin reescribir desde cero</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SLIDE 4: LOGO ═══════ -->
+    <div class="slide" data-slide="3">
+      <div class="slide-label">Logo</div>
+      <h2 class="slide-heading">Identidad visual</h2>
+      <div class="logo-showcase">
+        <div class="logo-box" data-tooltip="Uso principal: headers, documentos, presentaciones">
+          <span class="wordmark" style="font-size: 14px;">S T R A T O S <span class="pipe">|</span> C O R E</span>
+          <div class="logo-box-label">Wordmark</div>
+        </div>
+        <div class="logo-box" data-tooltip="Uso cuadrado: avatars, espacios reducidos">
+          <div style="text-align: center;">
+            <span class="wordmark" style="font-size: 12px;">S T R A T O S</span><br>
+            <span class="wordmark" style="font-size: 12px;"><span class="pipe">|</span> C O R E</span>
+          </div>
+          <div class="logo-box-label">Stacked</div>
+        </div>
+        <div class="logo-box" data-tooltip="Favicon, iconos, app badges">
+          <span class="monogram" style="font-size: 52px;">S</span>
+          <div class="logo-box-label">Monograma</div>
+        </div>
+      </div>
+      <div style="margin-top: 28px; font-size: 12px; color: var(--stellar); text-align: center;">
+        Aeonik &middot; weight 400 &middot; letter-spacing 0.35em &middot; pipe: <span style="color: var(--cyan);">#00F2FE</span>
+      </div>
+    </div>
+
+    <!-- ═══════ SLIDE 5: COLORS ═══════ -->
+    <div class="slide" data-slide="4">
+      <div class="slide-label">Paleta</div>
+      <h2 class="slide-heading">Colores de marca</h2>
+      <div class="color-showcase">
+        <div class="color-block" data-tooltip="Fondo principal y fondos oscuros">
+          <div class="color-fill" style="background: #001117;">
+            <span style="color: rgba(255,255,255,0.4);">Deep Carbon</span>
+          </div>
+          <div class="color-meta">
+            <div class="color-name">Deep Carbon</div>
+            <div class="color-hex">#001117</div>
+          </div>
+        </div>
+        <div class="color-block" data-tooltip="Texto primario sobre fondos oscuros">
+          <div class="color-fill" style="background: #E0EDE0;">
+            <span style="color: rgba(0,0,0,0.4);">Platinum</span>
+          </div>
+          <div class="color-meta">
+            <div class="color-name">Platinum</div>
+            <div class="color-hex">#E0EDE0</div>
+          </div>
+        </div>
+        <div class="color-block" data-tooltip="Acentos, botones, glows, bordes activos">
+          <div class="color-fill" style="background: #00F2FE;">
+            <span style="color: rgba(0,0,0,0.5);">Electric Cyan</span>
+          </div>
+          <div class="color-meta">
+            <div class="color-name">Electric Cyan</div>
+            <div class="color-hex">#00F2FE</div>
+          </div>
+        </div>
+        <div class="color-block" data-tooltip="Texto secundario y elementos muted">
+          <div class="color-fill" style="background: #8B949E;">
+            <span style="color: rgba(255,255,255,0.5);">Stellar Gray</span>
+          </div>
+          <div class="color-meta">
+            <div class="color-name">Stellar Gray</div>
+            <div class="color-hex">#8B949E</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SLIDE 6: TYPOGRAPHY ═══════ -->
+    <div class="slide" data-slide="5">
+      <div class="slide-label">Tipografia</div>
+      <h2 class="slide-heading">Familias tipograficas</h2>
+      <div class="type-showcase">
+        <div class="type-row">
+          <div class="type-font-name">Space Grotesk &mdash; Wordmark</div>
+          <div class="type-sample wordmark" style="font-size: 24px;">S T R A T O S <span class="pipe">|</span> C O R E</div>
+          <div class="type-note">Solo para wordmark. Aeonik como font canonical (Space Grotesk fallback web).</div>
+        </div>
+        <div class="type-row">
+          <div class="type-font-name">Satoshi &mdash; Body</div>
+          <div class="type-sample" style="font-family: 'Satoshi', sans-serif; font-size: 28px; font-weight: 700; color: var(--white);">
+            The quick brown fox jumps
+          </div>
+          <div class="type-sample" style="font-family: 'Satoshi', sans-serif; font-size: 16px; color: var(--stellar); margin-top: 8px;">
+            Tipografia principal de plataforma. Weights: 400, 500, 700.
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-font-name">Inter &mdash; Fallback</div>
+          <div class="type-sample" style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 600; color: var(--white);">
+            Aa Bb Cc 0123456789
+          </div>
+          <div class="type-note">Google Fonts. Disponible universalmente.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SLIDE 7: UI / EFFECTS ═══════ -->
+    <div class="slide" data-slide="6">
+      <div class="slide-label">Efectos UI</div>
+      <h2 class="slide-heading">Lenguaje visual</h2>
+      <div class="fx-grid">
+        <div class="fx-card" data-tooltip="box-shadow: 0 0 8px rgba(0,242,254,0.55)">
+          <div class="monogram" style="font-size: 32px; box-shadow: 0 0 8px rgba(0,242,254,0.55); width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid rgba(0,242,254,0.15);">S</div>
+          <div class="fx-label">Glow SM</div>
+        </div>
+        <div class="fx-card" data-tooltip="box-shadow: 0 0 20px rgba(0,242,254,0.6), 0 0 60px rgba(0,242,254,0.2)">
+          <div class="monogram" style="font-size: 32px; box-shadow: 0 0 20px rgba(0,242,254,0.6), 0 0 60px rgba(0,242,254,0.2); width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid rgba(0,242,254,0.15);">S</div>
+          <div class="fx-label">Glow MD</div>
+        </div>
+        <div class="fx-card" data-tooltip="box-shadow: 0 0 36px rgba(0,242,254,0.7), 0 0 90px rgba(0,242,254,0.25)">
+          <div class="monogram" style="font-size: 32px; box-shadow: 0 0 36px rgba(0,242,254,0.7), 0 0 90px rgba(0,242,254,0.25); width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid rgba(0,242,254,0.15);">S</div>
+          <div class="fx-label">Glow LG</div>
+        </div>
+        <div class="fx-card">
+          <span class="fx-btn" style="background: var(--cyan); color: var(--carbon);">Primario</span>
+          <div class="fx-label">Button Primary</div>
+        </div>
+        <div class="fx-card">
+          <span class="fx-btn" style="border: 1px solid rgba(0,242,254,0.3); color: var(--cyan);">Outline</span>
+          <div class="fx-label">Button Outline</div>
+        </div>
+        <div class="fx-card">
+          <div class="text-gradient" style="font-size: 22px; font-weight: 700;">Gradient</div>
+          <div class="fx-label">Text Gradient</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SLIDE 8: VOICE & TONE ═══════ -->
+    <div class="slide" data-slide="7">
+      <div class="slide-label">Voz y Tono</div>
+      <h2 class="slide-heading">Como hablamos</h2>
+      <div class="voice-showcase">
+        <div class="voice-item" data-tooltip="Para networking y elevator pitch">
+          <div class="voice-item-title text-cyan">Networking</div>
+          <div class="voice-item-text">"Construimos software empresarial 10 veces mas rapido usando IA como arquitecto de software."</div>
+        </div>
+        <div class="voice-item" data-tooltip="Para presentaciones a inversionistas">
+          <div class="voice-item-title text-cyan">Inversionistas</div>
+          <div class="voice-item-text">"Time-to-market de 6 meses a 3 semanas, $50/mes de infraestructura por cliente."</div>
+        </div>
+        <div class="voice-item" data-tooltip="Para CTOs y equipos tecnicos">
+          <div class="voice-item-title text-cyan">Tecnico</div>
+          <div class="voice-item-text">"Next.js 16, RSC, Supabase PostgreSQL con RLS, Vercel Edge. Deploy automatico en cada commit."</div>
+        </div>
+        <div class="voice-item" data-tooltip="Para duenos de negocio no tecnicos">
+          <div class="voice-item-title text-cyan">No tecnico</div>
+          <div class="voice-item-text">"Misma seguridad que usa su banco, 24/7, cualquier dispositivo, y solo paga por lo que usa."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SLIDE 9: CLIENTS ═══════ -->
+    <div class="slide" data-slide="8">
+      <div class="slide-label">Ecosistema</div>
+      <h2 class="slide-heading">Marcas del ecosistema</h2>
+      <div class="clients-grid">
+        <div class="client-pill" data-tooltip="Planificacion, ML forecast, analytics de ventas">
+          <div class="client-pill-header" style="background: #1A1A1A;">
+            <h4>VIDENDUM PLC</h4>
+          </div>
+          <div class="client-pill-body">
+            <p><strong style="color: var(--white);">#1A1A1A</strong> &middot; Monocromatico</p>
+            <p>Precision Planning &middot; Sales Operations</p>
+          </div>
+        </div>
+        <div class="client-pill" data-tooltip="Terapia fisica, calendario, WhatsApp, agentes IA">
+          <div class="client-pill-header" style="background: linear-gradient(135deg, #4472B8, #5988C7);">
+            <h4>Mobility Group CR</h4>
+          </div>
+          <div class="client-pill-body">
+            <p><strong style="color: var(--white);">#4472B8</strong> &middot; Espectro azul</p>
+            <p>Rehabilitacion Integral con Alta Tecnologia</p>
+          </div>
+        </div>
+        <div class="client-pill" data-tooltip="Mamografia digital 3D, ultrasonido, integracion Huli">
+          <div class="client-pill-header" style="background: linear-gradient(135deg, #C41E2A, #1A1A2E);">
+            <h4>MedCare</h4>
+          </div>
+          <div class="client-pill-body">
+            <p><strong style="color: var(--white);">#C41E2A</strong> &middot; Rojo + Navy</p>
+            <p>Centro Medico Especializado</p>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 24px; font-size: 12px; color: var(--stellar); text-align: center;">
+        StratosCore en el shell &middot; Marca del cliente en sus features &middot; "Powered by StratosCore"
+      </div>
+    </div>
+
+    <!-- ═══════ SLIDE 10: FINALE ═══════ -->
+    <div class="slide" data-slide="9">
+      <div class="orb orb-cyan" style="width: 600px; height: 600px; top: 40%; left: 50%; transform: translate(-50%,-50%);"></div>
+      <div class="orb orb-purple" style="width: 400px; height: 400px; top: 70%; left: 70%;"></div>
+      <div class="finale-container">
+        <div class="finale-monogram monogram" id="finaleLetter">S</div>
+        <div class="finale-wordmark wordmark">
+          S T R A T O S <span class="pipe">|</span> C O R E
+        </div>
+        <div class="finale-line"></div>
+        <div class="finale-metrics">
+          <div class="finale-metric" data-tooltip="Desarrollo 10 veces mas rapido que equipos tradicionales">
+            <div class="finale-metric-value" id="metric1">0x</div>
+            <div class="finale-metric-label">MAS RAPIDO</div>
+          </div>
+          <div class="finale-metric" data-tooltip="~$50/mes vs $500-2K en infraestructura tradicional">
+            <div class="finale-metric-value" id="metric2">0x</div>
+            <div class="finale-metric-label">MAS ECONOMICO</div>
+          </div>
+          <div class="finale-metric" data-tooltip="Vercel Edge Network SLA garantizado">
+            <div class="finale-metric-value" id="metric3">0%</div>
+            <div class="finale-metric-label">UPTIME</div>
+          </div>
+        </div>
+        <div class="finale-cta">
+          Construimos el futuro, un sprint a la vez.
+        </div>
+        <div class="finale-badge">
+          &#9889;&ensp;Software Factory 3.0
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav-bar">
+    <button class="nav-btn" id="btnPrev" data-tooltip="Slide anterior" disabled>&#8592;</button>
+    <div class="slide-dots" id="slideDots"></div>
+    <div class="slide-counter" id="slideCounter">1 / 10</div>
+    <button class="nav-btn" id="btnNext" data-tooltip="Siguiente slide">&#8594;</button>
+  </div>
+
+  <div class="kbd-hint">
+    <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> navegar &ensp; <span class="kbd">F</span> fullscreen
+  </div>
+
+  <script>
+    // ══════════════════════════════════════════════════════════════
+    // STARFIELD
+    // ══════════════════════════════════════════════════════════════
+    (function() {
+      const canvas = document.getElementById('starfield');
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      const COUNT = 200;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      function init() {
+        resize();
+        stars = [];
+        for (let i = 0; i < COUNT; i++) {
+          stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 1.2 + 0.3,
+            a: Math.random() * 0.5 + 0.1,
+            speed: Math.random() * 0.0005 + 0.0002
+          });
+        }
+      }
+      function draw(t) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(s => {
+          const flicker = Math.sin(t * s.speed * 1000) * 0.3 + 0.7;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(200,220,240,${s.a * flicker})`;
+          ctx.fill();
+        });
+        requestAnimationFrame(draw);
+      }
+      init();
+      window.addEventListener('resize', init);
+      requestAnimationFrame(draw);
+    })();
+
+    // ══════════════════════════════════════════════════════════════
+    // SLIDE ENGINE
+    // ══════════════════════════════════════════════════════════════
+    (function() {
+      const slides = document.querySelectorAll('.slide');
+      const total = slides.length;
+      const counter = document.getElementById('slideCounter');
+      const progress = document.getElementById('progressBar');
+      const btnPrev = document.getElementById('btnPrev');
+      const btnNext = document.getElementById('btnNext');
+      const dotsContainer = document.getElementById('slideDots');
+      let current = 0;
+      let transitioning = false;
+
+      // Build dots
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', () => goTo(i));
+        dotsContainer.appendChild(dot);
+      }
+
+      function updateUI() {
+        counter.textContent = `${current + 1} / ${total}`;
+        progress.style.width = `${((current + 1) / total) * 100}%`;
+        btnPrev.disabled = current === 0;
+        btnNext.disabled = current === total - 1;
+        dotsContainer.querySelectorAll('.dot').forEach((d, i) => {
+          d.className = 'dot' + (i === current ? ' active' : '');
+        });
+      }
+
+      function goTo(index) {
+        if (index === current || transitioning || index < 0 || index >= total) return;
+        transitioning = true;
+        const direction = index > current ? 'left' : 'right';
+        slides[current].classList.remove('active');
+        slides[current].classList.add(direction === 'left' ? 'exit-left' : 'exit-right');
+
+        setTimeout(() => {
+          slides[current].classList.remove('exit-left', 'exit-right');
+          current = index;
+          slides[current].classList.add('active');
+          updateUI();
+
+          // Trigger finale counter animation
+          if (current === total - 1) animateFinale();
+
+          setTimeout(() => { transitioning = false; }, 100);
+        }, 400);
+      }
+
+      function next() { goTo(current + 1); }
+      function prev() { goTo(current - 1); }
+
+      btnNext.addEventListener('click', next);
+      btnPrev.addEventListener('click', prev);
+
+      // Keyboard
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+        if (e.key === 'f' || e.key === 'F') {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          } else {
+            document.exitFullscreen();
+          }
+        }
+        if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+        if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+      });
+
+      // Touch swipe
+      let touchStartX = 0;
+      document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+      document.addEventListener('touchend', (e) => {
+        const diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) {
+          diff > 0 ? next() : prev();
+        }
+      });
+
+      updateUI();
+
+      // ── Finale counter animation ────────────────────────────
+      function animateFinale() {
+        animateCounter('metric1', 0, 10, 'x', 1500);
+        animateCounter('metric2', 0, 5, 'x', 1200);
+        animateCounter('metric3', 0, 99.99, '%', 2000);
+      }
+
+      function animateCounter(id, start, end, suffix, duration) {
+        const el = document.getElementById(id);
+        const startTime = performance.now();
+        const isDecimal = end % 1 !== 0;
+
+        function step(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease out cubic
+          const ease = 1 - Math.pow(1 - progress, 3);
+          const value = start + (end - start) * ease;
+
+          if (isDecimal) {
+            el.textContent = value.toFixed(2) + suffix;
+          } else {
+            el.textContent = Math.round(value) + suffix;
+          }
+
+          if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+    })();
+
+    // ══════════════════════════════════════════════════════════════
+    // LETTER CYCLING — S T R A T O S C O R E
+    // ══════════════════════════════════════════════════════════════
+    (function() {
+      const LETTERS = ['S','T','R','A','T','O','S','C','O','R','E'];
+      const INTERVAL = 1800; // ms between letters
+
+      function createCycler(elementId) {
+        const el = document.getElementById(elementId);
+        if (!el) return null;
+        el.classList.add('letter-cycle');
+        let index = 0;
+        let timer = null;
+
+        function cycle() {
+          // Flip out
+          el.classList.remove('flip-in');
+          el.classList.add('flip-out');
+
+          setTimeout(() => {
+            index = (index + 1) % LETTERS.length;
+            el.textContent = LETTERS[index];
+            el.classList.remove('flip-out');
+            el.classList.add('flip-in');
+          }, 300);
+        }
+
+        return {
+          start() { if (!timer) timer = setInterval(cycle, INTERVAL); },
+          stop()  { clearInterval(timer); timer = null; },
+          reset() { this.stop(); index = 0; el.textContent = LETTERS[0]; el.classList.remove('flip-out','flip-in'); }
+        };
+      }
+
+      const introCycler = createCycler('introLetter');
+      const finaleCycler = createCycler('finaleLetter');
+
+      // Start intro immediately
+      if (introCycler) introCycler.start();
+
+      // Observe slide changes to start/stop cyclers
+      const observer = new MutationObserver(() => {
+        const slides = document.querySelectorAll('.slide');
+        slides.forEach((slide, i) => {
+          if (slide.classList.contains('active')) {
+            if (i === 0 && introCycler) introCycler.start();
+            else if (introCycler) introCycler.stop();
+
+            if (i === slides.length - 1 && finaleCycler) finaleCycler.start();
+            else if (finaleCycler) { finaleCycler.reset(); }
+          }
+        });
+      });
+
+      document.querySelectorAll('.slide').forEach(s => {
+        observer.observe(s, { attributes: true, attributeFilter: ['class'] });
+      });
+    })();
+  </script>
+
+</body>
+</html>

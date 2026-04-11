@@ -5,6 +5,7 @@
  *   - JSON mode: file >50MB → text extracted in browser, only metadata + text saved
  */
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import {
   uploadDocumentStream,
   createTextOnlyDocument,
@@ -16,6 +17,9 @@ export const maxDuration = 300
 export const maxSize = '300mb'
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   const opportunityId = req.nextUrl.searchParams.get('opportunity_id')
   if (!opportunityId) {
     return NextResponse.json({ error: 'opportunity_id required' }, { status: 400 })
@@ -30,6 +34,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const contentType = req.headers.get('content-type') || ''
 

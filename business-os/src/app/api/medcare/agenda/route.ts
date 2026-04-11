@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { HuliConnector } from '@/features/medcare/lib/huli-connector'
 
 // Doctores y equipos de MedCare organizados por categoría
@@ -30,6 +31,9 @@ const DOCTORES_AGENDA = [
  * Agenda completa: todos los doctores y equipos
  */
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const { searchParams } = request.nextUrl
     const fromParam = searchParams.get('from')

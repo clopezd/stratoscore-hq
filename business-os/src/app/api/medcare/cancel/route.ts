@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { HuliConnector } from '@/features/medcare/lib/huli-connector'
 
 /**
@@ -7,6 +8,9 @@ import { HuliConnector } from '@/features/medcare/lib/huli-connector'
  * Body: { eventId: string, canceladoPor: 'paciente' | 'doctor' }
  */
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const { eventId, canceladoPor } = await request.json()
 

@@ -8,6 +8,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { evaluateOpportunity, evaluateBatch, BATCH_SIZE } from '@/features/bidhunter/agents/evaluator'
 import { getAggregatedExtraction } from '@/features/bidhunter/services/pdfService'
 import { applyEnrichment } from '@/features/bidhunter/services/enrichmentService'
@@ -26,6 +27,9 @@ function getAdminClient() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const body = await req.json().catch(() => ({}))
     const ids: string[] | undefined = body.ids

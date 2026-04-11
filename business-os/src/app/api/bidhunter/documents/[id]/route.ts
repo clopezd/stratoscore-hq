@@ -4,6 +4,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { deleteDocument } from '@/features/bidhunter/services/pdfService'
 
 export const runtime = 'nodejs'
@@ -20,6 +21,9 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   const { id } = await params
   const supabase = getAdmin()
 
@@ -47,6 +51,9 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   const { id } = await params
   try {
     await deleteDocument(id)

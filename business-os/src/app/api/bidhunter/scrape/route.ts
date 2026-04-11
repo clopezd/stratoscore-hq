@@ -8,6 +8,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { scrapeBuildingConnected } from '@/features/bidhunter/agents/scraper'
 
 export const runtime = 'nodejs'
@@ -22,6 +23,9 @@ function getAdminClient() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const { email, password, maxPages } = await req.json()
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { createServiceClient } from '@/lib/supabase/service'
 
 // Tasa USD/MXN por defecto (configurable)
@@ -23,6 +24,9 @@ function toUSD(monto: number, moneda?: string | null, tasa_cambio?: number | nul
 }
 
 export async function GET() {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const supabase = createServiceClient()
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { HuliConnector } from '@/features/medcare/lib/huli-connector'
 import { createClient } from '@supabase/supabase-js'
 
@@ -12,6 +13,9 @@ const PRECIO_MAMOGRAFIA = Number(process.env.MEDCARE_PRECIO_MAMOGRAFIA || '0')
  * Requiere auth (solo admin)
  */
 export async function GET() {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const huli = HuliConnector.getInstance()
 

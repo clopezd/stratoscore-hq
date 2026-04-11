@@ -5,11 +5,15 @@
  * Query: ?period=week|month|quarter|all
  */
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { getKPIs, getConversionFunnel, getTimeSeriesData } from '@/features/bidhunter/services/kpiService'
 
 export const runtime = 'nodejs'
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   try {
     const period = (req.nextUrl.searchParams.get('period') || 'all') as 'week' | 'month' | 'quarter' | 'all'
 

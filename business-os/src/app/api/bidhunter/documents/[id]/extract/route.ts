@@ -6,6 +6,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/supabase/auth-guard'
 import { extractFromPdf, extractFromPdfChunked } from '@/features/bidhunter/agents/pdf-extractor'
 import { isTextSufficient, processOCR } from '@/features/bidhunter/agents/ocr-processor'
 import {
@@ -31,6 +32,9 @@ export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const auth = await requireAuth()
+  if (auth.response) return auth.response
+
   const { id: documentId } = await params
 
   try {
