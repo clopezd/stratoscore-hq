@@ -17,9 +17,18 @@ const encodeSans = Encode_Sans({
   weight: ['400', '500', '600', '700'],
 })
 
+const SITE_URL = 'https://portal.medcare.cr'
+const OG_IMAGE = `${SITE_URL}/medcare/og-image.jpg`
+const TITLE = 'MedCare — Centro Médico Especializado'
+const DESC = 'Mamografía Digital 3D + Ultrasonido de mama en San José, Costa Rica. Tomosíntesis con IA. Agendá tu cita en línea — Promo abril ₡65.000.'
+
 export const metadata: Metadata = {
-  title: 'MedCare — Centro Médico Especializado',
-  description: 'Mamografía Digital 3D + Ultrasonido de mama en San José, Costa Rica. Agendá tu cita en línea.',
+  title: TITLE,
+  description: DESC,
+  metadataBase: new URL(SITE_URL),
+  applicationName: 'MedCare',
+  authors: [{ name: 'MedCare Centro Médico Especializado' }],
+  keywords: ['mamografía 3D', 'tomosíntesis', 'ultrasonido de mama', 'diagnóstico', 'Costa Rica', 'San José', 'MedCare'],
   icons: {
     icon: [
       { url: '/medcare/favicon-medcare.png', type: 'image/png', sizes: '512x512' },
@@ -27,6 +36,28 @@ export const metadata: Metadata = {
     ],
     apple: '/medcare/favicon-medcare.png',
     shortcut: '/medcare/favicon-medcare.png',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'es_CR',
+    url: `${SITE_URL}/medcare/agendar-estudio`,
+    siteName: 'MedCare',
+    title: TITLE,
+    description: DESC,
+    images: [
+      {
+        url: OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: 'MedCare — Mamografía 3D + Ultrasonido de mama, promo ₡65.000',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESC,
+    images: [OG_IMAGE],
   },
   appleWebApp: {
     capable: true,

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCare — Kit de Lanzamiento</title>
+<style>
+  :root {
+    --red: #B11C28;
+    --red-dark: #8A1520;
+    --navy: #0F1820;
+    --navy-light: #1E2A36;
+    --blue-gray: #C4CFDA;
+    --pale-blue: #D2DCE6;
+    --bg: #F2F5F8;
+    --card: #FFFFFF;
+    --muted: #546378;
+    --border: #E4EAF0;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--navy);
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, var(--red) 0%, var(--navy) 100%);
+    color: white;
+    padding: 64px 24px 56px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0 0 8px;
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  header p {
+    margin: 0;
+    opacity: 0.92;
+    font-size: 17px;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .container {
+    max-width: 860px;
+    margin: -24px auto 64px;
+    padding: 0 20px;
+  }
+  .section {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 32px 36px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 16px rgba(15, 24, 32, 0.06);
+    border: 1px solid var(--border);
+  }
+  .section h2 {
+    margin: 0 0 8px;
+    color: var(--red);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .section .sub {
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .section h3 {
+    margin: 24px 0 10px;
+    font-size: 16px;
+    color: var(--navy);
+    font-weight: 700;
+  }
+  .url-box {
+    background: var(--navy);
+    color: white;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 14px;
+    word-break: break-all;
+    display: block;
+    margin: 6px 0;
+  }
+  .url-box.small { font-size: 13px; }
+  .label {
+    display: inline-block;
+    background: var(--pale-blue);
+    color: var(--navy);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .code {
+    background: #F7F9FC;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--navy);
+    overflow-x: auto;
+  }
+  .copy-text {
+    background: #F9FAFB;
+    border-left: 4px solid var(--red);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: #374151;
+    white-space: pre-wrap;
+    font-family: "Georgia", serif;
+    line-height: 1.65;
+  }
+  .asset {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    background: #F7F9FC;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin: 10px 0;
+  }
+  .asset img {
+    max-width: 150px;
+    max-height: 120px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .asset-meta {
+    flex: 1;
+  }
+  .asset-meta .name {
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+  .asset-meta .spec {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .asset-meta a {
+    color: var(--red);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .asset-meta a:hover { text-decoration: underline; }
+  .warn {
+    background: #FEF3C7;
+    border: 1px solid #FCD34D;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: #78350F;
+    margin: 12px 0;
+  }
+  .warn strong { color: #78350F; }
+  .btn-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--red);
+    color: white;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    margin: 10px 0;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 10px 0;
+  }
+  .grid-2 > div {
+    background: #F7F9FC;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .grid-2 strong {
+    display: block;
+    color: var(--navy);
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .grid-2 span {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .tag {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🚀 Kit de Lanzamiento MedCare</h1>
+  <p>Todo lo que necesitás para publicar el portal de agendamiento en tu sitio Wix, redes sociales y material impreso.</p>
+</header>
+
+<div class="container">
+
+  <!-- ═══════════════ 1. LINKS ═══════════════ -->
+  <div class="section">
+    <h2>1. Links del portal</h2>
+    <p class="sub">El link principal es uno solo. Los demás son variantes con <em>etiquetas de seguimiento</em> para saber de qué canal viene cada cita (te sirve para decidir dónde invertir tu tiempo/pauta).</p>
+
+    <h3>🔗 Link principal (el que cliente escribe en la barra del navegador)</h3>
+    <code class="url-box">https://portal.medcare.cr/medcare/agendar-estudio</code>
+
+    <a href="https://portal.medcare.cr/medcare/agendar-estudio" class="btn-preview" target="_blank">Ver portal en vivo →</a>
+
+    <h3>🎯 Links con seguimiento (UTM) — uno por canal</h3>
+    <p class="sub">Usá estos en vez del principal cuando lo pegues en cada lugar:</p>
+
+    <span class="label">Botón en tu sitio Wix</span>
+    <code class="url-box small">https://portal.medcare.cr/medcare/agendar-estudio?utm_source=wix&utm_medium=website&utm_campaign=landing</code>
+
+    <span class="label">Bio de Instagram</span>
+    <code class="url-box small">https://portal.medcare.cr/medcare/agendar-estudio?utm_source=instagram&utm_medium=bio</code>
+
+    <span class="label">Historias de Instagram</span>
+    <code class="url-box small">https://portal.medcare.cr/medcare/agendar-estudio?utm_source=instagram&utm_medium=story&utm_campaign=promo_abril</code>
+
+    <span class="label">Estado de WhatsApp</span>
+    <code class="url-box small">https://portal.medcare.cr/medcare/agendar-estudio?utm_source=whatsapp&utm_medium=status</code>
+
+    <span class="label">Facebook</span>
+    <code class="url-box small">https://portal.medcare.cr/medcare/agendar-estudio?utm_source=facebook&utm_medium=post</code>
+
+    <span class="label">QR en material impreso</span>
+    <code class="url-box small">https://portal.medcare.cr/medcare/agendar-estudio?utm_source=qr&utm_medium=print</code>
+  </div>
+
+  <!-- ═══════════════ 2. BOTÓN WIX ═══════════════ -->
+  <div class="section">
+    <h2>2. Botón "Agendar cita" para tu sitio Wix</h2>
+    <p class="sub">En Wix: editá tu página → agregá un <strong>bloque HTML embebido</strong> (Wix lo llama "Embed code" o "Integración HTML") → pegá este código:</p>
+
+    <div class="code">&lt;a href="https://portal.medcare.cr/medcare/agendar-estudio?utm_source=wix&amp;utm_medium=website&amp;utm_campaign=landing"
+   style="display:inline-flex;align-items:center;gap:10px;
+          background:#B11C28;color:#ffffff;
+          padding:16px 32px;border-radius:10px;
+          font-family:-apple-system,Arial,sans-serif;
+          font-weight:700;font-size:17px;
+          text-decoration:none;
+          box-shadow:0 4px 14px rgba(177,28,40,0.3);
+          transition:transform 0.15s;"
+   onmouseover="this.style.transform='translateY(-2px)'"
+   onmouseout="this.style.transform='translateY(0)'"&gt;
+  📅 Agendar cita en línea
+&lt;/a&gt;</div>
+
+    <p class="sub" style="margin-top:14px">Si preferís que Wix use su propio botón nativo, simplemente creás un botón y en el destino pegás:</p>
+    <code class="url-box small">https://portal.medcare.cr/medcare/agendar-estudio?utm_source=wix&utm_medium=website&utm_campaign=landing</code>
+
+    <div class="warn"><strong>Recomendación:</strong> colocá el botón <em>arriba del todo</em> en la página principal y repetilo en cada sección de servicios. La tasa de conversión sube 30% cuando el botón se ve sin scrollear.</div>
+  </div>
+
+  <!-- ═══════════════ 3. REDES SOCIALES ═══════════════ -->
+  <div class="section">
+    <h2>3. Textos sugeridos para publicar</h2>
+    <p class="sub">Copy-paste directo. Ya revisados con frameworks de copywriting (AIDA).</p>
+
+    <h3>Instagram — Post de feed</h3>
+    <div class="copy-text">🎀 Cuidar tu salud no puede esperar.
+
+En MedCare tenemos la mamografía más avanzada de Costa Rica: Fujifilm Sophinity con tomosíntesis 3D e inteligencia artificial. Estudio sin dolor, resultados el mismo día.
+
+🎁 PROMO ABRIL: Mamografía 3D + Ultrasonido de mama por solo ¢65.000
+
+📅 Agendá en línea en minutos:
+portal.medcare.cr
+
+📍 Edificio Centro Colón, San José
+🕐 Lunes a viernes 6am–10pm
+
+#MamografiaCostaRica #Tomosintesis #SaludMujer #PrevencionDelCancer #MedCareCR</div>
+
+    <h3>Instagram — Story (con sticker de link)</h3>
+    <div class="copy-text">💗 Promo abril: Mamografía 3D + Ultrasonido de mama ¢65.000
+
+Agendá con un toque ⬆️ — link arriba</div>
+
+    <h3>Estado de WhatsApp</h3>
+    <div class="copy-text">🩺 ¿Sabías que podés agendar tu mamografía desde tu celular?
+
+En MedCare: tomosíntesis 3D con IA, sin filas, y este mes con promo Mamo + US ¢65.000.
+
+👉 portal.medcare.cr</div>
+
+    <h3>Mensaje directo para compartir con conocidas</h3>
+    <div class="copy-text">Hola! Te comparto esto que está bueno: MedCare tiene promo en abril de mamografía 3D + ultrasonido de mama a ¢65.000 (normal ¢84k). Es el único centro en CR con tomosíntesis Fujifilm + IA y podés agendar la cita en línea acá: portal.medcare.cr</div>
+  </div>
+
+  <!-- ═══════════════ 4. ASSETS VISUALES ═══════════════ -->
+  <div class="section">
+    <h2>4. Imágenes listas para descargar</h2>
+    <p class="sub">Todas respetan el Libro de Marca MedCare (colores Pantone 7621 C y Black 6 C, tipografía Montserrat).</p>
+
+    <div class="asset">
+      <img src="/medcare/og-image.jpg" alt="OG image">
+      <div class="asset-meta">
+        <div class="name">OG Image — Preview de WhatsApp/FB/Twitter</div>
+        <div class="spec">1200×630 JPG — se muestra automáticamente cuando alguien comparte el link</div>
+        <a href="/medcare/og-image.jpg" download>⬇ Descargar</a>
+      </div>
+    </div>
+
+    <div class="asset">
+      <img src="/medcare/instagram-post.jpg" alt="Instagram post">
+      <div class="asset-meta">
+        <div class="name">Post de Instagram / Facebook</div>
+        <div class="spec">1080×1080 JPG — para publicar en el feed</div>
+        <a href="/medcare/instagram-post.jpg" download>⬇ Descargar</a>
+      </div>
+    </div>
+
+    <div class="asset">
+      <img src="/medcare/whatsapp-status.jpg" alt="WhatsApp status">
+      <div class="asset-meta">
+        <div class="name">Estado de WhatsApp / Story vertical</div>
+        <div class="spec">1080×1920 JPG — formato 9:16 para historias y estados</div>
+        <a href="/medcare/whatsapp-status.jpg" download>⬇ Descargar</a>
+      </div>
+    </div>
+
+    <div class="asset">
+      <img src="/medcare/qr-medcare.png" alt="QR code">
+      <div class="asset-meta">
+        <div class="name">Código QR con isotipo MedCare</div>
+        <div class="spec">954×954 PNG — para material impreso (flyers, tarjetas, tótem en recepción)</div>
+        <a href="/medcare/qr-medcare.png" download>⬇ Descargar</a>
+      </div>
+    </div>
+
+    <div class="asset">
+      <img src="/medcare/logo-medcare.png" alt="Logo MedCare">
+      <div class="asset-meta">
+        <div class="name">Logo MedCare horizontal (fondo transparente)</div>
+        <div class="spec">PNG transparente — para usar sobre fondos claros</div>
+        <a href="/medcare/logo-medcare.png" download>⬇ Descargar</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 5. CRM ═══════════════ -->
+  <div class="section">
+    <h2>5. Tu panel de control (CRM)</h2>
+    <p class="sub">Desde acá vas a ver las citas que entran en vivo, contactar pacientes, marcar el estado de cada lead y medir tus conversiones.</p>
+
+    <h3>🔐 Entrar al panel</h3>
+    <code class="url-box">https://portal.medcare.cr/medcare</code>
+
+    <div class="warn">
+      <strong>Credenciales pendientes:</strong> Carlos Mario te va a crear una cuenta con tu correo personal. En cuanto te llegue el email de bienvenida, usá ese correo + contraseña para entrar.
+    </div>
+
+    <h3>📋 Qué podés hacer adentro</h3>
+    <div class="grid-2">
+      <div><strong>Dashboard</strong><span>Total de leads, conversión, ocupación, ingresos estimados del mes</span></div>
+      <div><strong>Agenda</strong><span>Citas del día por doctor/equipo (se sincroniza en vivo con Huli)</span></div>
+      <div><strong>Leads</strong><span>Listado de todas las solicitudes. Cambiar estado: nuevo → contactado → agendado</span></div>
+      <div><strong>Pipeline</strong><span>Vista Kanban para ver cada lead por etapa</span></div>
+      <div><strong>Inteligencia</strong><span>Análisis de tendencias, fuentes de mayor conversión, no-shows</span></div>
+      <div><strong>Reactivación</strong><span>Pacientes viejos para re-contactar</span></div>
+    </div>
+
+    <h3>⚡ Cómo va a funcionar en el día a día</h3>
+    <ol style="padding-left:22px;color:#374151;font-size:14px;line-height:1.8">
+      <li>Una paciente agenda desde el portal → se crea la cita en Huli automáticamente</li>
+      <li>Se registra en tu CRM como lead en estado <strong>"cita_agendada"</strong></li>
+      <li>Carlos recibe una alerta por Telegram en el momento (para monitoreo)</li>
+      <li>Cuando la llames para confirmar, marcás <strong>"contactado"</strong> en el panel</li>
+      <li>Cuando llegue a la cita y se complete el estudio, marcás <strong>"completado"</strong></li>
+      <li>Si no se presenta, marcás <strong>"no_show"</strong> (Huli también lo sincroniza)</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ 6. CHECKLIST ═══════════════ -->
+  <div class="section">
+    <h2>6. Checklist para el lanzamiento</h2>
+    <p class="sub">Orden sugerido para publicar todo en un día:</p>
+
+    <ol style="padding-left:22px;color:#374151;font-size:14px;line-height:2">
+      <li>✅ Abrir tu sitio Wix y pegar el botón "Agendar cita" en la página principal</li>
+      <li>✅ Pegar el link (variante Instagram bio) en el link de tu biografía de Instagram</li>
+      <li>✅ Publicar el post de Instagram con la imagen 1080×1080 y el texto sugerido</li>
+      <li>✅ Subir la historia vertical de Instagram usando el sticker de link</li>
+      <li>✅ Subir el estado de WhatsApp con la imagen 1080×1920</li>
+      <li>✅ Imprimir el QR en flyers/tarjetas para el centro</li>
+      <li>✅ Entrar al CRM y familiarizarte con las pestañas</li>
+      <li>✅ Hacer una cita de prueba tú misma para ver cómo es la experiencia</li>
+    </ol>
+  </div>
+
+</div>
+
+<footer>
+  Kit generado por StratosCore para MedCare · Alineado al Libro de Marca Nov 2022 · Colores Pantone 7621 C y Black 6 C
+</footer>
+
+</body>
+</html>
