@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { HuliConnector } from '@/features/medcare/lib/huli-connector'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, getClientIP, RATE_LIMITS } from '@/features/medcare/lib/rate-limiter'
+import { notifyNewLead } from '@/features/medcare/lib/telegram-notify'
 
 const MAMOGRAFIA_DOCTOR_ID = Number(process.env.HULI_MAMOGRAFIA_DOCTOR_ID || '96314')
 const CLINIC_ID = Number(process.env.HULI_CLINIC_ID || '9694')
@@ -123,6 +124,19 @@ export async function POST(request: NextRequest) {
       })
       .select()
       .single()
+
+    // Alerta a Telegram (fire-and-forget, no bloquea la respuesta)
+    await notifyNewLead({
+      nombre,
+      telefono,
+      email,
+      tipo_estudio: tipo_estudio || 'mamografia',
+      fecha,
+      hora,
+      esPromo: !!esPromo,
+      huliAppointmentId: mamoAppointment.idEvent,
+      fuente: fuente || 'web',
+    })
 
     return NextResponse.json({
       success: true,
