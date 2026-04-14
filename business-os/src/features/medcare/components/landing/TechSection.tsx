@@ -81,12 +81,11 @@ export function TechSection() {
         </div>
 
         {/* Galería de detalles */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {[
             { src: '/medcare/mamografo-software-diagnostico.jpeg', alt: 'Software de diagnóstico con 4 vistas mamográficas', label: 'Diagnóstico IA' },
             { src: '/medcare/mamografo-monitor-comparacion.jpeg', alt: 'Monitor diagnóstico con comparación mamográfica', label: 'Comparación 3D' },
             { src: '/medcare/reales/detalle-control.jpg', alt: 'Detalle de control del mamógrafo en MedCare', label: 'Equipo real en MedCare' },
-            { src: '/medcare/reales/equipo-vertical.jpg', alt: 'Mamógrafo FUJIFILM Sophinity en el consultorio de MedCare', label: 'En nuestra sala' },
           ].map((img, i) => (
             <div key={i} className="relative group overflow-hidden rounded-xl">
               <Image
