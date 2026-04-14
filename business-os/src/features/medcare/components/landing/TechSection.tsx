@@ -21,11 +21,11 @@ export function TechSection() {
         <div className="flex flex-col lg:flex-row items-center gap-10 mb-16">
           <div className="flex-1 flex justify-center">
             <Image
-              src="/medcare/mamografo-equipo-completo.jpeg"
-              alt="FUJIFILM AMULET Sophinity — Mamógrafo 3D con estación de diagnóstico"
-              width={500}
+              src="/medcare/reales/sala-flamencos.jpg"
+              alt="Mamógrafo FUJIFILM AMULET Sophinity instalado en el consultorio de MedCare"
+              width={900}
               height={600}
-              className="rounded-2xl max-h-[500px] object-contain"
+              className="rounded-2xl max-h-[500px] object-cover shadow-xl"
             />
           </div>
           <div className="flex-1 space-y-6">
@@ -85,8 +85,8 @@ export function TechSection() {
           {[
             { src: '/medcare/mamografo-software-diagnostico.jpeg', alt: 'Software de diagnóstico con 4 vistas mamográficas', label: 'Diagnóstico IA' },
             { src: '/medcare/mamografo-monitor-comparacion.jpeg', alt: 'Monitor diagnóstico con comparación mamográfica', label: 'Comparación 3D' },
-            { src: '/medcare/mamografo-comfort-comp.jpeg', alt: 'Control Comfort Comp', label: 'Comfort Comp' },
-            { src: '/medcare/mamografo-posicion-comfort.jpeg', alt: 'Posicionamiento ergonómico', label: 'Ergonómico' },
+            { src: '/medcare/reales/detalle-control.jpg', alt: 'Detalle de control del mamógrafo en MedCare', label: 'Equipo real en MedCare' },
+            { src: '/medcare/reales/equipo-vertical.jpg', alt: 'Mamógrafo FUJIFILM Sophinity en el consultorio de MedCare', label: 'En nuestra sala' },
           ].map((img, i) => (
             <div key={i} className="relative group overflow-hidden rounded-xl">
               <Image

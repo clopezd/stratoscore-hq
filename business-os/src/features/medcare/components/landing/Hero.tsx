@@ -44,8 +44,8 @@ export function Hero() {
           {/* Móvil: imagen visible */}
           <div className="w-full md:hidden flex justify-center">
             <Image
-              src="/medcare/promo-mamografia-3d.jpeg"
-              alt="Mamografía 3D + Ultrasonido — ₡65,000 en MedCare"
+              src="/medcare/reales/tecnica-operando.jpg"
+              alt="Técnica de MedCare operando el mamógrafo FUJIFILM Sophinity en nuestro consultorio"
               width={340}
               height={420}
               className="rounded-2xl shadow-2xl border-2 border-white/10 object-cover"
@@ -55,8 +55,8 @@ export function Hero() {
           {/* Desktop: imagen lateral */}
           <div className="hidden md:block flex-shrink-0">
             <Image
-              src="/medcare/promo-mamografia-3d.jpeg"
-              alt="Mamografía 3D + Ultrasonido — ₡65,000 en MedCare"
+              src="/medcare/reales/tecnica-operando.jpg"
+              alt="Técnica de MedCare operando el mamógrafo FUJIFILM Sophinity en nuestro consultorio"
               width={420}
               height={520}
               className="rounded-2xl shadow-2xl border-2 border-white/10 object-cover"
