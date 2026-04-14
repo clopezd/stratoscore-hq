@@ -7,7 +7,7 @@ export function Testimonials() {
     },
     {
       name: 'Carolina R.',
-      text: 'Mi ginecóloga me refirió a MedCare para un ultrasonido mamario. Cero filas, la cita fue puntual y las instalaciones son excelentes. 100% recomendado.',
+      text: 'Mi ginecóloga me refirió a MedCare para un ultrasonido de mama. Cero filas, la cita fue puntual y las instalaciones son excelentes. 100% recomendado.',
       age: '52 años',
     },
     {

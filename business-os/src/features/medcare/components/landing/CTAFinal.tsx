@@ -10,7 +10,7 @@ export function CTAFinal() {
           Tu tranquilidad empieza con 15 minutos
         </h2>
         <p className="text-red-100 mb-8 text-lg">
-          Mamografía 3D + Ultrasonido mamario por solo <strong className="text-white">₡65,000</strong>. Promo válida en abril.
+          Mamografía 3D + Ultrasonido de mama por solo <strong className="text-white">₡65,000</strong>. Promo válida en abril.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a

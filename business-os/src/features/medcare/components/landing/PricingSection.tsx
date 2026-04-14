@@ -20,7 +20,7 @@ export function PricingSection() {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-red-800">Mamografía 3D + Ultrasonido Mamario</h3>
+                <h3 className="text-lg font-bold text-red-800">Mamografía 3D + Ultrasonido de mama</h3>
                 <p className="text-sm text-red-600 mt-1">Paquete completo — detección temprana integral</p>
               </div>
               <div className="text-right shrink-0 ml-4">
@@ -52,7 +52,7 @@ export function PricingSection() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-bold text-gray-900 group-hover:text-slate-700">Ultrasonido Mamario</h3>
+                  <h3 className="text-base font-bold text-gray-900 group-hover:text-slate-700">Ultrasonido de mama</h3>
                   <p className="text-xs text-gray-500 mt-1">Complemento diagnóstico — 20 min</p>
                 </div>
                 <p className="text-xl font-bold text-gray-900 shrink-0 ml-3">₡49,000</p>

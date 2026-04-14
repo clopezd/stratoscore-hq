@@ -29,7 +29,7 @@ const faqs = [
   },
   {
     q: '¿Qué preparación necesito?',
-    a: 'Para mamografía: no usar desodorante, talco ni cremas el día del estudio. Vestir ropa de dos piezas para mayor comodidad. Para ultrasonido mamario: no se requiere ayuno ni preparación especial, solo evitar cremas en la zona.',
+    a: 'Para mamografía: no usar desodorante, talco ni cremas el día del estudio. Vestir ropa de dos piezas para mayor comodidad. Para ultrasonido de mama: no se requiere ayuno ni preparación especial, solo evitar cremas en la zona.',
   },
 ]
 

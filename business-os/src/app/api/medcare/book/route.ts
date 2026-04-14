@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       time_from: hora,
       source_event: sourceEvent ? Number(sourceEvent) : undefined,
       notes: esPromo
-        ? 'Promo Abril: Mamografía + US Mamario ₡50,000 — Agendado desde web'
+        ? 'Promo Abril: Mamografía + US de mama ₡65,000 — Agendado desde web'
         : (notas || `Agendado desde web — ${tipo_estudio || 'mamografía'}`),
       is_first_time_patient: true,
     })
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         fecha_preferida: fecha,
         horario_preferido: horario_preferido || null,
         fuente: fuente || 'web',
-        notas: esPromo ? 'Promo Abril: Mamografía + US Mamario ₡50,000' : (notas || null),
+        notas: esPromo ? 'Promo Abril: Mamografía + US de mama ₡65,000' : (notas || null),
         estado: 'cita_agendada',
         huli_patient_id: patient.id,
         huli_appointment_id: mamoAppointment.idEvent,
