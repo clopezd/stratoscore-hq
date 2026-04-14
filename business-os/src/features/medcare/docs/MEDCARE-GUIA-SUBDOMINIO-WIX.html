@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCare — Guía: Crear subdominio en Wix</title>
+<style>
+  :root {
+    --red: #C41E2A;
+    --navy: #1A1A2E;
+    --bg: #f7f7fa;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --ok: #10b981;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    background: var(--bg);
+    color: var(--navy);
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, var(--red) 0%, #8b1520 100%);
+    color: white;
+    padding: 48px 24px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 700;
+  }
+  header p {
+    margin: 0;
+    opacity: 0.95;
+    font-size: 17px;
+  }
+  .container {
+    max-width: 780px;
+    margin: -24px auto 48px;
+    padding: 0 20px;
+  }
+  .intro {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    margin-bottom: 24px;
+  }
+  .intro h2 {
+    margin: 0 0 12px;
+    color: var(--red);
+    font-size: 20px;
+  }
+  .intro p {
+    margin: 0 0 8px;
+    color: #374151;
+  }
+  .time-badge {
+    display: inline-block;
+    background: #fef2f2;
+    color: var(--red);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  .step {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--red);
+  }
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .step-number {
+    background: var(--red);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .step-title {
+    font-size: 19px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .step p { margin: 8px 0; color: #374151; }
+  .step ul { margin: 10px 0; padding-left: 22px; }
+  .step li { margin-bottom: 6px; }
+  .highlight {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 15px;
+  }
+  .highlight strong { color: var(--red); }
+  code {
+    background: #f3f4f6;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 14px;
+    color: var(--navy);
+    font-weight: 600;
+  }
+  .example-box {
+    background: #f9fafb;
+    border: 1px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .example-box .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .final {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    margin-top: 24px;
+    box-shadow: 0 4px 20px rgba(16,185,129,0.25);
+  }
+  .final h2 {
+    margin: 0 0 12px;
+    font-size: 22px;
+  }
+  .final p { margin: 8px 0; opacity: 0.95; }
+  .contact {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 20px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .contact h3 {
+    margin: 0 0 10px;
+    color: var(--navy);
+    font-size: 16px;
+  }
+  .contact p {
+    margin: 4px 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .contact strong { color: var(--navy); }
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .note {
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin: 12px 0;
+    color: #1e3a8a;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Crear el subdominio medcare.cr</h1>
+  <p>Guía paso a paso para habilitar el portal de agendamiento en línea</p>
+</header>
+
+<div class="container">
+
+  <div class="intro">
+    <h2>¿Qué vamos a hacer?</h2>
+    <p>Necesitamos crear un <strong>subdominio</strong> dentro de su sitio web actual (por ejemplo <code>portal.medcare.cr</code> o <code>citas.medcare.cr</code>) para alojar el sistema de agendamiento en línea y la integración con HuliPractice.</p>
+    <p>Su página principal <strong>seguirá funcionando igual en Wix</strong>. El subdominio apunta a un servidor distinto donde corre el portal que construimos, sin afectar nada de lo existente.</p>
+    <span class="time-badge">⏱ Tiempo estimado: 5–10 minutos</span>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-number">1</div>
+      <h3 class="step-title">Entrar al panel de Wix</h3>
+    </div>
+    <p>Ingrese a su cuenta de Wix desde <code>www.wix.com</code> y abra el sitio de MedCare.</p>
+    <ul>
+      <li>En el panel principal del sitio, busque en el menú lateral izquierdo la opción <strong>“Configuración”</strong> (Settings).</li>
+      <li>Dentro de Configuración, seleccione <strong>“Dominios”</strong> (Domains).</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-number">2</div>
+      <h3 class="step-title">Abrir la configuración DNS de medcare.cr</h3>
+    </div>
+    <p>En la lista de dominios le debe aparecer <code>medcare.cr</code>.</p>
+    <ul>
+      <li>Haga clic en los tres puntos (<strong>⋯</strong>) al lado del dominio.</li>
+      <li>Seleccione la opción <strong>“Administrar DNS”</strong> o <strong>“Avanzado”</strong> → <strong>“Editar registros DNS”</strong>.</li>
+    </ul>
+    <div class="note">Si el dominio está registrado por fuera de Wix (por ejemplo en NIC.cr o GoDaddy), este paso debe hacerlo en el panel donde compró el dominio. Avísenos y le indicamos cómo.</div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-number">3</div>
+      <h3 class="step-title">Agregar un nuevo registro CNAME</h3>
+    </div>
+    <p>Busque la sección de <strong>“Registros CNAME”</strong> y presione <strong>“Agregar registro”</strong> (Add Record). Llene los campos así:</p>
+
+    <div class="example-box">
+      <div class="label">Tipo de registro</div>
+      <code>CNAME</code>
+    </div>
+
+    <div class="example-box">
+      <div class="label">Host / Nombre / Subdominio</div>
+      <code>portal</code>
+      <p style="margin: 8px 0 0; font-size: 13px; color: var(--muted);">Esto creará <code>portal.medcare.cr</code>. Si prefieren otro nombre (como <code>citas</code> o <code>agenda</code>), avísenos antes.</p>
+    </div>
+
+    <div class="example-box">
+      <div class="label">Apunta a / Valor / Destino</div>
+      <code>cname.vercel-dns.com</code>
+    </div>
+
+    <div class="example-box">
+      <div class="label">TTL</div>
+      <code>3600</code> (o dejar el valor por defecto)
+    </div>
+
+    <div class="highlight">
+      <strong>Importante:</strong> no modifique ni borre ningún otro registro existente. Solo agregue uno nuevo.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-number">4</div>
+      <h3 class="step-title">Guardar cambios</h3>
+    </div>
+    <p>Presione <strong>“Guardar”</strong> (Save). Wix mostrará un mensaje confirmando que el registro fue agregado.</p>
+    <p>Los cambios en DNS pueden tardar entre <strong>15 minutos y 2 horas</strong> en propagarse por internet (normalmente menos).</p>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-number">5</div>
+      <h3 class="step-title">Avisarnos por WhatsApp</h3>
+    </div>
+    <p>Una vez guardado el registro, envíenos un mensaje con una captura de pantalla del registro creado. Nosotros:</p>
+    <ul>
+      <li>Verificamos que el DNS esté apuntando correctamente.</li>
+      <li>Activamos el certificado SSL (candado de seguridad 🔒).</li>
+      <li>Publicamos el portal en <code>portal.medcare.cr</code>.</li>
+      <li>Les enviamos el enlace listo para usar y para enlazar desde su sitio de Wix.</li>
+    </ul>
+  </div>
+
+  <div class="final">
+    <h2>✓ Eso es todo</h2>
+    <p>Con estos 5 pasos queda listo el subdominio.</p>
+    <p>Nosotros nos encargamos del resto: publicación, seguridad y conexión con Huli.</p>
+  </div>
+
+  <div class="contact">
+    <h3>¿Dudas o necesita ayuda?</h3>
+    <p>Escríbanos y le acompañamos en vivo durante el proceso.</p>
+    <p><strong>StratosCore — Equipo técnico MedCare</strong></p>
+  </div>
+
+</div>
+
+<footer>
+  MedCare Centro Médico Especializado · Documento generado por StratosCore
+</footer>
+
+</body>
+</html>

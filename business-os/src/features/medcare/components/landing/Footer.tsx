@@ -40,9 +40,11 @@ export function Footer() {
             <p className="text-sm text-gray-400 leading-relaxed mb-2">
               {B.contact.address}
             </p>
-            <p className="text-sm text-gray-400">
-              {B.contact.hours}
-            </p>
+            <div className="text-sm text-gray-400 space-y-1">
+              <p>{B.contact.hoursDetail.weekdays}</p>
+              <p>{B.contact.hoursDetail.saturday}</p>
+              <p>{B.contact.hoursDetail.sundayHolidays}</p>
+            </div>
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-6 text-center">

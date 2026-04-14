@@ -19,8 +19,8 @@ export function TrustBar() {
       ),
     },
     {
-      label: 'L-V 8am-8pm',
-      sub: 'horario extendido',
+      label: 'L-V 5:30am-10pm',
+      sub: 'sábados, domingos y feriados',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
