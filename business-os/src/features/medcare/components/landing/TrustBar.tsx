@@ -19,7 +19,7 @@ export function TrustBar() {
       ),
     },
     {
-      label: 'L-V 5:30am-10pm',
+      label: 'L-V 6am-10pm',
       sub: 'sábados, domingos y feriados',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">

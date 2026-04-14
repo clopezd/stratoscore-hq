@@ -42,10 +42,10 @@ export const MedCareBrand = {
     whatsapp: '8368-2100',
     whatsappLink: 'https://wa.me/50683682100',
     address: 'De la esquina noreste del Edificio Centro Colón, 50 metros al norte, San José, Costa Rica',
-    hours: 'L-V 5:30am-10pm | Sáb 5:30am-8pm | Dom y feriados 7am-4pm',
+    hours: 'L-V 6am-10pm | Sáb 6am-8pm | Dom y feriados 7am-4pm',
     hoursDetail: {
-      weekdays: 'Lunes a Viernes: 5:30 a.m. – 10:00 p.m.',
-      saturday: 'Sábados: 5:30 a.m. – 8:00 p.m.',
+      weekdays: 'Lunes a Viernes: 6:00 a.m. – 10:00 p.m.',
+      saturday: 'Sábados: 6:00 a.m. – 8:00 p.m.',
       sundayHolidays: 'Domingos y feriados: 7:00 a.m. – 4:00 p.m.',
     },
     instagram: '@medcare_cr',

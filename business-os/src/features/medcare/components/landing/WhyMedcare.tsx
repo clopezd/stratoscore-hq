@@ -21,7 +21,7 @@ export function WhyMedcare() {
             },
             {
               title: 'Sin filas, sin espera',
-              desc: 'Agenda hoy, hacete el estudio esta semana. Resultados el mismo día. Horario amplio L-V 5:30am-10pm, sábados, domingos y feriados.',
+              desc: 'Agenda hoy, hacete el estudio esta semana. Resultados el mismo día. Horario amplio L-V 6am-10pm, sábados, domingos y feriados.',
               icon: (
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
