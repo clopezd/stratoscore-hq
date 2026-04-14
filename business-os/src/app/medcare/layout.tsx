@@ -21,9 +21,12 @@ export const metadata: Metadata = {
   title: 'MedCare — Centro Médico Especializado',
   description: 'Mamografía Digital 3D + Ultrasonido de mama en San José, Costa Rica. Agendá tu cita en línea.',
   icons: {
-    icon: [{ url: '/medcare/logo-medcare.jpg', type: 'image/jpeg' }],
-    apple: '/medcare/logo-medcare.jpg',
-    shortcut: '/medcare/logo-medcare.jpg',
+    icon: [
+      { url: '/medcare/favicon-medcare.png', type: 'image/png', sizes: '512x512' },
+      { url: '/medcare/isotipo-medcare.png', type: 'image/png' },
+    ],
+    apple: '/medcare/favicon-medcare.png',
+    shortcut: '/medcare/favicon-medcare.png',
   },
   appleWebApp: {
     capable: true,

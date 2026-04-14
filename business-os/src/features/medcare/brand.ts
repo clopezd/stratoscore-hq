@@ -34,8 +34,17 @@ export const MedCareBrand = {
   },
 
   logo: {
-    default: '/medcare/logo-medcare.jpg',
-    white: '/medcare/logo-medcare-white.jpg',
+    // Horizontal con colores oficiales, fondo transparente — para fondos claros (navbar blanco, cards)
+    default: '/medcare/logo-medcare.png',
+    // Version blanca transparente — para fondos oscuros/rojos (footer, hero)
+    white: '/medcare/logo-medcare-white.png',
+    // Solo el isotipo (4 cuadrados) — para espacios compactos, avatars, favicon
+    isotipo: '/medcare/isotipo-medcare.png',
+    // Icono cuadrado 512x512 para favicon/PWA
+    favicon: '/medcare/favicon-medcare.png',
+    // Legacy JPG fallbacks (conservados por compatibilidad)
+    defaultJpg: '/medcare/logo-medcare.jpg',
+    whiteJpg: '/medcare/logo-medcare-white.jpg',
   },
 
   contact: {
