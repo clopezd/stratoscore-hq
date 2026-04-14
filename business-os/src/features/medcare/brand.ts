@@ -3,16 +3,21 @@
 // Colores extraídos del logo oficial
 // ============================================================
 
+// Colores oficiales extraidos del Libro de Marca MedCare (Nov 2022)
+// Pantone references: 7621 C (rojo), Black 6 C (navy), 538 C y 642 C (secundarios)
 export const MedCareBrand = {
   colors: {
-    primary: '#C41E2A',       // Rojo MedCare (MED)
-    primaryDark: '#A3181F',
-    primaryLight: '#E8343F',
-    secondary: '#1A1A2E',     // Navy oscuro MedCare (CARE)
-    secondaryDark: '#0F0F1A',
-    secondaryLight: '#2D2D4A',
-    accent: '#FEF2F2',        // Fondo suave rojo
-    dark: '#1A1A2E',
+    primary: '#B11C28',       // Pantone 7621 C — Rojo MedCare (MED)
+    primaryDark: '#8A1520',
+    primaryLight: '#D23846',
+    secondary: '#0F1820',     // Pantone Black 6 C — Navy profundo (CARE)
+    secondaryDark: '#070C12',
+    secondaryLight: '#1E2A36',
+    // Secundarios oficiales del brand book
+    blueGray: '#C4CFDA',      // Pantone 538 C
+    paleBlue: '#D2DCE6',      // Pantone 642 C
+    accent: '#FEF2F2',        // Fondo suave rojo (derivado)
+    dark: '#0F1820',
     white: '#FFFFFF',
     gray: '#6B7280',
     success: '#10B981',
@@ -21,11 +26,11 @@ export const MedCareBrand = {
   },
 
   gradients: {
-    primary: 'linear-gradient(135deg, #C41E2A 0%, #1A1A2E 100%)',
-    hero: 'from-red-700 to-slate-900',
-    heroHover: 'from-red-800 to-slate-950',
-    bg: 'from-red-50 to-slate-50',
-    card: 'from-red-50 to-white',
+    primary: 'linear-gradient(135deg, #B11C28 0%, #0F1820 100%)',
+    hero: 'from-[#B11C28] to-[#0F1820]',
+    heroHover: 'from-[#8A1520] to-[#070C12]',
+    bg: 'from-[#FEF2F2] to-[#D2DCE6]',
+    card: 'from-[#FEF2F2] to-white',
   },
 
   logo: {
