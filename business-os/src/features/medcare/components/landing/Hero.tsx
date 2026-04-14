@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { MedCareBrand } from '../../brand'
+import { MamografiaWordmark } from './MamografiaWordmark'
 
 const B = MedCareBrand
 
@@ -31,8 +32,12 @@ export function Hero() {
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight mb-6">
-            Mamografía 3D con{' '}
+          {/* Wordmark oficial del brand book Mamografia — Mam[o]grafía con tomosíntesis 3D */}
+          <div className="mb-6 flex justify-start">
+            <MamografiaWordmark size="xl" inverted={false} color="#E50995" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.1] tracking-tight mb-6 text-white">
+            Diagnóstico 3D con{' '}
             <span className="bg-gradient-to-r from-[#E50995] to-[#FCAFD9] bg-clip-text text-transparent">
               Inteligencia Artificial
             </span>

@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { MamografiaWordmark } from './MamografiaWordmark'
 
 export function TechSection() {
   return (
@@ -14,8 +15,11 @@ export function TechSection() {
               FUJIFILM AMULET Sophinity
             </span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-bold mb-3 tracking-tight">
-            Mamógrafo de{' '}
+          <div className="flex justify-center mb-4">
+            <MamografiaWordmark size="md" inverted={true} showSubtitle={true} />
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-bold mb-3 tracking-tight text-white">
+            El equipo de{' '}
             <span className="bg-gradient-to-r from-[#E50995] to-[#FCAFD9] bg-clip-text text-transparent">
               última generación
             </span>

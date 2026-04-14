@@ -1,5 +1,6 @@
 import { MedCareBrand } from '../../brand'
 import { BreastIcon } from './BreastIcon'
+import { MamografiaWordmark } from './MamografiaWordmark'
 
 const B = MedCareBrand
 
@@ -27,16 +28,21 @@ export function CTAFinal() {
           </span>
         </div>
 
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-4 tracking-tight">
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-6 tracking-tight">
           Tu tranquilidad empieza{' '}
           <span className="bg-gradient-to-r from-[#E50995] to-[#FCAFD9] bg-clip-text text-transparent">
             con 15 minutos
           </span>
         </h2>
 
+        {/* Wordmark oficial del sub-brand Mamografia */}
+        <div className="flex justify-center mb-6">
+          <MamografiaWordmark size="lg" inverted={true} showSubtitle={true} />
+        </div>
+
         <p className="text-lg sm:text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-          Mamografía 3D + Ultrasonido de mama por solo{' '}
-          <strong className="text-white">₡65.000</strong> — tomosíntesis con IA, resultados el mismo día.
+          + Ultrasonido de mama por solo{' '}
+          <strong className="text-white">₡65.000</strong> — resultados el mismo día.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
