@@ -1,11 +1,16 @@
+import { BreastIcon } from './BreastIcon'
+
 export function WhyMedcare() {
   return (
-    <section className="bg-gray-50 py-12 sm:py-16">
+    <section className="relative bg-gradient-to-b from-white via-[#FEEBF5]/30 to-white py-12 sm:py-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-3">
+        <div className="flex justify-center mb-4">
+          <BreastIcon className="w-10 h-10" color="#E50995" />
+        </div>
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#0F1820] text-center mb-3 tracking-tight">
           Por qué hacerte tu mamografía en MedCare
         </h2>
-        <p className="text-gray-500 text-center mb-10 max-w-2xl mx-auto">
+        <p className="text-slate-500 text-center mb-10 max-w-2xl mx-auto">
           El mismo centro que trajo la resonancia magnética con IA a Costa Rica, ahora con mamografía digital 3D.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -38,12 +43,12 @@ export function WhyMedcare() {
               ),
             },
           ].map((item, i) => (
-            <div key={i} className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-red-200 hover:shadow-lg transition-all">
-              <div className="w-14 h-14 bg-red-50 text-red-600 rounded-xl flex items-center justify-center mb-4">
+            <div key={i} className="group bg-white rounded-2xl p-6 border border-gray-200 hover:border-[#E50995]/40 hover:shadow-xl hover:shadow-[#E50995]/10 hover:-translate-y-1 transition-all">
+              <div className="w-14 h-14 bg-gradient-to-br from-[#FEEBF5] to-[#FCAFD9]/40 text-[#E50995] rounded-xl flex items-center justify-center mb-4 group-hover:from-[#E50995] group-hover:to-[#B11C28] group-hover:text-white transition-all">
                 {item.icon}
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
+              <h3 className="text-lg font-bold text-[#0F1820] mb-2">{item.title}</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>

@@ -2,16 +2,25 @@ import Image from 'next/image'
 
 export function TechSection() {
   return (
-    <section className="bg-slate-900 text-white py-16 sm:py-20 overflow-hidden">
+    <section className="relative isolate bg-[#0F1820] text-white py-16 sm:py-20 overflow-hidden">
+      {/* Glow decorativo pink */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-[#E50995]/10 blur-3xl -z-10" />
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <p className="text-red-400 text-sm font-semibold uppercase tracking-wider mb-2">
-            FUJIFILM AMULET Sophinity
-          </p>
-          <h2 className="text-2xl sm:text-4xl font-bold mb-3">
-            Mamógrafo de última generación
+          <div className="inline-flex items-center gap-2 bg-[#E50995]/15 border border-[#E50995]/40 backdrop-blur-sm px-4 py-1.5 rounded-full mb-4">
+            <span className="w-2 h-2 rounded-full bg-[#E50995] animate-pulse" />
+            <span className="text-xs font-semibold tracking-wider text-[#FCAFD9] uppercase">
+              FUJIFILM AMULET Sophinity
+            </span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-bold mb-3 tracking-tight">
+            Mamógrafo de{' '}
+            <span className="bg-gradient-to-r from-[#E50995] to-[#FCAFD9] bg-clip-text text-transparent">
+              última generación
+            </span>
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
+          <p className="text-slate-400 max-w-2xl mx-auto">
             La mayoría de centros en Costa Rica usan mamógrafos 2D convencionales.
             En MedCare diagnosticamos en 3D con inteligencia artificial.
           </p>

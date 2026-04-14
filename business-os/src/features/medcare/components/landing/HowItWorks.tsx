@@ -14,19 +14,19 @@ export function HowItWorks() {
               step: '1',
               title: 'Escogé tu estudio',
               desc: 'Seleccioná mamografía, ultrasonido o el combo promo y elegí la fecha.',
-              color: 'bg-red-600',
+              color: 'bg-gradient-to-br from-[#E50995] to-[#B11C28]',
             },
             {
               step: '2',
               title: 'Confirmá tu cita',
               desc: 'Seleccioná el horario que más te convenga y listo — tu cita queda confirmada al instante.',
-              color: 'bg-slate-700',
+              color: 'bg-gradient-to-br from-[#1E2A36] to-[#0F1820]',
             },
             {
               step: '3',
               title: 'Hacete tu estudio',
               desc: 'Vení a MedCare, tu estudio toma 15-30 minutos y recibís resultados el mismo día.',
-              color: 'bg-green-600',
+              color: 'bg-gradient-to-br from-emerald-500 to-emerald-700',
             },
           ].map((item) => (
             <div key={item.step} className="text-center">
