@@ -203,6 +203,46 @@
   --color-surface:  #001e30;
   --color-border:   rgba(0, 242, 254, 0.12);
   --color-cyan-dim: #00F2FE40;
+
+  /* ── MedCare Brand Book (Nov 2022) ────────────────────────────────── */
+  /* Tokens explicitos — usar cuando se quiera el color exacto del brand */
+  --color-medcare-red:        #B11C28;   /* Pantone 7621 C */
+  --color-medcare-navy:       #0F1820;   /* Pantone Black 6 C */
+  --color-medcare-blue-gray:  #C4CFDA;   /* Pantone 538 C */
+  --color-medcare-pale-blue:  #D2DCE6;   /* Pantone 642 C */
+}
+
+/* ── MedCare scoped palette override ──────────────────────────────────────
+   Dentro de .medcare-root redefinimos las paletas `red-*` y `slate-*` de
+   Tailwind para que usen los valores del Libro de Marca MedCare sin tener
+   que cambiar cada componente. La escala 50-900 se extrapola a partir de
+   los Pantone oficiales manteniendo ratios de luminosidad coherentes.
+   ──────────────────────────────────────────────────────────────────────── */
+.medcare-root {
+  /* Rojo — base #B11C28 (Pantone 7621 C) en red-600 */
+  --color-red-50:  #FEF2F2;
+  --color-red-100: #FDE4E6;
+  --color-red-200: #F9C5CA;
+  --color-red-300: #F195A0;
+  --color-red-400: #E25866;
+  --color-red-500: #D23846;
+  --color-red-600: #B11C28;
+  --color-red-700: #8A1520;
+  --color-red-800: #6B101A;
+  --color-red-900: #4D0B12;
+
+  /* Slate — base #0F1820 (Pantone Black 6 C) en slate-900 */
+  --color-slate-50:  #F2F5F8;
+  --color-slate-100: #E4EAF0;
+  --color-slate-200: #D2DCE6;   /* = Pantone 642 C */
+  --color-slate-300: #C4CFDA;   /* = Pantone 538 C */
+  --color-slate-400: #8494A6;
+  --color-slate-500: #546378;
+  --color-slate-600: #334356;
+  --color-slate-700: #1E2A36;
+  --color-slate-800: #141E28;
+  --color-slate-900: #0F1820;
+  --color-slate-950: #070C12;
 }
 
 /* Glow utilities */
