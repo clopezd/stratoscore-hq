@@ -1,0 +1,22 @@
+# ============================================================
+# MedCare Assets — archivos fuente pesados NO se commitean
+# ============================================================
+# El libro de marca, fotos RAW del centro y PDFs del proveedor del
+# mamógrafo quedan aquí como referencia local únicamente.
+# Lo que SÍ se commitea son los derivados optimizados en:
+#   ../../../../public/medcare/*  (JPG/PNG/SVG servidos al usuario)
+#
+# Si alguien clona el repo y necesita los originales, debe pedirlos
+# a Carlos Mario.
+
+# PDFs pesados (brand books, propuestas)
+*.pdf
+
+# Fotos originales RAW / alta resolución
+*.raw
+*.psd
+*.ai
+*.sketch
+
+# Excepciones explícitas (si quisiéramos commitear algún PDF pequeño)
+!README.md
