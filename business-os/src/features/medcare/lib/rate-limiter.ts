@@ -53,13 +53,17 @@ export function checkRateLimit(
   return { allowed: true, remaining: config.maxRequests - entry.count, resetAt: entry.resetAt }
 }
 
-// Extraer IP del request (funciona en Vercel)
+// Extraer IP del request — usar SOLO headers que setea Vercel directamente
+// (no x-forwarded-for: ese viene del cliente y es spoofable).
+// Ver: https://vercel.com/docs/edge-network/headers/request-headers
 export function getClientIP(request: Request): string {
-  return (
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    'unknown'
-  )
+  const vercelFwd = request.headers.get('x-vercel-forwarded-for')
+  if (vercelFwd) return vercelFwd.split(',')[0]?.trim() || 'unknown'
+
+  const realIp = request.headers.get('x-real-ip')
+  if (realIp) return realIp
+
+  return 'unknown'
 }
 
 // Configs predefinidas

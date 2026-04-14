@@ -1,10 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { HuliConnector } from '@/features/medcare/lib/huli-connector'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, getClientIP, RATE_LIMITS } from '@/features/medcare/lib/rate-limiter'
 
 const MAMOGRAFIA_DOCTOR_ID = Number(process.env.HULI_MAMOGRAFIA_DOCTOR_ID || '96314')
 const CLINIC_ID = Number(process.env.HULI_CLINIC_ID || '9694')
+
+const todayISO = () => new Date().toISOString().slice(0, 10)
+
+const BookSchema = z.object({
+  // Solo letras (incluye acentos), espacios, guiones, apóstrofes y puntos
+  nombre: z.string().trim().min(2).max(80).regex(/^[\p{L}\s'.\-]+$/u, 'nombre invalido'),
+  // Acepta 8 dígitos CR, con o sin código país, con o sin guión
+  telefono: z.string().trim().min(8).max(20).regex(/^[\d+\s\-()]+$/, 'telefono invalido'),
+  email: z.string().trim().email().max(120).optional().or(z.literal('')),
+  fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'fecha YYYY-MM-DD').refine(
+    (d) => d >= todayISO(),
+    'fecha debe ser hoy o futura'
+  ),
+  hora: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, 'hora HH:MM[:SS]'),
+  sourceEvent: z.union([z.string(), z.number()]).optional(),
+  tipo_estudio: z.enum(['mamografia', 'ultrasonido']).optional(),
+  servicio_id: z.string().uuid().optional().nullable(),
+  medico_referente: z.string().max(120).optional(),
+  horario_preferido: z.string().max(40).optional(),
+  fuente: z.string().max(40).optional(),
+  notas: z.string().max(500).optional(),
+  esPromo: z.boolean().optional(),
+})
 
 /**
  * POST /api/medcare/book
@@ -23,7 +47,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
+    const rawBody = await request.json().catch(() => null)
+    if (!rawBody || typeof rawBody !== 'object') {
+      return NextResponse.json({ error: 'Body invalido' }, { status: 400 })
+    }
+
+    const parsed = BookSchema.safeParse(rawBody)
+    if (!parsed.success) {
+      const first = parsed.error.issues[0]
+      return NextResponse.json(
+        { error: `${first.path.join('.') || 'body'}: ${first.message}` },
+        { status: 400 }
+      )
+    }
 
     const {
       nombre, telefono, email,
@@ -31,15 +67,8 @@ export async function POST(request: NextRequest) {
       tipo_estudio, servicio_id,
       medico_referente, horario_preferido,
       fuente, notas,
-      esPromo, // true si es combo promo
-    } = body
-
-    if (!nombre || !telefono || !fecha || !hora) {
-      return NextResponse.json(
-        { error: 'nombre, telefono, fecha y hora son requeridos' },
-        { status: 400 }
-      )
-    }
+      esPromo,
+    } = parsed.data
 
     const huli = HuliConnector.getInstance()
 
