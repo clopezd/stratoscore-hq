@@ -10,23 +10,27 @@ export function PricingSection() {
         </p>
 
         <div className="space-y-3">
-          {/* Promo destacada */}
+          {/* Promo destacada — sub-brand Mamografía (Pantone Rhodamine Red C + 806 C) */}
           <a
             href="#agendar"
-            className="group block relative overflow-hidden border-2 border-red-400 bg-gradient-to-r from-red-50 to-red-100 rounded-2xl p-6 hover:shadow-lg transition-all"
+            className="group block relative overflow-hidden border-2 border-[#E50995]/40 bg-gradient-to-br from-[#FEEBF5] via-white to-[#FCAFD9]/40 rounded-2xl p-6 hover:shadow-xl hover:shadow-[#E50995]/15 transition-all"
           >
-            <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl">
+            <div className="absolute top-0 right-0 bg-gradient-to-r from-[#E50995] to-[#EC52B4] text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl tracking-wider">
               PROMO ABRIL
             </div>
             <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-red-800">Mamografía 3D + Ultrasonido de mama</h3>
-                <p className="text-sm text-red-600 mt-1">Paquete completo — detección temprana integral</p>
+              <div className="flex-1 pr-4">
+                <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#E50995] uppercase tracking-wider mb-1.5">
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                  Paquete recomendado
+                </div>
+                <h3 className="text-lg font-bold text-[#0F1820]">Mamografía 3D + Ultrasonido de mama</h3>
+                <p className="text-sm text-slate-600 mt-1">Detección temprana integral — tomosíntesis con IA</p>
               </div>
-              <div className="text-right shrink-0 ml-4">
-                <p className="text-sm text-gray-400 line-through">₡84,000</p>
-                <p className="text-2xl font-black text-red-700">₡65,000</p>
-                <p className="text-xs text-red-600 font-medium">Ahorrás ₡19,000</p>
+              <div className="text-right shrink-0">
+                <p className="text-xs text-slate-400 line-through">₡84,000</p>
+                <p className="text-3xl font-black bg-gradient-to-r from-[#E50995] to-[#B11C28] bg-clip-text text-transparent">₡65,000</p>
+                <p className="text-[10px] text-[#E50995] font-bold uppercase tracking-wider">Ahorrás ₡19,000</p>
               </div>
             </div>
           </a>

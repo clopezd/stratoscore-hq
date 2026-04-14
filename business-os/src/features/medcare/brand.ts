@@ -16,6 +16,11 @@ export const MedCareBrand = {
     // Secundarios oficiales del brand book
     blueGray: '#C4CFDA',      // Pantone 538 C
     paleBlue: '#D2DCE6',      // Pantone 642 C
+    // Sub-brand Mamografía (brand book Mamo)
+    mamoPink: '#E50995',       // Pantone Rhodamine Red C
+    mamoPinkMid: '#EC52B4',    // Pantone 806 C
+    mamoPinkSoft: '#FCAFD9',   // 806 C 50%
+    mamoPinkBg: '#FEEBF5',     // 806 C al 50% para fondos
     accent: '#FEF2F2',        // Fondo suave rojo (derivado)
     dark: '#0F1820',
     white: '#FFFFFF',

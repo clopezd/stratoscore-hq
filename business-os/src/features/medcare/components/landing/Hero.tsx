@@ -5,66 +5,123 @@ const B = MedCareBrand
 
 export function Hero() {
   return (
-    <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-red-900 text-white">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-          <div className="max-w-2xl flex-1">
-            <h1 className="text-3xl sm:text-5xl font-bold leading-tight mb-4">
-              Mamografía 3D con<br />
-              <span className="text-red-400">Inteligencia Artificial.</span>
-            </h1>
-            <p className="text-lg sm:text-xl text-gray-300 mb-4 leading-relaxed">
-              FUJIFILM AMULET Sophinity — tomosíntesis de última generación.
-              Adquisición 3D en 10 segundos con menos dolor.
-            </p>
-            <p className="text-base text-gray-400 mb-8">
-              Detectar a tiempo lo cambia todo. Agenda hoy y recibí resultados el mismo día.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <a
-                href="#agendar"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-lg transition shadow-lg shadow-red-600/25"
-              >
-                Agendar Mi Estudio
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </a>
-              <a
-                href={B.contact.whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl font-medium text-lg transition"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                Consultar por WhatsApp
-              </a>
-            </div>
+    <section className="relative isolate overflow-hidden bg-[#0F1820] text-white">
+      {/* Imagen de fondo full-bleed */}
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src="/medcare/reales/tecnica-operando-hero.jpg"
+          alt="Técnica de MedCare operando el mamógrafo FUJIFILM Sophinity"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[70%_center]"
+        />
+        {/* Overlay degradado navy desde la izquierda */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0F1820] via-[#0F1820]/90 via-40% to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F1820]/70 to-transparent" />
+      </div>
+
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28 lg:py-36">
+        <div className="max-w-2xl">
+          {/* Eyebrow badge */}
+          <div className="inline-flex items-center gap-2 bg-[#E50995]/15 border border-[#E50995]/40 backdrop-blur-sm px-4 py-1.5 rounded-full mb-6">
+            <span className="w-2 h-2 rounded-full bg-[#E50995] animate-pulse" />
+            <span className="text-xs font-semibold tracking-wider text-[#FCAFD9] uppercase">
+              Tecnología Fujifilm de última generación
+            </span>
           </div>
-          {/* Móvil: imagen visible */}
-          <div className="w-full md:hidden flex justify-center">
-            <Image
-              src="/medcare/reales/tecnica-operando.jpg"
-              alt="Técnica de MedCare operando el mamógrafo FUJIFILM Sophinity en nuestro consultorio"
-              width={340}
-              height={420}
-              className="rounded-2xl shadow-2xl border-2 border-white/10 object-cover"
-              priority
-            />
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight mb-6">
+            Mamografía 3D con{' '}
+            <span className="bg-gradient-to-r from-[#E50995] to-[#FCAFD9] bg-clip-text text-transparent">
+              Inteligencia Artificial
+            </span>
+          </h1>
+
+          <p className="text-lg sm:text-xl text-slate-200 leading-relaxed mb-4 max-w-xl">
+            <strong className="text-white">FUJIFILM AMULET Sophinity.</strong> Tomosíntesis de última generación con adquisición 3D en 10 segundos y menos dolor que un mamógrafo convencional.
+          </p>
+          <p className="text-base text-slate-300 mb-8 max-w-xl">
+            Detectar a tiempo lo cambia todo. Agendá hoy y recibí resultados el mismo día.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-10">
+            <a
+              href="#agendar"
+              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#B11C28] hover:bg-[#8A1520] text-white rounded-xl font-semibold text-lg transition-all shadow-xl shadow-[#B11C28]/30 hover:shadow-2xl hover:shadow-[#B11C28]/50 hover:-translate-y-0.5"
+            >
+              Agendar Mi Estudio
+              <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </a>
+            <a
+              href={B.contact.whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/30 text-white rounded-xl font-medium text-lg transition"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Consultar por WhatsApp
+            </a>
           </div>
-          {/* Desktop: imagen lateral */}
-          <div className="hidden md:block flex-shrink-0">
-            <Image
-              src="/medcare/reales/tecnica-operando.jpg"
-              alt="Técnica de MedCare operando el mamógrafo FUJIFILM Sophinity en nuestro consultorio"
-              width={420}
-              height={520}
-              className="rounded-2xl shadow-2xl border-2 border-white/10 object-cover"
-              priority
-            />
+
+          {/* Tech stats chips */}
+          <div className="flex flex-wrap gap-3">
+            <TechChip icon="cube" label="Tomosíntesis 3D" sublabel="Capa a capa" />
+            <TechChip icon="ai" label="IA integrada" sublabel="Detección asistida" />
+            <TechChip icon="clock" label="10 segundos" sublabel="Captura 3D" />
+            <TechChip icon="check" label="Mismo día" sublabel="Resultados" />
           </div>
         </div>
       </div>
+
+      {/* Degradado inferior para suavizar transición */}
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0F1820] to-transparent" />
     </section>
+  )
+}
+
+function TechChip({
+  icon,
+  label,
+  sublabel,
+}: {
+  icon: 'cube' | 'ai' | 'clock' | 'check'
+  label: string
+  sublabel: string
+}) {
+  const icons = {
+    cube: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+      </svg>
+    ),
+    ai: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+      </svg>
+    ),
+    clock: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    check: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  }
+
+  return (
+    <div className="group flex items-center gap-2.5 bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-xl transition">
+      <div className="text-[#FCAFD9]">{icons[icon]}</div>
+      <div className="text-left">
+        <div className="text-sm font-bold text-white leading-tight">{label}</div>
+        <div className="text-[11px] text-slate-300 leading-tight">{sublabel}</div>
+      </div>
+    </div>
   )
 }
