@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRP · Activación del Ultrasonido — MedCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:        #B11C28;
+    --red-dark:   #8A1520;
+    --navy:       #0F1820;
+    --navy-light: #1E2A36;
+    --pink:       #E50995;
+    --pink-soft:  #FCAFD9;
+    --pink-bg:    #FEEBF5;
+    --blue-gray:  #C4CFDA;
+    --pale-blue:  #D2DCE6;
+    --bg:         #F7F9FC;
+    --card:       #FFFFFF;
+    --text:       #0F1820;
+    --muted:      #546378;
+    --border:     #E4EAF0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'kern', 'liga', 'calt';
+  }
+
+  /* ─────────────────────────────────────── COVER ─────────────────────────────────────── */
+  .cover {
+    position: relative;
+    min-height: 90vh;
+    background: linear-gradient(135deg, #0F1820 0%, #1E2A36 45%, #0F1820 100%);
+    color: white;
+    padding: 80px 48px 100px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -150px;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(229, 9, 149, 0.25) 0%, transparent 65%);
+    z-index: -1;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -300px;
+    left: -200px;
+    width: 800px;
+    height: 800px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(177, 28, 40, 0.2) 0%, transparent 65%);
+    z-index: -1;
+  }
+  .cover-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .cover-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(229, 9, 149, 0.15);
+    border: 1px solid rgba(229, 9, 149, 0.4);
+    backdrop-filter: blur(8px);
+    padding: 8px 18px;
+    border-radius: 100px;
+    margin-bottom: 48px;
+  }
+  .cover-eyebrow .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--pink);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+  }
+  .cover-eyebrow span {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--pink-soft);
+    text-transform: uppercase;
+  }
+  .cover h1 {
+    font-size: clamp(38px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin: 0 0 28px;
+    max-width: 900px;
+  }
+  .cover h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--pink) 0%, var(--pink-soft) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .cover p.lede {
+    font-size: 20px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.78);
+    max-width: 680px;
+    margin: 0 0 56px;
+    line-height: 1.6;
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 24px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    max-width: 900px;
+  }
+  .cover-meta-item .label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--pink-soft);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .cover-meta-item .value {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+  }
+
+  /* ─────────────────────────────────────── SECTIONS ─────────────────────────────────────── */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 88px 48px;
+  }
+  .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .section-eyebrow .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--pink) 0%, var(--red) 100%);
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+  }
+  .section-eyebrow .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--pink);
+    text-transform: uppercase;
+  }
+  .section h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 20px;
+    max-width: 860px;
+    color: var(--navy);
+  }
+  .section .lede {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 720px;
+    margin: 0 0 48px;
+    line-height: 1.7;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ─────────────────────────────────────── CONTEXT CARDS ─────────────────────────────────────── */
+  .context-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 32px;
+  }
+  @media (max-width: 760px) { .context-grid { grid-template-columns: 1fr; } }
+  .ctx-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .ctx-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(15, 24, 32, 0.08);
+  }
+  .ctx-card .icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .ctx-card.works .icon {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+  }
+  .ctx-card.fails .icon {
+    background: linear-gradient(135deg, #EF4444 0%, #B11C28 100%);
+    color: white;
+  }
+  .ctx-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: var(--navy);
+  }
+  .ctx-card .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .ctx-card.works .tag {
+    background: #D1FAE5;
+    color: #065F46;
+  }
+  .ctx-card.fails .tag {
+    background: #FEE2E2;
+    color: #991B1B;
+  }
+  .ctx-card p {
+    margin: 0 0 14px;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  .ctx-card ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .ctx-card ul li { margin-bottom: 6px; }
+  .ctx-card code {
+    background: #F3F4F6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', ui-monospace, monospace;
+    font-size: 12px;
+    color: var(--navy);
+  }
+
+  /* ─────────────────────────────────────── DECISIONS ─────────────────────────────────────── */
+  .decisions {
+    margin-top: 32px;
+    display: grid;
+    gap: 16px;
+  }
+  .decision {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 32px;
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 24px;
+    align-items: center;
+    transition: all 0.2s;
+  }
+  .decision:hover {
+    border-color: var(--pink);
+    background: linear-gradient(to right, var(--pink-bg), var(--card));
+  }
+  .decision .letter {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color: white;
+    font-size: 28px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .decision:hover .letter {
+    background: linear-gradient(135deg, var(--pink) 0%, var(--red) 100%);
+  }
+  .decision .content h4 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--navy);
+  }
+  .decision .content p {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+  .decision .pro {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--pink);
+    text-transform: uppercase;
+    background: var(--pink-bg);
+    padding: 8px 14px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  @media (max-width: 760px) {
+    .decision { grid-template-columns: 1fr; }
+    .decision .pro { justify-self: start; }
+  }
+
+  /* ─────────────────────────────────────── TIMELINE ─────────────────────────────────────── */
+  .phases {
+    position: relative;
+    margin-top: 40px;
+    padding-left: 40px;
+  }
+  .phases::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    bottom: 16px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--pink) 0%, var(--red) 100%);
+  }
+  .phase {
+    position: relative;
+    padding-bottom: 32px;
+  }
+  .phase:last-child { padding-bottom: 0; }
+  .phase::before {
+    content: '';
+    position: absolute;
+    left: -32px;
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid var(--pink);
+  }
+  .phase .head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .phase .title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .phase .chip {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    background: var(--pink-bg);
+    color: var(--pink);
+    padding: 4px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+  }
+  .phase .chip.secondary {
+    background: #F3F4F6;
+    color: var(--muted);
+  }
+  .phase p {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0 0 10px;
+    line-height: 1.7;
+  }
+  .phase pre {
+    background: var(--navy);
+    color: #E0EDE0;
+    padding: 16px 20px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 12px;
+    font-family: 'SF Mono', ui-monospace, monospace;
+    line-height: 1.6;
+    margin: 12px 0 0;
+  }
+  .phase pre .kw { color: var(--pink-soft); }
+  .phase pre .str { color: #A8F0A8; }
+  .phase pre .cmt { color: #6B7280; font-style: italic; }
+
+  /* ─────────────────────────────────────── MUST HAVE ─────────────────────────────────────── */
+  .must {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color: white;
+    padding: 56px 48px;
+    border-radius: 24px;
+    margin-top: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .must::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(229, 9, 149, 0.2) 0%, transparent 70%);
+  }
+  .must h3 {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    color: var(--pink-soft);
+    text-transform: uppercase;
+    margin: 0 0 16px;
+    position: relative;
+  }
+  .must-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    position: relative;
+  }
+  @media (max-width: 760px) { .must-grid { grid-template-columns: 1fr; } }
+  .must-item {
+    padding: 24px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+  }
+  .must-item .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--pink);
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .must-item h4 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: white;
+  }
+  .must-item p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    margin: 0;
+    line-height: 1.65;
+  }
+  .must-item .time {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--pink);
+    text-transform: uppercase;
+  }
+
+  /* ─────────────────────────────────────── EFFORT ─────────────────────────────────────── */
+  .effort-table {
+    margin-top: 32px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .effort-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 120px 140px;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    gap: 16px;
+  }
+  .effort-row:last-child { border-bottom: none; }
+  .effort-row.head {
+    background: #F9FAFC;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .effort-row .icon-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--pink-bg);
+    color: var(--pink);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .effort-row .name { font-size: 14px; font-weight: 600; color: var(--navy); }
+  .effort-row .desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .effort-row .hours {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    text-align: right;
+  }
+  .effort-row .type {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 5px 10px;
+    border-radius: 6px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .effort-row .type.dev { background: var(--pink-bg); color: var(--pink); }
+  .effort-row .type.qa  { background: #DBEAFE; color: #1E40AF; }
+  .effort-total {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color: white;
+    padding: 24px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .effort-total .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--pink-soft);
+    text-transform: uppercase;
+  }
+  .effort-total .value {
+    font-size: 28px;
+    font-weight: 800;
+    color: white;
+  }
+  @media (max-width: 760px) {
+    .effort-row { grid-template-columns: 1fr; }
+    .effort-row.head { display: none; }
+  }
+
+  /* ─────────────────────────────────────── RISKS ─────────────────────────────────────── */
+  .risks {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+  @media (max-width: 900px) { .risks { grid-template-columns: 1fr; } }
+  .risk {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--pink);
+    border-radius: 14px;
+    padding: 24px 26px;
+  }
+  .risk .level {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+  .risk.low .level    { background: #D1FAE5; color: #065F46; }
+  .risk.medium .level { background: #FEF3C7; color: #92400E; }
+  .risk.high .level   { background: #FEE2E2; color: #991B1B; }
+  .risk.high { border-left-color: #EF4444; }
+  .risk.medium { border-left-color: #F59E0B; }
+  .risk.low { border-left-color: #10B981; }
+  .risk h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: var(--navy);
+  }
+  .risk p {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+  .risk .mitigation {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    font-size: 12px;
+  }
+  .risk .mitigation strong {
+    color: var(--pink);
+    font-weight: 700;
+  }
+
+  /* ─────────────────────────────────────── CTA ─────────────────────────────────────── */
+  .final-cta {
+    max-width: 1100px;
+    margin: 0 auto 100px;
+    padding: 0 48px;
+  }
+  .final-cta-inner {
+    background: linear-gradient(135deg, var(--pink) 0%, var(--red) 100%);
+    border-radius: 24px;
+    padding: 56px 48px;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .final-cta-inner::before {
+    content: '';
+    position: absolute;
+    top: -150px;
+    left: -150px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+  }
+  .final-cta-inner::after {
+    content: '';
+    position: absolute;
+    bottom: -150px;
+    right: -150px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  }
+  .final-cta h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+    position: relative;
+  }
+  .final-cta p {
+    font-size: 17px;
+    color: rgba(255,255,255,0.9);
+    max-width: 620px;
+    margin: 0 auto 32px;
+    position: relative;
+    line-height: 1.65;
+  }
+  .sign {
+    display: inline-flex;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 32px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    position: relative;
+  }
+  .sign .who {
+    text-align: left;
+  }
+  .sign .who .label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .sign .who .name {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* ─────────────────────────────────────── FOOTER ─────────────────────────────────────── */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    padding: 32px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  footer strong { color: var(--pink-soft); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════ COVER ════════════════════════════ -->
+<header class="cover">
+  <div class="cover-inner">
+    <div class="cover-eyebrow">
+      <span class="dot"></span>
+      <span>Product Requirements Proposal · MedCare</span>
+    </div>
+    <h1>Activar el agendamiento <em>en línea del Ultrasonido</em> igual que el Mamógrafo</h1>
+    <p class="lede">
+      Hoy el portal agenda mamografía de forma 100% automática. El ultrasonido quedó fuera por una restricción de arquitectura en Huli.
+      Este documento explica qué falta, qué decisiones necesita tomar la dirección, y cómo se ejecutaría en ~7 horas de desarrollo.
+    </p>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="label">PRP</div>
+        <div class="value">MEDCARE-US-001</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="label">Fecha</div>
+        <div class="value">15 de abril, 2026</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="label">Estado</div>
+        <div class="value">Pendiente aprobación</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="label">Esfuerzo</div>
+        <div class="value">~7 horas dev</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="label">Autor</div>
+        <div class="value">StratosCore</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════════════ 01. CONTEXTO ════════════════════════════ -->
+<section class="section">
+  <div class="section-eyebrow">
+    <span class="num">01</span>
+    <span class="label">Contexto</span>
+  </div>
+  <h2>Por qué el ultrasonido no se agenda solo todavía</h2>
+  <p class="lede">
+    La diferencia no es técnica nuestra — es cómo HuliPractice modela los recursos. El mamógrafo se trata como un equipo con agenda propia; los ultrasonidos dependen de radiólogos humanos con 4 agendas distintas que hay que orquestar.
+  </p>
+
+  <div class="context-grid">
+    <div class="ctx-card works">
+      <div class="icon">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <div class="tag">Funciona</div>
+      <h3>Mamografía 3D</h3>
+      <p>Huli trata al <strong>mamógrafo como un doctor</strong> con ID <code>96314</code> y agenda propia.</p>
+      <ul>
+        <li>1 consulta a <code>getAvailability()</code> devuelve slots listos</li>
+        <li>1 llamada a <code>createAppointment()</code> confirma la cita</li>
+        <li>Flujo probado en producción desde el día 1</li>
+      </ul>
+    </div>
+
+    <div class="ctx-card fails">
+      <div class="icon">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3h.008M12 21a9 9 0 110-18 9 9 0 010 18z"/>
+        </svg>
+      </div>
+      <div class="tag">Requiere diseño</div>
+      <h3>Ultrasonido de mama</h3>
+      <p>Lo operan <strong>4 radiólogos humanos</strong> — cada uno con su propia agenda e ID Huli.</p>
+      <ul>
+        <li>Hay que consultar <strong>4 agendas en paralelo</strong> y fusionar</li>
+        <li>El sistema necesita una <strong>estrategia de asignación</strong> (no puede adivinar)</li>
+        <li>Algunos IDs pueden estar obsoletos y hay que confirmar con la dueña</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════ 02. DECISIONES ════════════════════════════ -->
+<section class="section">
+  <div class="section-eyebrow">
+    <span class="num">02</span>
+    <span class="label">Decisiones de negocio</span>
+  </div>
+  <h2>¿Cómo asignamos el radiólogo cuando entra una solicitud?</h2>
+  <p class="lede">
+    Esta es una decisión clínica y operativa. No es técnica. La dirección tiene que elegir una de estas cuatro estrategias — cada una tiene un balance distinto entre experiencia de la paciente, carga de trabajo y control.
+  </p>
+
+  <div class="decisions">
+    <div class="decision">
+      <div class="letter">A</div>
+      <div class="content">
+        <h4>Round-Robin equitativo</h4>
+        <p>Reparte parejo entre los 4 radiólogos. Primer paciente va con Dr. Solís, el siguiente con Dr. Pastora, y así sucesivamente en orden fijo.</p>
+      </div>
+      <div class="pro">Justo y balanceado</div>
+    </div>
+
+    <div class="decision">
+      <div class="letter">B</div>
+      <div class="content">
+        <h4>Disponibilidad primero</h4>
+        <p>El sistema asigna al radiólogo que tenga el próximo slot libre más cercano al horario que prefiere la paciente. Máxima eficiencia de agenda.</p>
+      </div>
+      <div class="pro">Mejor UX paciente</div>
+    </div>
+
+    <div class="decision">
+      <div class="letter">C</div>
+      <div class="content">
+        <h4>Un solo titular</h4>
+        <p>Todas las citas van a un único radiólogo designado. Máxima simplicidad técnica y continuidad clínica, pero carga concentrada.</p>
+      </div>
+      <div class="pro">Simple y rápido</div>
+    </div>
+
+    <div class="decision">
+      <div class="letter">D</div>
+      <div class="content">
+        <h4>La paciente escoge</h4>
+        <p>Mostrar los 4 radiólogos en el formulario y que la paciente elija — útil si hay preferencias de género, idioma o historial clínico previo.</p>
+      </div>
+      <div class="pro">Máximo control</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════ 03. SOLUCIÓN TÉCNICA ════════════════════════════ -->
+<section class="section">
+  <div class="section-eyebrow">
+    <span class="num">03</span>
+    <span class="label">Arquitectura propuesta</span>
+  </div>
+  <h2>Cómo lo resolveríamos del lado técnico</h2>
+  <p class="lede">
+    Tres fases coordinadas — sin romper el flujo actual de mamografía. Todo corre en paralelo durante el deploy.
+  </p>
+
+  <div class="phases">
+    <div class="phase">
+      <div class="head">
+        <span class="title">Fase 1 — Nuevo endpoint de disponibilidad multi-doctor</span>
+        <span class="chip">1.5 h</span>
+        <span class="chip secondary">Backend</span>
+      </div>
+      <p>
+        Crear <code>/api/medcare/availability-us</code> que consulta a los 4 radiólogos <strong>en paralelo</strong> con <code>Promise.allSettled</code>, fusiona sus slots y devuelve un listado ordenado por fecha + hora con metadata del radiólogo asignado según la estrategia elegida.
+      </p>
+      <pre><span class="cmt">// simplificado</span>
+<span class="kw">const</span> radiologos = [<span class="str">49493</span>, <span class="str">18828</span>, <span class="str">14145</span>, <span class="str">97620</span>]
+<span class="kw">const</span> results = <span class="kw">await</span> Promise.allSettled(
+  radiologos.map(id =&gt; huli.getAvailability(id, CLINIC_ID, from, to))
+)
+<span class="kw">return</span> mergeSlots(results, estrategia) <span class="cmt">// A/B/C/D</span></pre>
+    </div>
+
+    <div class="phase">
+      <div class="head">
+        <span class="title">Fase 2 — Extender el endpoint de booking</span>
+        <span class="chip">2 h</span>
+        <span class="chip secondary">Backend · Zod</span>
+      </div>
+      <p>
+        Modificar <code>/api/medcare/book</code> para aceptar un campo opcional <code>doctorId</code> validado contra una whitelist (los 4 radiólogos + el mamógrafo). Si no viene, asume mamografía como fallback. Se persiste <code>huli_doctor_id</code> en <code>medcare_leads</code> para saber quién atendió cada estudio.
+      </p>
+      <pre><span class="kw">const</span> BookSchema = z.object({
+  <span class="cmt">// ... campos existentes ...</span>
+  doctorId: z.number().refine(id =&gt; ALLOWED_IDS.includes(id)).optional(),
+})</pre>
+    </div>
+
+    <div class="phase">
+      <div class="head">
+        <span class="title">Fase 3 — Actualización del formulario</span>
+        <span class="chip">2.5 h</span>
+        <span class="chip secondary">Frontend · UX</span>
+      </div>
+      <p>
+        Cuando la paciente selecciona "Ultrasonido de mama", el formulario llama al nuevo endpoint. Si la dirección elige la estrategia D, muestra selección de radiólogo como paso extra. Si elige A/B/C, el flujo queda idéntico al de mamografía — una capa de abstracción resuelve todo por detrás.
+      </p>
+    </div>
+
+    <div class="phase">
+      <div class="head">
+        <span class="title">Fase 4 — QA y ajuste del combo promo</span>
+        <span class="chip">1 h</span>
+        <span class="chip secondary">Testing</span>
+      </div>
+      <p>
+        Probar el flujo end-to-end con Playwright: mamografía solo, US solo, combo con ambas citas agendadas automáticamente. Si el combo detecta que no hay slot de US cercano, cae al flujo manual actual ("coordinaremos por teléfono") sin romper la UX.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════ 04. DEPENDENCIAS ════════════════════════════ -->
+<section class="section">
+  <div class="section-eyebrow">
+    <span class="num">04</span>
+    <span class="label">Lo que necesito de la dirección</span>
+  </div>
+  <h2>Sin estas dos cosas, no puedo arrancar</h2>
+  <p class="lede">
+    Son los únicos bloqueadores reales. Cuando los tenga, ejecuto todo en un ciclo de trabajo continuo y el portal queda agendando US automáticamente el mismo día.
+  </p>
+
+  <div class="must">
+    <h3>Pre-requisitos del cliente</h3>
+    <div class="must-grid">
+      <div class="must-item">
+        <div class="num">1</div>
+        <h4>Decisión de estrategia de asignación</h4>
+        <p>Elegir una de las 4 opciones (A, B, C o D) del bloque de decisiones de negocio. Es una llamada de 10 minutos con la dirección del centro médico — no requiere nada técnico.</p>
+        <div class="time">⏱ 10 minutos — Una reunión</div>
+      </div>
+
+      <div class="must-item">
+        <div class="num">2</div>
+        <h4>Validación de los IDs de Huli</h4>
+        <p>Confirmar en la plataforma Huli que los 4 IDs registrados (<code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">49493</code>, <code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">18828</code>, <code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">14145</code>, <code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">97620</code>) corresponden a los radiólogos actuales y están activos. Un typo tumba la búsqueda de disponibilidad con error silencioso.</p>
+        <div class="time">⏱ 5 minutos — En Huli</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════ 05. ESFUERZO ════════════════════════════ -->
+<section class="section">
+  <div class="section-eyebrow">
+    <span class="num">05</span>
+    <span class="label">Estimación detallada</span>
+  </div>
+  <h2>Breakdown de horas y entregables</h2>
+  <p class="lede">
+    Horas efectivas de trabajo. Asume que los dos pre-requisitos ya están resueltos — de lo contrario los tiempos se extienden al día siguiente.
+  </p>
+
+  <div class="effort-table">
+    <div class="effort-row head">
+      <div></div>
+      <div>Fase</div>
+      <div style="text-align:right">Horas</div>
+      <div>Tipo</div>
+    </div>
+    <div class="effort-row">
+      <div class="icon-box">01</div>
+      <div>
+        <div class="name">Endpoint multi-doctor</div>
+        <div class="desc">Paralelización, merge de slots, cache</div>
+      </div>
+      <div class="hours">1.5 h</div>
+      <div class="type dev">Backend</div>
+    </div>
+    <div class="effort-row">
+      <div class="icon-box">02</div>
+      <div>
+        <div class="name">Extender booking + whitelist</div>
+        <div class="desc">Zod + validación Huli + persistencia Supabase</div>
+      </div>
+      <div class="hours">2 h</div>
+      <div class="type dev">Backend</div>
+    </div>
+    <div class="effort-row">
+      <div class="icon-box">03</div>
+      <div>
+        <div class="name">UI del formulario</div>
+        <div class="desc">Selector condicional + fallback UX</div>
+      </div>
+      <div class="hours">2.5 h</div>
+      <div class="type dev">Frontend</div>
+    </div>
+    <div class="effort-row">
+      <div class="icon-box">04</div>
+      <div>
+        <div class="name">QA end-to-end + combo</div>
+        <div class="desc">Playwright + pruebas manuales</div>
+      </div>
+      <div class="hours">1 h</div>
+      <div class="type qa">QA</div>
+    </div>
+    <div class="effort-total">
+      <div class="label">Total estimado · efectivo</div>
+      <div class="value">7 horas</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════ 06. RIESGOS ════════════════════════════ -->
+<section class="section">
+  <div class="section-eyebrow">
+    <span class="num">06</span>
+    <span class="label">Análisis de riesgos</span>
+  </div>
+  <h2>Qué podría salir mal y cómo lo mitigamos</h2>
+
+  <div class="risks">
+    <div class="risk medium">
+      <div class="level">Medio</div>
+      <h4>IDs de Huli incorrectos</h4>
+      <p>Si algún ID está obsoleto, la consulta de disponibilidad falla con error silencioso.</p>
+      <div class="mitigation">
+        <strong>Mitigación →</strong> Pre-validación antes de deploy. Script de verificación que hace ping a cada ID y reporta antes de ir a prod.
+      </div>
+    </div>
+
+    <div class="risk low">
+      <div class="level">Bajo</div>
+      <h4>Rate limits de Huli</h4>
+      <p>Consultar 4 doctores en paralelo multiplica por 4 los hits al API.</p>
+      <div class="mitigation">
+        <strong>Mitigación →</strong> Cache de 60s en Redis por par (doctorId + fecha). Reduce el 90% de llamadas repetidas.
+      </div>
+    </div>
+
+    <div class="risk low">
+      <div class="level">Bajo</div>
+      <h4>Conflictos de agenda</h4>
+      <p>Dos pacientes agendan el mismo slot del mismo radiólogo en el mismo segundo.</p>
+      <div class="mitigation">
+        <strong>Mitigación →</strong> Huli rechaza el segundo con 409. El frontend captura el error y ofrece un nuevo slot automáticamente.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ CTA FINAL ════════════════════════════ -->
+<div class="final-cta">
+  <div class="final-cta-inner">
+    <h2>Aprobamos y arrancamos</h2>
+    <p>
+      Con la estrategia definida y los IDs validados, en 7 horas hábiles el portal agenda ultrasonido solo,
+      en combo con mamografía, y con la confianza de un sistema que ya maneja 100% del flujo en producción.
+    </p>
+    <div class="sign">
+      <div class="who">
+        <div class="label">Ejecutor</div>
+        <div class="name">StratosCore · Agent-driven delivery</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Documento generado por <strong>StratosCore</strong> · PRP MEDCARE-US-001 · Alineado al Libro de Marca MedCare y al sub-brand Mamografía · Pantones 7621 C · Black 6 C · Rhodamine Red C
+</footer>
+
+</body>
+</html>
