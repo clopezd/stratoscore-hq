@@ -18,8 +18,9 @@
     --pale-blue:  #D2DCE6;
     --bg:         #F7F9FC;
     --card:       #FFFFFF;
-    --text:       #0F1820;
-    --muted:      #546378;
+    --text:       #0B1218;      /* more contrast */
+    --text-body:  #1F2937;      /* body text — darker than muted */
+    --muted:      #3D4A5E;      /* darker muted for accessibility */
     --border:     #E4EAF0;
   }
 
@@ -29,8 +30,9 @@
   body {
     font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg);
-    color: var(--text);
-    line-height: 1.65;
+    color: var(--text-body);
+    line-height: 1.75;
+    font-size: 17px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: 'kern', 'liga', 'calt';
@@ -118,12 +120,12 @@
     color: transparent;
   }
   .cover p.lede {
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 400;
-    color: rgba(255,255,255,0.78);
-    max-width: 680px;
+    color: rgba(255,255,255,0.92);
+    max-width: 720px;
     margin: 0 0 56px;
-    line-height: 1.6;
+    line-height: 1.7;
   }
   .cover-meta {
     display: grid;
@@ -189,11 +191,12 @@
     color: var(--navy);
   }
   .section .lede {
-    font-size: 17px;
+    font-size: 19px;
     color: var(--muted);
-    max-width: 720px;
+    max-width: 760px;
     margin: 0 0 48px;
-    line-height: 1.7;
+    line-height: 1.75;
+    font-weight: 400;
   }
 
   .divider {
@@ -267,17 +270,18 @@
   }
   .ctx-card p {
     margin: 0 0 14px;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--muted);
-    line-height: 1.65;
+    line-height: 1.7;
   }
   .ctx-card ul {
     margin: 0;
-    padding-left: 18px;
-    font-size: 13px;
+    padding-left: 20px;
+    font-size: 15px;
     color: var(--muted);
+    line-height: 1.7;
   }
-  .ctx-card ul li { margin-bottom: 6px; }
+  .ctx-card ul li { margin-bottom: 8px; }
   .ctx-card code {
     background: #F3F4F6;
     padding: 2px 6px;
@@ -324,16 +328,16 @@
     background: linear-gradient(135deg, var(--pink) 0%, var(--red) 100%);
   }
   .decision .content h4 {
-    font-size: 17px;
+    font-size: 19px;
     font-weight: 700;
-    margin: 0 0 4px;
+    margin: 0 0 6px;
     color: var(--navy);
   }
   .decision .content p {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--muted);
     margin: 0;
-    line-height: 1.6;
+    line-height: 1.7;
   }
   .decision .pro {
     font-size: 11px;
@@ -390,7 +394,7 @@
     flex-wrap: wrap;
   }
   .phase .title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--navy);
   }
@@ -409,21 +413,21 @@
     color: var(--muted);
   }
   .phase p {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--muted);
     margin: 0 0 10px;
-    line-height: 1.7;
+    line-height: 1.75;
   }
   .phase pre {
     background: var(--navy);
     color: #E0EDE0;
-    padding: 16px 20px;
+    padding: 18px 22px;
     border-radius: 10px;
     overflow-x: auto;
-    font-size: 12px;
+    font-size: 13px;
     font-family: 'SF Mono', ui-monospace, monospace;
-    line-height: 1.6;
-    margin: 12px 0 0;
+    line-height: 1.65;
+    margin: 14px 0 0;
   }
   .phase pre .kw { color: var(--pink-soft); }
   .phase pre .str { color: #A8F0A8; }
@@ -486,16 +490,16 @@
     margin-bottom: 16px;
   }
   .must-item h4 {
-    font-size: 17px;
+    font-size: 19px;
     font-weight: 700;
     margin: 0 0 8px;
     color: white;
   }
   .must-item p {
-    font-size: 13px;
-    color: rgba(255,255,255,0.75);
+    font-size: 15px;
+    color: rgba(255,255,255,0.88);
     margin: 0;
-    line-height: 1.65;
+    line-height: 1.75;
   }
   .must-item .time {
     display: inline-block;
@@ -544,10 +548,10 @@
     font-size: 14px;
     font-weight: 800;
   }
-  .effort-row .name { font-size: 14px; font-weight: 600; color: var(--navy); }
-  .effort-row .desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .effort-row .name { font-size: 16px; font-weight: 600; color: var(--navy); }
+  .effort-row .desc { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.55; }
   .effort-row .hours {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--navy);
     text-align: right;
@@ -620,22 +624,24 @@
   .risk.medium { border-left-color: #F59E0B; }
   .risk.low { border-left-color: #10B981; }
   .risk h4 {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
     margin: 0 0 8px;
     color: var(--navy);
   }
   .risk p {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--muted);
     margin: 0;
-    line-height: 1.6;
+    line-height: 1.7;
   }
   .risk .mitigation {
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
     border-top: 1px dashed var(--border);
-    font-size: 12px;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
   }
   .risk .mitigation strong {
     color: var(--pink);
@@ -685,12 +691,12 @@
     position: relative;
   }
   .final-cta p {
-    font-size: 17px;
-    color: rgba(255,255,255,0.9);
-    max-width: 620px;
+    font-size: 19px;
+    color: rgba(255,255,255,0.94);
+    max-width: 680px;
     margin: 0 auto 32px;
     position: relative;
-    line-height: 1.65;
+    line-height: 1.7;
   }
   .sign {
     display: inline-flex;
@@ -810,7 +816,7 @@
       <ul>
         <li>Hay que consultar <strong>4 agendas en paralelo</strong> y fusionar</li>
         <li>El sistema necesita una <strong>estrategia de asignación</strong> (no puede adivinar)</li>
-        <li>Algunos IDs pueden estar obsoletos y hay que confirmar con la dueña</li>
+        <li>Si un ID está mal por un solo dígito, el radiólogo desaparece del portal sin ningún error visible</li>
       </ul>
     </div>
   </div>
@@ -864,6 +870,15 @@
         <p>Mostrar los 4 radiólogos en el formulario y que la paciente elija — útil si hay preferencias de género, idioma o historial clínico previo.</p>
       </div>
       <div class="pro">Máximo control</div>
+    </div>
+
+    <div class="decision">
+      <div class="letter">E</div>
+      <div class="content">
+        <h4>Coordinación manual por teléfono</h4>
+        <p>Dada la complejidad clínica del ultrasonido (depende del hallazgo de la mamografía, del radiólogo disponible y del historial), el portal captura la solicitud en línea pero el agendamiento real lo hace un asistente del centro por llamada o WhatsApp. La dirección mantiene el 100% del control clínico y cero fricción técnica.</p>
+      </div>
+      <div class="pro">Recomendado para arranque</div>
     </div>
   </div>
 </section>
@@ -964,7 +979,7 @@
       <div class="must-item">
         <div class="num">2</div>
         <h4>Validación de los IDs de Huli</h4>
-        <p>Confirmar en la plataforma Huli que los 4 IDs registrados (<code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">49493</code>, <code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">18828</code>, <code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">14145</code>, <code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">97620</code>) corresponden a los radiólogos actuales y están activos. Un typo tumba la búsqueda de disponibilidad con error silencioso.</p>
+        <p>Confirmar en la plataforma Huli que los 4 IDs registrados (<code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">49493</code>, <code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">18828</code>, <code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">14145</code>, <code style="background:rgba(229,9,149,0.2);padding:2px 6px;border-radius:4px;color:#FCAFD9">97620</code>) corresponden a los radiólogos actuales y están activos. Si uno solo está mal escrito por un dígito, ese radiólogo desaparece del portal sin mostrar error a la paciente — simplemente no aparecerían sus slots y nadie del centro se enteraría hasta revisar manualmente la agenda.</p>
         <div class="time">⏱ 5 minutos — En Huli</div>
       </div>
     </div>
