@@ -1,6 +1,6 @@
 export function HowItWorks() {
   return (
-    <section className="bg-white py-12 sm:py-16">
+    <section className="bg-gradient-to-b from-[#FEEBF5] to-white py-12 sm:py-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-3">
           Agende en 3 simples pasos
@@ -14,19 +14,19 @@ export function HowItWorks() {
               step: '1',
               title: 'Escoja su estudio',
               desc: 'Seleccione mamografía, ultrasonido o el combo promo y elija la fecha.',
-              color: 'bg-gradient-to-br from-[#E50995] to-[#B11C28]',
+              color: 'bg-gradient-to-br from-[#FCAFD9] to-[#E50995]',
             },
             {
               step: '2',
               title: 'Confirme su cita',
               desc: 'Seleccione el horario que más le convenga y listo — su cita queda confirmada al instante.',
-              color: 'bg-gradient-to-br from-[#1E2A36] to-[#0F1820]',
+              color: 'bg-gradient-to-br from-[#E50995] to-[#B11C28]',
             },
             {
               step: '3',
               title: 'Haga su estudio',
               desc: 'Venga a MedCare, su estudio toma 15-30 minutos y reciba resultados el mismo día.',
-              color: 'bg-gradient-to-br from-emerald-500 to-emerald-700',
+              color: 'bg-gradient-to-br from-[#B11C28] to-[#8A1520]',
             },
           ].map((item) => (
             <div key={item.step} className="text-center">

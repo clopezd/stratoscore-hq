@@ -3,28 +3,28 @@ import { MamografiaWordmark } from './MamografiaWordmark'
 
 export function TechSection() {
   return (
-    <section className="relative isolate bg-[#0F1820] text-white py-16 sm:py-20 overflow-hidden">
+    <section className="relative isolate bg-gradient-to-b from-white via-[#FEEBF5] to-white text-[#0F1820] py-16 sm:py-20 overflow-hidden">
       {/* Glow decorativo pink */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-[#E50995]/10 blur-3xl -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-[#FCAFD9]/30 blur-3xl -z-10" />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-[#E50995]/15 border border-[#E50995]/40 backdrop-blur-sm px-4 py-1.5 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-white border border-[#E50995]/30 backdrop-blur-sm px-4 py-1.5 rounded-full mb-4 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-[#E50995] animate-pulse" />
-            <span className="text-xs font-semibold tracking-wider text-[#FCAFD9] uppercase">
+            <span className="text-xs font-semibold tracking-wider text-[#E50995] uppercase">
               FUJIFILM AMULET Sophinity
             </span>
           </div>
           <div className="flex justify-center mb-4">
-            <MamografiaWordmark size="md" inverted={true} showSubtitle={true} />
+            <MamografiaWordmark size="md" inverted={false} showSubtitle={true} color="#E50995" />
           </div>
-          <h2 className="text-2xl sm:text-4xl font-bold mb-3 tracking-tight text-white">
+          <h2 className="text-2xl sm:text-4xl font-bold mb-3 tracking-tight text-[#0F1820]">
             El equipo de{' '}
-            <span className="bg-gradient-to-r from-[#E50995] to-[#FCAFD9] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#E50995] to-[#B11C28] bg-clip-text text-transparent">
               última generación
             </span>
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <p className="text-slate-600 max-w-2xl mx-auto">
             La mayoría de centros en Costa Rica usan mamógrafos 2D convencionales.
             En MedCare diagnosticamos en 3D con inteligencia artificial.
           </p>
@@ -81,12 +81,12 @@ export function TechSection() {
               },
             ].map((item, i) => (
               <div key={i} className="flex gap-4">
-                <div className="w-12 h-12 bg-red-600/20 text-red-400 rounded-xl flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#FEEBF5] to-[#FCAFD9]/40 text-[#E50995] rounded-xl flex items-center justify-center shrink-0 border border-[#E50995]/20">
                   {item.icon}
                 </div>
                 <div>
-                  <h3 className="font-bold text-white mb-1">{item.title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+                  <h3 className="font-bold text-[#0F1820] mb-1">{item.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -108,7 +108,7 @@ export function TechSection() {
                 height={300}
                 className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0F1820]/80 to-transparent p-3">
                 <p className="text-xs font-semibold text-white">{img.label}</p>
               </div>
             </div>
