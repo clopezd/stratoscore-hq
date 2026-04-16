@@ -23,7 +23,7 @@ export function Testimonials() {
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
           Lo que dicen nuestras pacientes
         </h2>
-        <p className="text-gray-500 text-center mb-10">Más de 7 años cuidando la salud de Costa Rica</p>
+        <p className="text-gray-500 text-center mb-10">Más de 10 años cuidando la salud de Costa Rica</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((t, i) => (
             <div key={i} className="bg-gray-50 rounded-2xl p-6 border border-gray-100">

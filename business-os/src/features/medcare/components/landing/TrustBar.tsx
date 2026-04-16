@@ -1,7 +1,7 @@
 export function TrustBar() {
   const items = [
     {
-      label: '+7 años',
+      label: '+10 años',
       sub: 'de experiencia',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
