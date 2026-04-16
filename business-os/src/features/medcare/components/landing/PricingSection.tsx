@@ -16,7 +16,7 @@ export function PricingSection() {
             className="group block relative overflow-hidden border-2 border-[#E50995]/40 bg-gradient-to-br from-[#FEEBF5] via-white to-[#FCAFD9]/40 rounded-2xl p-6 hover:shadow-xl hover:shadow-[#E50995]/15 transition-all"
           >
             <div className="absolute top-0 right-0 bg-gradient-to-r from-[#E50995] to-[#EC52B4] text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl tracking-wider">
-              PROMO ABRIL
+              PROMO HASTA MAYO 2026
             </div>
             <div className="flex items-center justify-between">
               <div className="flex-1 pr-4">

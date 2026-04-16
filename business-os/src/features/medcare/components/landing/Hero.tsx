@@ -44,10 +44,10 @@ export function Hero() {
           </h1>
 
           <p className="text-lg sm:text-xl text-slate-200 leading-relaxed mb-4 max-w-xl">
-            <strong className="text-white">FUJIFILM AMULET Sophinity.</strong> Tomosíntesis de última generación con adquisición 3D en 10 segundos y menos dolor que un mamógrafo convencional.
+            Crecimos y mejoramos por ustedes. Ahora en <strong className="text-white">MEDCARE</strong> nos vestimos de rosa con nuestro nuevo equipo de mamografía con la más alta tecnología del país.
           </p>
-          <p className="text-base text-slate-300 mb-8 max-w-xl">
-            Detectar a tiempo lo cambia todo. Agendá hoy y recibí resultados el mismo día.
+          <p className="text-base text-[#FCAFD9] font-semibold mb-8 max-w-xl">
+            Una mamografía a tiempo salva vidas.
           </p>
 
           {/* CTAs */}

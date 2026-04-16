@@ -24,7 +24,7 @@ export function CTAFinal() {
         <div className="inline-flex items-center gap-2 bg-[#E50995]/15 border border-[#E50995]/40 backdrop-blur-sm px-4 py-1.5 rounded-full mb-6">
           <span className="w-2 h-2 rounded-full bg-[#E50995] animate-pulse" />
           <span className="text-xs font-semibold tracking-wider text-[#FCAFD9] uppercase">
-            Promo válida solo en abril
+            Promo válida hasta mayo 2026
           </span>
         </div>
 
