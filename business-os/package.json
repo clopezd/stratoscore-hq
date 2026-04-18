@@ -20,6 +20,7 @@
     "@excalidraw/excalidraw": "^0.18.0",
     "@excalidraw/mermaid-to-excalidraw": "^2.0.0",
     "@polar-sh/sdk": "^0.47.0",
+    "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/ssr": "^0.6.0",
     "@supabase/supabase-js": "^2.49.0",
     "@tailwindcss/postcss": "^4.1.18",
