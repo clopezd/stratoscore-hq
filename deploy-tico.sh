@@ -20,7 +20,7 @@ NC='\033[0m'
 # Variables
 VERCEL_USER="clopezd"
 DOMAIN="stratoscore.app"
-SUBDOMAIN="tico"
+SUBDOMAIN="TRestoration"
 FULL_DOMAIN="${SUBDOMAIN}.${DOMAIN}"
 
 echo -e "${BLUE}📋 Información del Deployment:${NC}"

@@ -1,6 +1,6 @@
 # TICO RESTORATION - Deployment a Vercel
 
-**Dominio Final:** `tico.stratoscore.app`
+**Dominio Final:** `TRestoration.stratoscore.app`
 
 ---
 
@@ -38,7 +38,7 @@ https://vercel.com/dashboard/projects
 
 ### Paso 3: Configurar Dominio
 1. Project Settings → Domains
-2. Add Domain: `tico.stratoscore.app`
+2. Add Domain: `TRestoration.stratoscore.app`
 3. Copia el CNAME que te da
 
 ### Paso 4: Actualizar DNS
@@ -46,7 +46,7 @@ En tu proveedor de dominio (donde registraste stratoscore.app):
 
 ```
 Type: CNAME
-Name: tico
+Name: TRestoration
 Value: (CNAME de Vercel)
 TTL: 3600
 ```
@@ -60,10 +60,10 @@ Propagación DNS: 5-10 minutos
 
 ```bash
 # Después de ~10 minutos, verifica:
-curl -I https://tico.stratoscore.app
+curl -I https://TRestoration.stratoscore.app
 
 # O abre en navegador:
-https://tico.stratoscore.app
+https://TRestoration.stratoscore.app
 ```
 
 Deberías ver tu página de TICO RESTORATION.
@@ -74,7 +74,7 @@ Deberías ver tu página de TICO RESTORATION.
 
 | Aspecto | Valor |
 |---------|-------|
-| **URL** | https://tico.stratoscore.app |
+| **URL** | https://TRestoration.stratoscore.app |
 | **Proyecto** | stratoscore-hq |
 | **Rama** | claude/tico-restoration-website-ntNPO |
 | **Proveedor** | Vercel |
@@ -98,7 +98,7 @@ Cada vez que hagas push a `claude/tico-restoration-website-ntNPO`:
 ### Puerto cerrado / Conexión rechazada
 ```bash
 # Intenta con DNS diferente
-nslookup tico.stratoscore.app
+nslookup TRestoration.stratoscore.app
 ```
 
 ### Dominio no resuelve
