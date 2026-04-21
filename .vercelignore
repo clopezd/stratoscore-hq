@@ -1,0 +1,18 @@
+# Ignore everything except what we need for TICO
+.git/
+.github/
+node_modules/
+.env*
+.DS_Store
+
+# Keep only TICO files
+!index.html
+!docs/tico-restoration-dynamic.html
+!docs/tico-restoration-prp.html
+!docs/TICO-RESTORATION-PRESENCIA-DIGITAL.md
+!docs/PRP-TICO-RESTORATION-WEBSITE.md
+!docs/TICO-RESTORATION-DESIGN-SPECS.md
+!docs/TICO-RESTORATION-QUICK-PITCH.md
+!tico_instagram/
+!vercel.json
+!.vercelignore
