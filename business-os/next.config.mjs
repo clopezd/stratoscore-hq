@@ -53,6 +53,30 @@ const nextConfig = {
       },
     ]
   },
+  async rewrites() {
+    return [
+      {
+        source: '/',
+        destination: '/tico-restoration',
+        has: [
+          {
+            type: 'host',
+            value: '(?i)trestoration\\.stratoscore\\.app',
+          },
+        ],
+      },
+      {
+        source: '/:path*',
+        destination: '/tico-restoration/:path*',
+        has: [
+          {
+            type: 'host',
+            value: '(?i)trestoration\\.stratoscore\\.app',
+          },
+        ],
+      },
+    ]
+  },
 }
 
 export default nextConfig
