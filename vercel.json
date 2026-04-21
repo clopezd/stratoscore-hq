@@ -1,3 +1,11 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json"
+  "buildCommand": "echo 'No build needed - static files'",
+  "outputDirectory": ".",
+  "framework": "static",
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "$1"
+    }
+  ]
 }
