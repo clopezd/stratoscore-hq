@@ -24,7 +24,8 @@ const PUBLIC_PATHS = [
   '/encuesta',
   '/demo-landing',
   '/fitsync-landing',
-  '/medcare/agendar-estudio'
+  '/medcare/agendar-estudio',
+  '/tico-restoration'
 ]
 
 function isPublicPath(pathname: string): boolean {
@@ -37,6 +38,10 @@ function isLavanderiaSubdomain(hostname: string): boolean {
 
 function isFitSyncSubdomain(hostname: string): boolean {
   return hostname.startsWith('fitsync.')
+}
+
+function isTicoSubdomain(hostname: string): boolean {
+  return hostname.toLowerCase().startsWith('trestoration.')
 }
 
 /**
@@ -64,7 +69,16 @@ export function middleware(request: NextRequest) {
   const hostHeader = request.headers.get('host')?.split(':')[0]?.trim()
   const hostname = forwardedHost ?? hostHeader ?? request.nextUrl.hostname
 
-  // ── 0. Subdominio fitsync → rewrite a /fitsync-landing y /fitsync ────────
+  // ── 0. Subdominio TRestoration → rewrite a /tico-restoration ─────────────
+  if (isTicoSubdomain(hostname)) {
+    if (pathname.startsWith('/_next') || pathname.startsWith('/api')) {
+      return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
+    }
+    const rewritePath = pathname === '/' ? '/tico-restoration' : `/tico-restoration${pathname}`
+    return addSecurityHeaders(NextResponse.rewrite(new URL(rewritePath, request.url), { request: { headers: requestHeaders } }))
+  }
+
+  // ── 0b. Subdominio fitsync → rewrite a /fitsync-landing y /fitsync ───────
   if (isFitSyncSubdomain(hostname)) {
     if (pathname.startsWith('/_next') || pathname.startsWith('/api')) {
       return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))

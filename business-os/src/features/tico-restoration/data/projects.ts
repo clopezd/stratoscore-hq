@@ -78,6 +78,7 @@ export const contactInfo = {
   email: 'service@ticorestorations.com',
   address: '1646 Clark Center Ave Unit B, Sarasota, FL 34238',
   instagram: 'https://www.instagram.com/ticorestorations/',
+  facebook: 'https://www.facebook.com/profile.php?id=61565429398006',
   hours: {
     weekdays: 'Lunes - Viernes: 8:00 AM - 6:00 PM',
     saturday: 'Sábados: 9:00 AM - 2:00 PM',

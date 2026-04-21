@@ -277,9 +277,38 @@ export function TicoPortfolio() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 text-center text-white" style={{ background: '#003366' }}>
-        <p>TICO RESTORATION LLC — Restauración Profesional en Florida</p>
-        <p className="text-sm mt-2 opacity-75">© {new Date().getFullYear()} Todos los derechos reservados</p>
+      <footer className="py-10 text-center text-white" style={{ background: '#003366' }}>
+        <p className="text-lg font-semibold mb-4">TICO RESTORATION LLC</p>
+        <p className="opacity-90 mb-6">Restauración Profesional en Florida</p>
+
+        <div className="flex justify-center gap-5 mb-6">
+          <a
+            href={contactInfo.facebook}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-orange-300 transition-colors"
+            aria-label="Facebook"
+          >
+            <span className="inline-flex items-center gap-2">
+              <span className="text-2xl">📘</span>
+              <span>Facebook</span>
+            </span>
+          </a>
+          <a
+            href={contactInfo.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-orange-300 transition-colors"
+            aria-label="Instagram"
+          >
+            <span className="inline-flex items-center gap-2">
+              <span className="text-2xl">📷</span>
+              <span>Instagram</span>
+            </span>
+          </a>
+        </div>
+
+        <p className="text-sm opacity-75">© {new Date().getFullYear()} Todos los derechos reservados</p>
       </footer>
 
       {/* Lightbox */}
