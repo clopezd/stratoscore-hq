@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "title": "Hotel Miami - Renovación Completa",
+    "category": "comercial",
+    "description": "Renovación de 2000 sqft en hotel premium",
+    "date": "2024-01-15",
+    "tags": [
+      "hotel",
+      "pintura",
+      "renovación"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Office Space - Pintura Profesional",
+    "category": "pintura",
+    "description": "Pintura interior de espacio comercial",
+    "date": "2024-01-20",
+    "tags": [
+      "office",
+      "pintura",
+      "comercial"
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Condo Miami Beach - Restauración",
+    "category": "restauracion",
+    "description": "Restauración completa de 3000 sqft",
+    "date": "2024-02-01",
+    "tags": [
+      "condo",
+      "restauración",
+      "miami"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Restaurant - Waterproofing",
+    "category": "comercial",
+    "description": "Impermeabilización y sellado profesional",
+    "date": "2024-02-10",
+    "tags": [
+      "waterproofing",
+      "restaurant",
+      "protección"
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Exterior Painting - Edificio Comercial",
+    "category": "pintura",
+    "description": "Pintura exterior de 5000 sqft",
+    "date": "2024-02-20",
+    "tags": [
+      "exterior",
+      "comercial",
+      "pintura"
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Multi-Family Project - Sarasota",
+    "category": "restauracion",
+    "description": "Proyecto multi-familia completo",
+    "date": "2024-03-01",
+    "tags": [
+      "multi-family",
+      "sarasota",
+      "renovación"
+    ]
+  }
+]
