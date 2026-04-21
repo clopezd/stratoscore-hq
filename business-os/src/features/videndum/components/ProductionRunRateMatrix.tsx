@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { Fragment, useEffect, useState, useMemo } from 'react'
 import { Download, Factory, Info, Search, Loader2, RefreshCw, AlertCircle } from 'lucide-react'
 
 interface WeekLabel {
@@ -292,9 +292,8 @@ export function ProductionRunRateMatrix() {
                 {filteredRows.map((r, i) => {
                   const isExpanded = expanded === r.part_number
                   return (
-                    <>
+                    <Fragment key={r.part_number}>
                       <tr
-                        key={r.part_number}
                         className={`${i % 2 === 1 ? 'bg-white/[0.02]' : ''} hover:bg-white/[0.05] cursor-pointer`}
                         onClick={() => setExpanded(isExpanded ? null : r.part_number)}
                       >
@@ -350,11 +349,32 @@ export function ProductionRunRateMatrix() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </Fragment>
                   )
                 })}
               </tbody>
             </table>
+            {filteredRows.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
+                  <AlertCircle size={22} className="text-white/30" />
+                </div>
+                {search ? (
+                  <>
+                    <div className="text-sm text-white/60">Sin resultados para &quot;{search}&quot;</div>
+                    <div className="text-xs text-white/40 mt-1">Prueba con otro SKU o limpia el filtro.</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-sm text-white/60">No hay SKUs activos con demanda proyectada</div>
+                    <div className="text-xs text-white/40 mt-1 max-w-md">
+                      Verifica que haya datos en <code className="text-white/60">videndum_records</code> (ventas últimos 12m),
+                      <code className="text-white/60">planning_forecasts</code> o <code className="text-white/60">order_book</code>.
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Drivers summary */}
