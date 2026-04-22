@@ -1,7 +1,12 @@
 /**
  * GET /api/videndum/forecast-vs-real
- * Compara forecast (planning_forecasts) vs ventas reales (videndum_records)
- * Calcula varianzas, MAPE, RMSE, y genera insights
+ * Forecast Accuracy con ventana rolling de 8 semanas (2 meses).
+ *
+ * Params:
+ *  - window: meses de ventana (default 2 = ~8 semanas)
+ *  - catalog_type: 'INV' | 'PKG' (omitir = todos)
+ *  - year, month: período específico (omitir = último disponible)
+ *  - top: cantidad de SKUs en top/bottom (default 20)
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
@@ -9,37 +14,15 @@ import { createClient } from '@/lib/supabase/server'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-interface ForecastVsReal {
-  sku: string
-  year: number
-  month: number
-  forecast_qty: number
-  real_qty: number
-  variance_abs: number
-  variance_pct: number
-  month_name: string
+function getGrade(mape: number): 'A' | 'B' | 'C' | 'D' | 'F' {
+  if (mape < 10) return 'A'
+  if (mape < 20) return 'B'
+  if (mape < 30) return 'C'
+  if (mape < 50) return 'D'
+  return 'F'
 }
 
-interface AccuracyMetrics {
-  mape: number  // Mean Absolute Percentage Error
-  rmse: number  // Root Mean Squared Error
-  bias: number  // Promedio de varianzas (positivo = sobre-forecast, negativo = sub-forecast)
-  total_forecast: number
-  total_real: number
-  records_compared: number
-}
-
-interface ProductAnalysis {
-  sku: string
-  mape: number
-  total_forecast: number
-  total_real: number
-  variance_pct: number
-  records: number
-  accuracy_grade: 'A' | 'B' | 'C' | 'D' | 'F'
-}
-
-const MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
 export async function GET(req: Request) {
   const supabase = await createClient()
@@ -49,157 +32,248 @@ export async function GET(req: Request) {
   }
 
   const { searchParams } = new URL(req.url)
+  const windowMonths = parseInt(searchParams.get('window') ?? '2')
   const topN = parseInt(searchParams.get('top') ?? '20')
-  const filterYear = searchParams.get('year') ? parseInt(searchParams.get('year')!) : null
-  const filterMonth = searchParams.get('month') ? parseInt(searchParams.get('month')!) : null
+  const paramYear = searchParams.get('year') ? parseInt(searchParams.get('year')!) : null
+  const paramMonth = searchParams.get('month') ? parseInt(searchParams.get('month')!) : null
+  const catalogType = searchParams.get('catalog_type') ?? null
 
   try {
-    // 1. Query comparativo: Forecast vs Real con filtros opcionales
-    let forecastQuery = supabase
-      .from('planning_forecasts')
-      .select('part_number, year, month, quantity')
-      .eq('tenant_id', 'videndum')
+    // Determine the analysis period
+    let latestYear: number
+    let latestMonth: number
 
-    if (filterYear) forecastQuery = forecastQuery.eq('year', filterYear)
-    if (filterMonth) forecastQuery = forecastQuery.eq('month', filterMonth)
+    if (paramYear && paramMonth) {
+      latestYear = paramYear
+      latestMonth = paramMonth
+    } else {
+      const { data: latestRecords } = await supabase
+        .from('videndum_records')
+        .select('year, month')
+        .eq('tenant_id', 'videndum')
+        .eq('metric_type', 'revenue')
+        .not('month', 'is', null)
+        .order('year', { ascending: false })
+        .order('month', { ascending: false })
+        .limit(1)
 
-    const { data: forecastData, error: forecastError } = await forecastQuery
-
-    if (forecastError) throw forecastError
-
-    let realQuery = supabase
-      .from('videndum_records')
-      .select('part_number, year, month, quantity')
-      .eq('tenant_id', 'videndum')
-      .eq('metric_type', 'revenue')
-
-    if (filterYear) realQuery = realQuery.eq('year', filterYear)
-    if (filterMonth) realQuery = realQuery.eq('month', filterMonth)
-
-    const { data: realData, error: realError } = await realQuery
-
-    if (realError) throw realError
-
-    // 2. Crear mapa de ventas reales para lookup rápido
-    const realMap = new Map<string, number>()
-    for (const row of realData) {
-      const key = `${row.part_number}|${row.year}|${row.month}`
-      realMap.set(key, parseFloat(String(row.quantity ?? 0)))
-    }
-
-    // 3. Comparar y calcular varianzas
-    const comparisons: ForecastVsReal[] = []
-    const skuMetrics = new Map<string, { sumAbsError: number; sumSqError: number; sumBias: number; totalForecast: number; totalReal: number; count: number }>()
-
-    for (const forecast of forecastData) {
-      const key = `${forecast.part_number}|${forecast.year}|${forecast.month}`
-      const realQty = realMap.get(key)
-
-      if (realQty !== undefined && realQty > 0) {
-        const forecastQty = parseFloat(String(forecast.quantity ?? 0))
-        const varianceAbs = realQty - forecastQty
-        const variancePct = forecastQty > 0 ? ((varianceAbs / forecastQty) * 100) : 0
-        const absError = Math.abs(varianceAbs)
-        const sqError = varianceAbs * varianceAbs
-
-        comparisons.push({
-          sku: forecast.part_number,
-          year: forecast.year,
-          month: forecast.month,
-          forecast_qty: forecastQty,
-          real_qty: realQty,
-          variance_abs: varianceAbs,
-          variance_pct: variancePct,
-          month_name: MONTH_NAMES[forecast.month - 1] ?? `M${forecast.month}`
-        })
-
-        // Acumular métricas por SKU
-        if (!skuMetrics.has(forecast.part_number)) {
-          skuMetrics.set(forecast.part_number, { sumAbsError: 0, sumSqError: 0, sumBias: 0, totalForecast: 0, totalReal: 0, count: 0 })
-        }
-        const metrics = skuMetrics.get(forecast.part_number)!
-        metrics.sumAbsError += absError
-        metrics.sumSqError += sqError
-        metrics.sumBias += varianceAbs
-        metrics.totalForecast += forecastQty
-        metrics.totalReal += realQty
-        metrics.count++
+      if (!latestRecords?.length) {
+        return NextResponse.json({ error: 'No hay datos disponibles' }, { status: 404 })
       }
+      latestYear = latestRecords[0].year
+      latestMonth = latestRecords[0].month
     }
 
-    // 4. Calcular métricas globales
-    let totalAbsError = 0
-    let totalSqError = 0
-    let totalBias = 0
-    let totalForecast = 0
-    let totalReal = 0
-    let count = 0
-
-    for (const comp of comparisons) {
-      totalAbsError += Math.abs(comp.variance_abs)
-      totalSqError += comp.variance_abs * comp.variance_abs
-      totalBias += comp.variance_abs
-      totalForecast += comp.forecast_qty
-      totalReal += comp.real_qty
-      count++
+    // Build analysis window (current + previous for trend)
+    const analysisMonths: { year: number; month: number }[] = []
+    let y = latestYear, m = latestMonth
+    for (let i = 0; i < windowMonths; i++) {
+      analysisMonths.push({ year: y, month: m })
+      m--
+      if (m < 1) { m = 12; y-- }
     }
 
-    const mape = count > 0 ? (totalAbsError / totalForecast) * 100 : 0
-    const rmse = count > 0 ? Math.sqrt(totalSqError / count) : 0
-    const bias = count > 0 ? totalBias / count : 0
-
-    const globalMetrics: AccuracyMetrics = {
-      mape: Math.round(mape * 100) / 100,
-      rmse: Math.round(rmse * 100) / 100,
-      bias: Math.round(bias * 100) / 100,
-      total_forecast: Math.round(totalForecast),
-      total_real: Math.round(totalReal),
-      records_compared: count
+    // Previous window for trend comparison
+    const prevMonths: { year: number; month: number }[] = []
+    for (let i = 0; i < windowMonths; i++) {
+      prevMonths.push({ year: y, month: m })
+      m--
+      if (m < 1) { m = 12; y-- }
     }
 
-    // 5. Análisis por producto
-    const productAnalysis: ProductAnalysis[] = []
-    for (const [sku, metrics] of skuMetrics) {
-      const productMape = metrics.totalForecast > 0 ? (metrics.sumAbsError / metrics.totalForecast) * 100 : 0
-      const variancePct = metrics.totalForecast > 0 ? ((metrics.totalReal - metrics.totalForecast) / metrics.totalForecast) * 100 : 0
+    // Parallel queries: current window + previous window
+    const orFilter = (months: { year: number; month: number }[]) =>
+      months.map(am => `and(year.eq.${am.year},month.eq.${am.month})`).join(',')
 
-      // Asignar grade según MAPE
-      let grade: 'A' | 'B' | 'C' | 'D' | 'F'
-      if (productMape < 10) grade = 'A'
-      else if (productMape < 20) grade = 'B'
-      else if (productMape < 30) grade = 'C'
-      else if (productMape < 50) grade = 'D'
-      else grade = 'F'
+    const [forecastRes, realRes, prevForecastRes, prevRealRes, periodsRes] = await Promise.all([
+      supabase
+        .from('planning_forecasts')
+        .select('part_number, year, month, quantity')
+        .eq('tenant_id', 'videndum')
+        .or(orFilter(analysisMonths)),
+      supabase
+        .from('videndum_records')
+        .select('part_number, year, month, quantity, catalog_type')
+        .eq('tenant_id', 'videndum')
+        .eq('metric_type', 'revenue')
+        .not('month', 'is', null)
+        .or(orFilter(analysisMonths)),
+      supabase
+        .from('planning_forecasts')
+        .select('part_number, quantity')
+        .eq('tenant_id', 'videndum')
+        .or(orFilter(prevMonths)),
+      supabase
+        .from('videndum_records')
+        .select('part_number, quantity')
+        .eq('tenant_id', 'videndum')
+        .eq('metric_type', 'revenue')
+        .not('month', 'is', null)
+        .or(orFilter(prevMonths)),
+      // Available periods
+      supabase
+        .from('videndum_records')
+        .select('year, month')
+        .eq('tenant_id', 'videndum')
+        .eq('metric_type', 'revenue')
+        .not('month', 'is', null),
+    ])
+
+    if (forecastRes.error) throw forecastRes.error
+    if (realRes.error) throw realRes.error
+
+    const forecastData = forecastRes.data ?? []
+    let realData = realRes.data ?? []
+
+    // Apply catalog_type filter if specified
+    if (catalogType) {
+      realData = realData.filter(r => r.catalog_type === catalogType)
+    }
+
+    // Build per-SKU aggregates
+    const skuCatalog = new Map<string, string | null>()
+    const skuForecast = new Map<string, number>()
+    const skuReal = new Map<string, number>()
+    const skuMonths = new Map<string, number>()
+
+    // Collect catalog types from real data
+    for (const row of realData) {
+      skuCatalog.set(row.part_number, row.catalog_type)
+    }
+
+    // Filter forecasts to only SKUs present in (possibly filtered) real data
+    const relevantSkus = new Set(realData.map(r => r.part_number))
+
+    for (const row of forecastData) {
+      if (!relevantSkus.has(row.part_number)) continue
+      const qty = parseFloat(String(row.quantity ?? 0))
+      skuForecast.set(row.part_number, (skuForecast.get(row.part_number) ?? 0) + qty)
+    }
+
+    for (const row of realData) {
+      const qty = parseFloat(String(row.quantity ?? 0))
+      skuReal.set(row.part_number, (skuReal.get(row.part_number) ?? 0) + qty)
+      skuMonths.set(row.part_number, (skuMonths.get(row.part_number) ?? 0) + 1)
+    }
+
+    // Calculate per-SKU accuracy
+    interface SkuAnalysis {
+      sku: string
+      catalog_type: string | null
+      mape: number
+      accuracy_grade: 'A' | 'B' | 'C' | 'D' | 'F'
+      total_forecast: number
+      total_real: number
+      variance_pct: number
+      records: number
+    }
+
+    const productAnalysis: SkuAnalysis[] = []
+    let globalAbsError = 0
+    let globalForecast = 0
+    let globalReal = 0
+    let globalBias = 0
+
+    for (const [sku, realTotal] of skuReal) {
+      const forecastTotal = skuForecast.get(sku)
+      if (!forecastTotal || forecastTotal === 0) continue
+      if (realTotal === 0) continue
+
+      const absError = Math.abs(realTotal - forecastTotal)
+      const mape = (absError / forecastTotal) * 100
+      const variancePct = ((realTotal - forecastTotal) / forecastTotal) * 100
 
       productAnalysis.push({
         sku,
-        mape: Math.round(productMape * 100) / 100,
-        total_forecast: Math.round(metrics.totalForecast),
-        total_real: Math.round(metrics.totalReal),
+        catalog_type: skuCatalog.get(sku) ?? null,
+        mape: Math.round(mape * 100) / 100,
+        accuracy_grade: getGrade(mape),
+        total_forecast: Math.round(forecastTotal),
+        total_real: Math.round(realTotal),
         variance_pct: Math.round(variancePct * 100) / 100,
-        records: metrics.count,
-        accuracy_grade: grade
+        records: skuMonths.get(sku) ?? 0,
       })
+
+      globalAbsError += absError
+      globalForecast += forecastTotal
+      globalReal += realTotal
+      globalBias += (realTotal - forecastTotal)
     }
 
-    // Ordenar por MAPE descendente (peores primero)
+    const mape = globalForecast > 0 ? (globalAbsError / globalForecast) * 100 : 0
+    const rmse = productAnalysis.length > 0
+      ? Math.sqrt(productAnalysis.reduce((sum, p) => {
+          const fc = p.total_forecast
+          const diff = p.total_real - fc
+          return sum + diff * diff
+        }, 0) / productAnalysis.length)
+      : 0
+    const bias = productAnalysis.length > 0 ? globalBias / productAnalysis.length : 0
+
+    // Previous window MAPE for trend
+    let mapePrev: number | null = null
+    if (prevForecastRes.data?.length && prevRealRes.data?.length) {
+      const pf = new Map<string, number>()
+      for (const r of prevForecastRes.data) pf.set(r.part_number, (pf.get(r.part_number) ?? 0) + parseFloat(String(r.quantity ?? 0)))
+      const pr = new Map<string, number>()
+      for (const r of prevRealRes.data) pr.set(r.part_number, (pr.get(r.part_number) ?? 0) + parseFloat(String(r.quantity ?? 0)))
+      let pAbsErr = 0, pTotalF = 0
+      for (const [sku, real] of pr) {
+        const fc = pf.get(sku)
+        if (fc && fc > 0) { pAbsErr += Math.abs(real - fc); pTotalF += fc }
+      }
+      if (pTotalF > 0) mapePrev = Math.round((pAbsErr / pTotalF) * 10000) / 100
+    }
+
+    // Accuracy distribution
+    const gradeCounts = { A: 0, B: 0, C: 0, D: 0, F: 0 }
+    for (const p of productAnalysis) gradeCounts[p.accuracy_grade]++
+    const total = productAnalysis.length
+    const accuracy_distribution = Object.entries(gradeCounts).map(([grade, count]) => ({
+      grade,
+      count,
+      pct: total > 0 ? Math.round((count / total) * 100) : 0,
+    }))
+
+    // Sort by MAPE desc (worst first)
     productAnalysis.sort((a, b) => b.mape - a.mape)
 
-    // 6. Top N peores productos
-    const topWorst = productAnalysis.slice(0, topN)
+    // Period label
+    const firstMonth = analysisMonths[analysisMonths.length - 1]
+    const lastMonth = analysisMonths[0]
+    const periodLabel = windowMonths === 1
+      ? `${MONTH_NAMES[lastMonth.month - 1]} ${lastMonth.year}`
+      : `${MONTH_NAMES[firstMonth.month - 1]}-${MONTH_NAMES[lastMonth.month - 1]} ${lastMonth.year}`
 
-    // 7. Top N mejores productos
-    const topBest = productAnalysis.slice(-topN).reverse()
+    // Available periods
+    const periodsSet = new Set<string>()
+    for (const r of periodsRes.data ?? []) {
+      periodsSet.add(`${r.year}-${String(r.month).padStart(2, '0')}`)
+    }
+    const available_periods = [...periodsSet].sort().reverse()
 
     return NextResponse.json({
-      global_metrics: globalMetrics,
-      comparisons: comparisons.slice(0, 100), // Limitar a 100 para no saturar
+      global_metrics: {
+        mape: Math.round(mape * 100) / 100,
+        mape_prev: mapePrev,
+        mape_grade: getGrade(mape),
+        rmse: Math.round(rmse * 100) / 100,
+        bias: Math.round(bias * 100) / 100,
+        total_forecast: Math.round(globalForecast),
+        total_real: Math.round(globalReal),
+        records_compared: productAnalysis.length,
+        period_label: periodLabel,
+        window_months: windowMonths,
+      },
       product_analysis: productAnalysis,
-      top_worst_products: topWorst,
-      top_best_products: topBest,
-      total_products_analyzed: productAnalysis.length
+      top_worst_products: productAnalysis.slice(0, topN),
+      top_best_products: [...productAnalysis].reverse().slice(0, topN),
+      accuracy_distribution,
+      available_periods,
+      total_products_analyzed: productAnalysis.length,
+    }, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
     })
-
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Error al analizar forecast vs real'
     console.error('[forecast-vs-real] error:', msg)

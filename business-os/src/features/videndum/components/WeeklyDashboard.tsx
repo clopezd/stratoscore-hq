@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Target, AlertTriangle, Package, TrendingUp, TrendingDown, RefreshCw, ArrowUpRight, ArrowDownRight, Search, Calendar, HelpCircle } from 'lucide-react'
+import { Target, AlertTriangle, Package, TrendingUp, TrendingDown, RefreshCw, ArrowUpRight, ArrowDownRight, Search, Calendar, HelpCircle, CheckCircle2 } from 'lucide-react'
 import { useWeeklyDashboard } from '../hooks/useWeeklyDashboard'
 import type { WeeklyKPIs, WeeklyAlert, SkuAccuracy } from '../types'
 
@@ -208,34 +208,54 @@ function KpiSection({ kpis }: { kpis: WeeklyKPIs }) {
 
 // ── Alerts Section ───────────────────────────────────────────────────────────
 
-function AlertCard({ alert }: { alert: WeeklyAlert }) {
+function AlertCard({ alert, onAcknowledge }: { alert: WeeklyAlert; onAcknowledge?: (id: string) => void }) {
   const router = useRouter()
   const isSpike = alert.alert_type === 'DEMAND_SPIKE'
+  const isAcked = alert.acknowledged
+
   return (
-    <button
-      onClick={() => router.push(`/videndum/forecast-accuracy?sku=${alert.part_number}`)}
-      className={`border rounded-lg p-3 text-left w-full hover:brightness-125 transition-all cursor-pointer ${SEVERITY_COLORS[alert.severity]}`}
-    >
+    <div className={`border rounded-lg p-3 text-left w-full transition-all ${isAcked ? 'opacity-50 border-white/[0.06] bg-white/[0.01]' : SEVERITY_COLORS[alert.severity]}`}>
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+        <button
+          onClick={() => router.push(`/videndum/forecast-accuracy?sku=${alert.part_number}`)}
+          className="flex items-center gap-2 min-w-0 hover:brightness-125 cursor-pointer"
+        >
           {isSpike
             ? <ArrowUpRight size={16} className="text-emerald-400 shrink-0" />
             : <ArrowDownRight size={16} className="text-red-400 shrink-0" />}
           <span className="font-mono text-sm text-white truncate">{alert.part_number}</span>
+        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className={`text-sm font-bold ${isSpike ? 'text-emerald-400' : 'text-red-400'}`}>
+            {alert.change_pct > 0 ? '+' : ''}{alert.change_pct}%
+          </span>
+          {alert.id && !isAcked && onAcknowledge && (
+            <button
+              onClick={() => onAcknowledge(alert.id!)}
+              title="Marcar como revisado"
+              className="p-1 hover:bg-white/10 rounded transition-colors text-gray-500 hover:text-emerald-400"
+            >
+              <CheckCircle2 size={14} />
+            </button>
+          )}
+          {isAcked && (
+            <span className="text-[10px] text-emerald-500/70 flex items-center gap-0.5">
+              <CheckCircle2 size={10} /> Revisado
+            </span>
+          )}
         </div>
-        <span className={`text-sm font-bold shrink-0 ${isSpike ? 'text-emerald-400' : 'text-red-400'}`}>
-          {alert.change_pct > 0 ? '+' : ''}{alert.change_pct}%
-        </span>
       </div>
       <div className="mt-1.5 text-[11px] text-gray-400 flex items-center gap-3">
         <span>{fmt(alert.previous_value)} → {fmt(alert.current_value)} uds</span>
         <span>{alert.period}</span>
       </div>
-    </button>
+    </div>
   )
 }
 
-function AlertsSection({ alerts }: { alerts: WeeklyAlert[] }) {
+function AlertsSection({ alerts, onAcknowledge }: { alerts: WeeklyAlert[]; onAcknowledge?: (id: string) => void }) {
+  const [showAcked, setShowAcked] = useState(false)
+
   if (!alerts || alerts.length === 0) {
     return (
       <div className="bg-emerald-900/10 border border-emerald-500/20 rounded-xl p-6 text-center">
@@ -245,24 +265,37 @@ function AlertsSection({ alerts }: { alerts: WeeklyAlert[] }) {
     )
   }
 
-  const critical = alerts.filter(a => a.severity === 'CRITICAL')
-  const high = alerts.filter(a => a.severity === 'HIGH')
-  const medium = alerts.filter(a => a.severity === 'MEDIUM')
+  const visible = showAcked ? alerts : alerts.filter(a => !a.acknowledged)
+  const ackedCount = alerts.filter(a => a.acknowledged).length
+
+  const critical = visible.filter(a => a.severity === 'CRITICAL')
+  const high = visible.filter(a => a.severity === 'HIGH')
+  const medium = visible.filter(a => a.severity === 'MEDIUM')
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white">
           Cambios Significativos
-          <Tooltip text="SKUs cuya demanda real cambió más de 20% respecto al mes anterior. Revisar si es tendencia real o dato atípico antes de ajustar el plan." />
+          <Tooltip text="SKUs cuya demanda real cambió más de 20% respecto al mes anterior. Marca como 'Revisado' cuando hayas tomado acción. Revisar si es tendencia real o dato atípico." />
         </h3>
-        <span className="text-xs text-gray-500">{alerts.length} alertas</span>
+        <div className="flex items-center gap-3">
+          {ackedCount > 0 && (
+            <button
+              onClick={() => setShowAcked(!showAcked)}
+              className="text-xs text-gray-500 hover:text-white transition-colors"
+            >
+              {showAcked ? 'Ocultar revisadas' : `Mostrar revisadas (${ackedCount})`}
+            </button>
+          )}
+          <span className="text-xs text-gray-500">{visible.length} alertas</span>
+        </div>
       </div>
       {critical.length > 0 && (
         <div>
           <p className="text-xs text-red-400 font-semibold mb-2 uppercase tracking-wider">Críticas (&gt;50%)</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {critical.map(a => <AlertCard key={a.part_number} alert={a} />)}
+            {critical.map(a => <AlertCard key={a.id ?? a.part_number} alert={a} onAcknowledge={onAcknowledge} />)}
           </div>
         </div>
       )}
@@ -270,7 +303,7 @@ function AlertsSection({ alerts }: { alerts: WeeklyAlert[] }) {
         <div>
           <p className="text-xs text-orange-400 font-semibold mb-2 uppercase tracking-wider">Altas (30-50%)</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {high.map(a => <AlertCard key={a.part_number} alert={a} />)}
+            {high.map(a => <AlertCard key={a.id ?? a.part_number} alert={a} onAcknowledge={onAcknowledge} />)}
           </div>
         </div>
       )}
@@ -278,7 +311,7 @@ function AlertsSection({ alerts }: { alerts: WeeklyAlert[] }) {
         <div>
           <p className="text-xs text-amber-400 font-semibold mb-2 uppercase tracking-wider">Medias (20-30%)</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {medium.map(a => <AlertCard key={a.part_number} alert={a} />)}
+            {medium.map(a => <AlertCard key={a.id ?? a.part_number} alert={a} onAcknowledge={onAcknowledge} />)}
           </div>
         </div>
       )}
@@ -396,6 +429,20 @@ export function WeeklyDashboard() {
   const { data, loading, error, refresh, selectedPeriod, changePeriod } = useWeeklyDashboard()
   const [catalogFilter, setCatalogFilter] = useState('all')
 
+  const handleAcknowledge = useCallback(async (alertId: string) => {
+    try {
+      const res = await fetch('/api/videndum/alerts', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: alertId, acknowledged: true }),
+      })
+      if (!res.ok) throw new Error('Error al marcar alerta')
+      refresh()
+    } catch (e) {
+      console.error('Error acknowledging alert:', e)
+    }
+  }, [refresh])
+
   if (loading) {
     return (
       <div className="space-y-4 animate-pulse">
@@ -468,7 +515,7 @@ export function WeeklyDashboard() {
       <KpiSection kpis={data.kpis} />
 
       {/* Alerts */}
-      <AlertsSection alerts={filteredAlerts} />
+      <AlertsSection alerts={filteredAlerts} onAcknowledge={handleAcknowledge} />
 
       {/* Accuracy Distribution + Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

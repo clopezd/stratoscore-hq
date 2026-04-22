@@ -129,6 +129,7 @@ export interface VidendumDashboardData {
 // ── Weekly Dashboard (MVP Operativo) ────────────────────────────────────────
 
 export interface WeeklyAlert {
+  id?: string
   part_number: string
   catalog_type: string | null
   alert_type: 'DEMAND_SPIKE' | 'DEMAND_DROP' | 'ACCURACY_DEGRADATION'
@@ -136,7 +137,9 @@ export interface WeeklyAlert {
   change_pct: number
   previous_value: number
   current_value: number
-  period: string // "2026-M02 vs 2026-M01"
+  period: string // "Feb vs Ene 2026"
+  acknowledged?: boolean
+  acknowledged_at?: string | null
 }
 
 export interface WeeklyKPIs {
