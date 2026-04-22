@@ -117,9 +117,11 @@ export async function buildRunRateExcelBuffer(matrix: RunRateMatrix): Promise<Bu
   let XLSX: typeof import('xlsx')
   try {
     const styledPkg = 'xlsx-js-style'
-    XLSX = (await import(styledPkg)) as typeof import('xlsx')
+    const mod = (await import(styledPkg)) as Record<string, unknown>
+    XLSX = (mod.utils ? mod : (mod as { default: typeof import('xlsx') }).default) as typeof import('xlsx')
   } catch {
-    XLSX = await import('xlsx')
+    const mod = (await import('xlsx')) as Record<string, unknown>
+    XLSX = (mod.utils ? mod : (mod as { default: typeof import('xlsx') }).default) as typeof import('xlsx')
   }
 
   const wb = XLSX.utils.book_new()
