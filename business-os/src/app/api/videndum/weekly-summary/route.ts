@@ -261,6 +261,38 @@ export async function GET(req: Request) {
     const severityOrder = { CRITICAL: 0, HIGH: 1, MEDIUM: 2 }
     alerts.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity] || Math.abs(b.change_pct) - Math.abs(a.change_pct))
 
+    // Persist alerts to videndum_change_alerts (upsert: delete old for this period, insert new)
+    if (alerts.length > 0) {
+      await supabase
+        .from('videndum_change_alerts')
+        .delete()
+        .eq('tenant_id', 'videndum')
+        .eq('period', periodLabel)
+
+      await supabase
+        .from('videndum_change_alerts')
+        .insert(alerts.map(a => ({
+          tenant_id: 'videndum',
+          part_number: a.part_number,
+          catalog_type: a.catalog_type,
+          alert_type: a.alert_type,
+          severity: a.severity,
+          change_pct: a.change_pct,
+          previous_value: a.previous_value,
+          current_value: a.current_value,
+          period: a.period,
+          week_detected: new Date().toISOString().split('T')[0],
+        })))
+    }
+
+    // Read back persisted alerts (includes id + acknowledged state)
+    const { data: persistedAlerts } = await supabase
+      .from('videndum_change_alerts')
+      .select('id, part_number, catalog_type, alert_type, severity, change_pct, previous_value, current_value, period, acknowledged, acknowledged_at')
+      .eq('tenant_id', 'videndum')
+      .eq('period', periodLabel)
+      .order('created_at', { ascending: false })
+
     // Sort SKU accuracies
     skuAccuracies.sort((a, b) => b.mape - a.mape)
     const worstSkus = skuAccuracies.slice(0, topN)
@@ -346,7 +378,7 @@ export async function GET(req: Request) {
         forecast_bias: globalCount > 0 ? Math.round((globalBias / globalCount) * 100) / 100 : 0,
         period_label: periodLabelFull,
       },
-      alerts: alerts.slice(0, 20), // Top 20 alerts
+      alerts: (persistedAlerts ?? alerts).slice(0, 20),
       worst_skus: worstSkus,
       best_skus: bestSkus,
       accuracy_distribution: distribution,
