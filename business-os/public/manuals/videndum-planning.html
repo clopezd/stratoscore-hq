@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Manual — Plan de Producción Semanal · Videndum</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #666;
+    --line: #e5e5e5;
+    --accent: #4f46e5;
+    --bg-soft: #f7f7f8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 4px;
+    font-weight: 700;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 32px;
+  }
+  h2 {
+    font-size: 18px;
+    margin: 40px 0 8px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-weight: 600;
+  }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 20px 0 4px;
+  }
+  p { margin: 8px 0 12px; }
+  ol, ul { padding-left: 20px; margin: 8px 0 12px; }
+  li { margin: 4px 0; }
+  code {
+    background: var(--bg-soft);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .step {
+    background: var(--bg-soft);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .step-number {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 22px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  th {
+    background: var(--bg-soft);
+    font-weight: 600;
+  }
+  .hint {
+    color: var(--muted);
+    font-size: 13px;
+    font-style: italic;
+  }
+  .note {
+    background: #fff8dc;
+    border: 1px solid #e8d585;
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+    margin: 12px 0;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>Plan de Producción Semanal</h1>
+<p class="subtitle">Manual de uso · Videndum · <strong>stratoscore.app/videndum/planning</strong></p>
+
+<h2>Qué es</h2>
+<p>Una matriz que te dice <strong>cuántas unidades producir por SKU cada semana</strong> para los próximos 3 meses, basada en tu forecast, órdenes en proceso, pipeline ponderado, ventas históricas e inventario actual.</p>
+<p>Reemplaza el cálculo manual en Excel. Exportas con un click al final.</p>
+
+<h2>Cómo entrar</h2>
+<div class="step">
+  <span class="step-number">1</span> Abre <code>stratoscore.app/login</code>
+</div>
+<div class="step">
+  <span class="step-number">2</span> Inicia sesión con tu usuario Videndum
+</div>
+<div class="step">
+  <span class="step-number">3</span> Ve a <strong>Videndum → Planning</strong> (menú superior)
+</div>
+
+<h2>Qué ves al entrar</h2>
+<p>Tres áreas de arriba hacia abajo:</p>
+
+<h3>1. KPIs (arriba)</h3>
+<table>
+  <tr><th>Dato</th><th>Qué significa</th></tr>
+  <tr><td>SKUs activos</td><td>Productos con ventas en los últimos 12 meses. Los dormidos se filtran.</td></tr>
+  <tr><td>Unidades 3M</td><td>Total a producir sumando las 13 semanas.</td></tr>
+  <tr><td>Promedio semanal</td><td>Unidades/semana en el horizonte.</td></tr>
+  <tr><td>Totales por mes</td><td>Abr · May · Jun · Jul (o los 3 meses que toquen).</td></tr>
+</table>
+
+<h3>2. Controles</h3>
+<ul>
+  <li><strong>Selector 8 / 13 / 26 semanas</strong>: cambia el horizonte. Default 13 (3 meses).</li>
+  <li><strong>Búsqueda SKU</strong>: filtra la tabla por part number.</li>
+  <li><strong>Descargar Excel</strong>: botón azul, arriba a la derecha.</li>
+</ul>
+
+<h3>3. Matriz</h3>
+<ul>
+  <li>Una fila por SKU.</li>
+  <li>Una columna por semana con la cantidad a producir.</li>
+  <li>Última columna: <em>Driver</em> — qué pesa más en el cálculo de ese SKU:
+    <ul>
+      <li><strong>Histórico + forecast</strong>: basado en ventas de años anteriores + forecast de planning.</li>
+      <li><strong>Order book firme</strong>: las órdenes ya confirmadas dominan la producción.</li>
+      <li><strong>Pipeline ponderado</strong>: oportunidades de ventas pesan más que el histórico.</li>
+      <li><strong>Momentum</strong>: la tendencia reciente de intake acelera/frena el forecast.</li>
+      <li><strong>Ajuste por inventario alto</strong>: hay stock cubriendo &gt;4 semanas, se bajó la producción.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>Click en una fila</strong> → se expande con el desglose mensual por componente (forecast, order book, pipeline, momentum factor, inventario aplicado).</p>
+
+<h2>Descargar a Excel</h2>
+<div class="step">
+  <span class="step-number">1</span> Elige el horizonte (8 / 13 / 26 semanas)
+</div>
+<div class="step">
+  <span class="step-number">2</span> Click en <strong>Descargar Excel</strong>
+</div>
+<div class="step">
+  <span class="step-number">3</span> Se baja un archivo <code>Videndum_RunRate_YYYY-MM-DD_Nsem.xlsx</code>
+</div>
+
+<p>El archivo trae 3 hojas:</p>
+<table>
+  <tr><th>Hoja</th><th>Contiene</th></tr>
+  <tr><td>Run Rate Matrix</td><td>SKU × semanas. Listo para compartir o cargar a IFS.</td></tr>
+  <tr><td>Assumptions</td><td>Parámetros usados (clamps de momentum, YoY, ventana SKUs activos, cobertura inventario).</td></tr>
+  <tr><td>Raw Inputs</td><td>Desglose por SKU y mes: baseline, order book, pipeline, momentum, inventory.</td></tr>
+</table>
+
+<h2>Cómo se calcula (resumen)</h2>
+<p>Para cada SKU y cada mes del horizonte:</p>
+<ol>
+  <li><strong>Baseline</strong> = lo mayor entre el forecast de planning y el promedio de ventas del mismo mes en los últimos 12 meses ajustado por YoY.</li>
+  <li><strong>Demanda del mes</strong> = (baseline + order book firme + pipeline ponderado) × factor momentum.</li>
+  <li><strong>Ajuste por inventario</strong>: si el stock actual cubre más de 4 semanas, se resta el exceso.</li>
+  <li><strong>Prorrateo a semana</strong>: cada semana toma la proporción de días que le tocan de ese mes.</li>
+</ol>
+
+<div class="note">
+  <strong>Límites aplicados:</strong> momentum en [0.7, 1.3] · YoY en [-25%, +25%] · cobertura objetivo inventario: 4 semanas.
+</div>
+
+<h2>Qué hacer si algo no cuadra</h2>
+<table>
+  <tr><th>Síntoma</th><th>Causa probable</th></tr>
+  <tr><td>No ves un SKU que esperabas</td><td>No tuvo ventas en los últimos 12 meses (se considera dormido).</td></tr>
+  <tr><td>El driver dice "Order book firme" y la cifra te parece alta</td><td>Hay órdenes confirmadas en ese mes que mandan sobre el forecast.</td></tr>
+  <tr><td>Pipeline aparece en 0 para todos los meses futuros</td><td>La tabla <code>opportunities</code> no tiene registros para ese horizonte. Hay que cargarlos.</td></tr>
+  <tr><td>El botón Excel devuelve error</td><td>Reporta con el SKU que estabas viendo y la hora.</td></tr>
+</table>
+
+<h2>Contacto</h2>
+<p>Problemas o sugerencias: <a href="mailto:mariolopez55@gmail.com">mariolopez55@gmail.com</a></p>
+
+<p class="subtitle" style="margin-top: 48px; text-align: center;">StratosCore · Videndum · v1 · 2026-04</p>
+
+</body>
+</html>
