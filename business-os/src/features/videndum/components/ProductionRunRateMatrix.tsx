@@ -79,6 +79,121 @@ function driverClass(driver: string): string {
   return DRIVER_COLORS[driver] ?? 'text-gray-400 bg-white/5 border-white/10'
 }
 
+type Severity = 'info' | 'ok' | 'warn' | 'alert'
+
+interface Interpretation {
+  severity: Severity
+  headline: string
+  reasons: string[]
+  decision: string
+}
+
+function interpretRow(r: RunRateRow): Interpretation {
+  const months = r.historical_months_observed
+  const delta = r.delta_vs_historical_pct
+  const hist = r.historical_avg_weekly
+  const plan = r.avg_weekly
+  const driver = r.driver
+  const annualHist = hist * 52
+
+  const isIntermittent = months > 0 && months < 6
+  const noHistory = hist === 0 || months === 0
+
+  // Severidad por magnitud de Δ y calidad de data
+  let severity: Severity = 'ok'
+  if (noHistory) severity = 'alert'
+  else if (delta === null) severity = 'info'
+  else if (Math.abs(delta) <= 10) severity = 'ok'
+  else if (Math.abs(delta) <= 30) severity = 'info'
+  else if (Math.abs(delta) <= 50) severity = 'warn'
+  else severity = 'alert'
+  if (isIntermittent && severity === 'ok') severity = 'info'
+
+  const reasons: string[] = []
+
+  // Calidad de data histórica
+  if (noHistory) {
+    reasons.push('Sin historia de ventas en los últimos 12 meses — el plan depende 100% del forecast, order book y pipeline.')
+  } else if (isIntermittent) {
+    reasons.push(
+      `SKU intermitente: solo ${months} de 12 meses con venta. El Hist/sem=${fmt(hist)} se calcula como total_12m / 52 semanas (≈ ${fmt(Math.round(annualHist))} u/año concentradas en pocos meses), por eso se ve bajo.`,
+    )
+  } else if (months < 12) {
+    reasons.push(`Historia parcial: ${months} de 12 meses con venta — la tendencia tiene algo de ruido.`)
+  }
+
+  // Driver dominante
+  if (driver === 'Order book firme') {
+    reasons.push('El plan está dominado por order book firme: hay backlog confirmado en los próximos meses empujando el run rate.')
+  } else if (driver === 'Pipeline comercial') {
+    reasons.push('El plan está dominado por pipeline comercial: oportunidades ponderadas por probabilidad están empujando el run rate.')
+  } else if (driver === 'Histórico + forecast') {
+    reasons.push('El plan está dominado por baseline (forecast UK o histórico + YoY). Ni order book ni pipeline son la causa principal.')
+  } else if (driver === 'Ajuste por inventario alto') {
+    reasons.push('El stock actual cubre más de 4 semanas de demanda — se descontó el exceso del run rate.')
+  } else if (driver.startsWith('Momentum al alza')) {
+    reasons.push(`${driver}: la tendencia reciente de order intake es más fuerte que la anterior.`)
+  } else if (driver.startsWith('Momentum a la baja')) {
+    reasons.push(`${driver}: la tendencia reciente de order intake cayó vs el período anterior.`)
+  }
+
+  // Magnitud del delta
+  if (delta !== null) {
+    if (Math.abs(delta) <= 10) {
+      reasons.push(`Plan ${delta >= 0 ? 'ligeramente por encima' : 'ligeramente por debajo'} del histórico (${delta > 0 ? '+' : ''}${delta}%) — alineado con la tendencia.`)
+    } else if (delta > 10 && delta <= 30) {
+      reasons.push(`Plan +${delta}% sobre el histórico — incremento moderado, esperable con algo de backlog o forecast positivo.`)
+    } else if (delta > 30 && delta <= 50) {
+      reasons.push(`Plan +${delta}% sobre el histórico — incremento notable. Validar que OB/forecast justifiquen el salto.`)
+    } else if (delta > 50) {
+      reasons.push(`Plan +${delta}% sobre el histórico — salto alto. Validar con UK que el forecast soporta este volumen.`)
+    } else if (delta < -10 && delta >= -30) {
+      reasons.push(`Plan ${delta}% bajo el histórico — reducción moderada, típico con momentum a la baja o inventario alto.`)
+    } else if (delta < -30 && delta >= -50) {
+      reasons.push(`Plan ${delta}% bajo el histórico — reducción fuerte. Revisar stock actual y order intake.`)
+    } else if (delta < -50) {
+      reasons.push(`Plan ${delta}% bajo el histórico — caída grande. Probablemente inventario cubre parte de la demanda o hay caída clara de pedidos.`)
+    }
+  }
+
+  // Headline
+  let headline: string
+  if (noHistory) {
+    headline = `Sin historia reciente — plan de ${fmt(plan)} u/sem basado en forecast y backlog`
+  } else if (delta === null || delta === 0) {
+    headline = `Plan ${fmt(plan)} u/sem alineado con el histórico`
+  } else if (delta > 0) {
+    headline = `Plan ${fmt(plan)} u/sem · +${delta}% vs histórico (${fmt(hist)} u/sem)`
+  } else {
+    headline = `Plan ${fmt(plan)} u/sem · ${delta}% vs histórico (${fmt(hist)} u/sem)`
+  }
+
+  // Decisión práctica
+  let decision: string
+  if (noHistory) {
+    decision = 'Decisión: confía en el plan solo si UK validó el forecast o el OB es firme. Sin historia no hay red de seguridad.'
+  } else if (severity === 'alert' && delta !== null && delta > 0) {
+    decision = 'Decisión: antes de aprobar, confirmar con UK que el forecast soporta este volumen. Si no, empieza con el Hist/sem y ajusta semana a semana.'
+  } else if (severity === 'alert' && delta !== null && delta < 0) {
+    decision = 'Decisión: revisa el inventario actual y el intake de los últimos 3 meses antes de bajar tanto. Podría ser un ajuste excesivo.'
+  } else if (severity === 'warn') {
+    decision = 'Decisión: aceptable, pero ancla el primer mes al Hist/sem y ajusta con la info real que vaya llegando.'
+  } else if (isIntermittent) {
+    decision = 'Decisión: en SKUs intermitentes el promedio semanal engaña. Usa el desglose mensual para planear solo en los meses con demanda real.'
+  } else {
+    decision = 'Decisión: plan razonable — produce según la recomendación semanal y monitorea desviaciones contra Prom/sem.'
+  }
+
+  return { severity, headline, reasons, decision }
+}
+
+const SEVERITY_STYLES: Record<Severity, { container: string; dot: string; label: string; title: string }> = {
+  ok:    { container: 'bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400',  label: 'ALINEADO',   title: 'text-emerald-200' },
+  info:  { container: 'bg-sky-500/10 border-sky-500/30',         dot: 'bg-sky-400',      label: 'NOTA',       title: 'text-sky-200' },
+  warn:  { container: 'bg-amber-500/10 border-amber-500/30',     dot: 'bg-amber-400',    label: 'REVISAR',    title: 'text-amber-200' },
+  alert: { container: 'bg-rose-500/10 border-rose-500/30',       dot: 'bg-rose-400',     label: 'VALIDAR',    title: 'text-rose-200' },
+}
+
 export function ProductionRunRateMatrix() {
   const [data, setData] = useState<RunRateMatrix | null>(null)
   const [loading, setLoading] = useState(true)
@@ -238,19 +353,30 @@ export function ProductionRunRateMatrix() {
             ))}
           </div>
 
-          {/* Search */}
-          <div className="flex items-center gap-2 max-w-md">
-            <div className="relative flex-1">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-              <input
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Buscar SKU…"
-                className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
-              />
+          {/* Search + leyenda */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex items-center gap-2 max-w-md w-full md:w-auto">
+              <div className="relative flex-1">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                <input
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Buscar SKU…"
+                  className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
+                />
+              </div>
+              <div className="text-xs text-white/50 whitespace-nowrap">
+                {fmt(filteredRows.length)} de {fmt(data.rows.length)} SKUs
+              </div>
             </div>
-            <div className="text-xs text-white/50">
-              {fmt(filteredRows.length)} de {fmt(data.rows.length)} SKUs
+            {/* Leyenda de severidad */}
+            <div className="flex items-center gap-3 text-[11px] text-white/50">
+              <Info size={12} className="text-white/40" />
+              <span className="hidden md:inline">Click en un SKU para ver interpretación</span>
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> alineado</span>
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-sky-400" /> nota</span>
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-400" /> revisar</span>
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-rose-400" /> validar</span>
             </div>
           </div>
 
@@ -307,14 +433,21 @@ export function ProductionRunRateMatrix() {
               <tbody>
                 {filteredRows.map((r, i) => {
                   const isExpanded = expanded === r.part_number
+                  const rowInterp = interpretRow(r)
+                  const rowSev = SEVERITY_STYLES[rowInterp.severity]
                   return (
                     <Fragment key={r.part_number}>
                       <tr
                         className={`${i % 2 === 1 ? 'bg-white/[0.02]' : ''} hover:bg-white/[0.05] cursor-pointer`}
                         onClick={() => setExpanded(isExpanded ? null : r.part_number)}
+                        title={`Click para ver interpretación: ${rowInterp.headline}`}
                       >
                         <td className="sticky left-0 bg-[#0d0d1a] px-3 py-2 border-b border-white/[0.06] font-mono text-white">
-                          {r.part_number}
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-block h-1.5 w-1.5 rounded-full ${rowSev.dot} shrink-0`} title={rowSev.label} />
+                            <span>{r.part_number}</span>
+                            <Info size={10} className="text-white/25 ml-auto shrink-0" />
+                          </div>
                         </td>
                         <td className="px-2 py-2 border-b border-white/[0.06] text-center text-white/50">
                           {r.catalog_type ?? '—'}
@@ -355,9 +488,34 @@ export function ProductionRunRateMatrix() {
                           </span>
                         </td>
                       </tr>
-                      {isExpanded && (
+                      {isExpanded && (() => {
+                        const interp = interpretRow(r)
+                        const sev = SEVERITY_STYLES[interp.severity]
+                        return (
                         <tr className="bg-white/[0.02]">
                           <td colSpan={data.num_weeks + 7} className="px-4 py-3 border-b border-white/[0.06]">
+                            {/* Interpretación automática por SKU */}
+                            <div className={`mb-3 rounded-md border ${sev.container} p-3`}>
+                              <div className="flex items-start gap-2">
+                                <span className={`mt-1 h-2 w-2 rounded-full ${sev.dot} shrink-0`} />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span className={`text-[10px] uppercase tracking-wider font-semibold ${sev.title}`}>{sev.label}</span>
+                                    <span className="font-mono text-[11px] text-white/80">{r.part_number}</span>
+                                    <span className="text-[10px] text-white/40">·</span>
+                                    <span className="text-[11px] text-white/90 font-medium">{interp.headline}</span>
+                                  </div>
+                                  <ul className="text-[11px] text-white/70 space-y-1 list-disc list-inside marker:text-white/30">
+                                    {interp.reasons.map((rs, idx) => (
+                                      <li key={idx}>{rs}</li>
+                                    ))}
+                                  </ul>
+                                  <div className="mt-2 text-[11px] text-white/85 font-medium">
+                                    {interp.decision}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                             <div className="text-[11px] text-white/50 mb-2 flex items-center gap-1">
                               <Info size={11} /> Desglose mensual de <span className="font-mono text-white">{r.part_number}</span>
                             </div>
@@ -383,7 +541,8 @@ export function ProductionRunRateMatrix() {
                             </div>
                           </td>
                         </tr>
-                      )}
+                        )
+                      })()}
                     </Fragment>
                   )
                 })}
