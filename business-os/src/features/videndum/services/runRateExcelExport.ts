@@ -131,7 +131,7 @@ export async function buildRunRateExcelBuffer(matrix: RunRateMatrix): Promise<Bu
   // ───────────────────────────────────────────────────────────────────────────
 
   const numWeeks = matrix.num_weeks
-  const totalCols = 2 + numWeeks + 3 // SKU + Catálogo + W1..Wn + Total + Prom/sem + Driver
+  const totalCols = 2 + numWeeks + 5 // SKU + Catálogo + W1..Wn + Total + Prom/sem + Hist/sem + Δ Hist + Driver
 
   const rows1: Array<Array<ReturnType<typeof cell>>> = []
 
@@ -152,7 +152,7 @@ export async function buildRunRateExcelBuffer(matrix: RunRateMatrix): Promise<Bu
     const monthLabel = wl.months.map(m => `${['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][m.month - 1]}`).join('/')
     monthHeaderRow.push(cell(monthLabel, S.MONTH_HEADER))
   }
-  monthHeaderRow.push(cell('', S.MONTH_HEADER), cell('', S.MONTH_HEADER), cell('', S.MONTH_HEADER))
+  monthHeaderRow.push(cell('', S.MONTH_HEADER), cell('', S.MONTH_HEADER), cell('', S.MONTH_HEADER), cell('', S.MONTH_HEADER), cell('', S.MONTH_HEADER))
   rows1.push(monthHeaderRow)
 
   // Fila de headers principales
@@ -163,7 +163,13 @@ export async function buildRunRateExcelBuffer(matrix: RunRateMatrix): Promise<Bu
   for (const wl of matrix.week_labels) {
     headerRow.push(cell(`S${wl.num}\n${wl.short}`, S.COL_HEADER))
   }
-  headerRow.push(cell(`Total ${matrix.num_months}M`, S.COL_HEADER), cell('Prom/sem', S.COL_HEADER), cell('Driver', S.COL_HEADER_LEFT))
+  headerRow.push(
+    cell(`Total ${matrix.num_months}M`, S.COL_HEADER),
+    cell('Prom/sem', S.COL_HEADER),
+    cell('Hist/sem (12m)', S.COL_HEADER),
+    cell('Δ vs Hist %', S.COL_HEADER),
+    cell('Driver', S.COL_HEADER_LEFT),
+  )
   rows1.push(headerRow)
 
   // Filas de datos
@@ -179,7 +185,16 @@ export async function buildRunRateExcelBuffer(matrix: RunRateMatrix): Promise<Bu
     for (const w of r.weeks) {
       row.push(cell(w, bodyStyle))
     }
-    row.push(cell(r.total, S.TOTAL), cell(r.avg_weekly, bodyStyle), cell(r.driver, leftStyle))
+    row.push(
+      cell(r.total, S.TOTAL),
+      cell(r.avg_weekly, bodyStyle),
+      cell(r.historical_avg_weekly, bodyStyle),
+      cell(
+        r.delta_vs_historical_pct ?? '',
+        r.delta_vs_historical_pct !== null ? { ...bodyStyle, numFmt: '+0.0"%";-0.0"%";0"%"' } : bodyStyle,
+      ),
+      cell(r.driver, leftStyle),
+    )
     rows1.push(row)
   })
 
@@ -192,9 +207,16 @@ export async function buildRunRateExcelBuffer(matrix: RunRateMatrix): Promise<Bu
     const sum = matrix.rows.reduce((s, r) => s + (r.weeks[w] ?? 0), 0)
     totalsRow.push(cell(sum, S.TOTAL))
   }
+  const totalHistorical = matrix.rows.reduce((s, r) => s + (r.historical_avg_weekly ?? 0), 0)
+  const avgPlanWeekly = Math.round(matrix.summary.total_units / numWeeks)
+  const totalDelta = totalHistorical > 0
+    ? Math.round(((avgPlanWeekly - totalHistorical) / totalHistorical) * 1000) / 10
+    : null
   totalsRow.push(
     cell(matrix.summary.total_units, S.TOTAL),
-    cell(Math.round(matrix.summary.total_units / numWeeks), S.TOTAL),
+    cell(avgPlanWeekly, S.TOTAL),
+    cell(totalHistorical, S.TOTAL),
+    cell(totalDelta ?? '', totalDelta !== null ? { ...S.TOTAL, numFmt: '+0.0"%";-0.0"%";0"%"' } : S.TOTAL),
     cell('', S.COL_HEADER_LEFT),
   )
   rows1.push(totalsRow)
@@ -211,6 +233,8 @@ export async function buildRunRateExcelBuffer(matrix: RunRateMatrix): Promise<Bu
     ...Array.from({ length: numWeeks }, () => ({ wch: 11 })),
     { wch: 14 }, // Total
     { wch: 11 }, // Prom/sem
+    { wch: 13 }, // Hist/sem
+    { wch: 11 }, // Δ vs Hist
     { wch: 30 }, // Driver
   ]
   ws1['!rows'] = [

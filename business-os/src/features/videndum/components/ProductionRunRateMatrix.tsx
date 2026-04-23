@@ -29,6 +29,9 @@ interface RunRateRow {
   weeks: number[]
   total: number
   avg_weekly: number
+  historical_avg_weekly: number
+  historical_months_observed: number
+  delta_vs_historical_pct: number | null
   driver: string
   monthly: MonthBreakdown[]
 }
@@ -269,6 +272,7 @@ export function ProductionRunRateMatrix() {
                     )
                   })}
                   <th className="px-2 py-1.5 border-b border-white/10 text-[10px] uppercase tracking-wider text-white/40 text-center" colSpan={2}>Totales</th>
+                  <th className="px-2 py-1.5 border-b border-white/10 text-[10px] uppercase tracking-wider text-amber-400/60 text-center" colSpan={2}>Solo histórico</th>
                   <th className="px-2 py-1.5 border-b border-white/10"></th>
                 </tr>
                 {/* Weeks header */}
@@ -285,6 +289,18 @@ export function ProductionRunRateMatrix() {
                   ))}
                   <th className="px-2 py-2 border-b border-white/10 font-medium text-white/70 text-center">Total</th>
                   <th className="px-2 py-2 border-b border-white/10 font-medium text-white/70 text-center">Prom</th>
+                  <th
+                    className="px-2 py-2 border-b border-white/10 font-medium text-amber-300/80 text-center whitespace-nowrap"
+                    title="Run rate semanal 100% histórico: ventas últimos 12 meses / 52 semanas. Sin order book, sin pipeline, sin momentum, sin inventario."
+                  >
+                    Hist/sem
+                  </th>
+                  <th
+                    className="px-2 py-2 border-b border-white/10 font-medium text-amber-300/80 text-center whitespace-nowrap"
+                    title="Diferencia % entre el promedio semanal recomendado y el histórico puro. Positivo = el plan excede el histórico (por OB/pipeline/momentum)."
+                  >
+                    Δ vs Hist
+                  </th>
                   <th className="px-2 py-2 border-b border-white/10 font-medium text-white/70 text-left">Driver</th>
                 </tr>
               </thead>
@@ -314,6 +330,25 @@ export function ProductionRunRateMatrix() {
                         <td className="px-2 py-2 border-b border-white/[0.06] text-right text-white/60 tabular-nums">
                           {fmt(r.avg_weekly)}
                         </td>
+                        <td
+                          className="px-2 py-2 border-b border-white/[0.06] text-right text-amber-300/90 tabular-nums whitespace-nowrap"
+                          title={`${r.historical_months_observed} meses con venta en últimos 12m`}
+                        >
+                          {r.historical_avg_weekly > 0 ? fmt(r.historical_avg_weekly) : '—'}
+                          {r.historical_months_observed > 0 && r.historical_months_observed < 12 && (
+                            <span className="text-[9px] text-white/30 ml-1">({r.historical_months_observed}m)</span>
+                          )}
+                        </td>
+                        <td
+                          className={`px-2 py-2 border-b border-white/[0.06] text-right tabular-nums whitespace-nowrap ${
+                            r.delta_vs_historical_pct === null ? 'text-white/30' :
+                            r.delta_vs_historical_pct > 0 ? 'text-emerald-400' : 'text-rose-400'
+                          }`}
+                        >
+                          {r.delta_vs_historical_pct !== null
+                            ? `${r.delta_vs_historical_pct > 0 ? '+' : ''}${r.delta_vs_historical_pct}%`
+                            : '—'}
+                        </td>
                         <td className="px-2 py-2 border-b border-white/[0.06] text-left">
                           <span className={`inline-block px-2 py-0.5 text-[10px] rounded border ${driverClass(r.driver)}`}>
                             {r.driver}
@@ -322,7 +357,7 @@ export function ProductionRunRateMatrix() {
                       </tr>
                       {isExpanded && (
                         <tr className="bg-white/[0.02]">
-                          <td colSpan={data.num_weeks + 5} className="px-4 py-3 border-b border-white/[0.06]">
+                          <td colSpan={data.num_weeks + 7} className="px-4 py-3 border-b border-white/[0.06]">
                             <div className="text-[11px] text-white/50 mb-2 flex items-center gap-1">
                               <Info size={11} /> Desglose mensual de <span className="font-mono text-white">{r.part_number}</span>
                             </div>

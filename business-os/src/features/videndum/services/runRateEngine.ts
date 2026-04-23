@@ -51,6 +51,9 @@ export interface RunRateRow {
   weeks: number[]
   total: number
   avg_weekly: number
+  historical_avg_weekly: number // promedio semanal solo basado en ventas últimos 12m (sin OB, sin pipeline, sin momentum)
+  historical_months_observed: number // meses con ventas > 0 dentro de la ventana 12m
+  delta_vs_historical_pct: number | null // % diferencia avg_weekly vs historical_avg_weekly
   driver: string
   monthly: MonthBreakdown[]
 }
@@ -243,15 +246,21 @@ export function calculateRunRateMatrix(input: RunRateInput): RunRateMatrix {
   for (const sku of activeSkus) {
     // Avg ventas últimos 12m (todos los meses)
     let salesLast12 = 0, salesPrev12 = 0
+    let monthsObservedLast12 = 0
     const last12Start = new Date(today); last12Start.setMonth(last12Start.getMonth() - 12)
     const prev12Start = new Date(today); prev12Start.setMonth(prev12Start.getMonth() - 24)
     for (const [k, qty] of salesByKey) {
       if (!k.startsWith(`${sku}|`)) continue
       const [, yStr, mStr] = k.split('|')
       const d = new Date(Number(yStr), Number(mStr) - 1, 1)
-      if (d >= last12Start && d < today) salesLast12 += qty
+      if (d >= last12Start && d < today) {
+        salesLast12 += qty
+        if (qty > 0) monthsObservedLast12++
+      }
       else if (d >= prev12Start && d < last12Start) salesPrev12 += qty
     }
+    // Run rate semanal 100% histórico: ventas últimos 12m / 52 semanas
+    const historicalAvgWeekly = salesLast12 / 52
     const yoyRaw = salesPrev12 > 0 ? (salesLast12 - salesPrev12) / salesPrev12 : 0
     const yoy = clamp(yoyRaw, YOY_CLAMP[0], YOY_CLAMP[1])
 
@@ -342,12 +351,19 @@ export function calculateRunRateMatrix(input: RunRateInput): RunRateMatrix {
       monthlyTotals[i] += monthly[i].demand
     }
 
+    const deltaVsHistorical = historicalAvgWeekly > 0
+      ? ((avgWeekly - historicalAvgWeekly) / historicalAvgWeekly) * 100
+      : null
+
     rows.push({
       part_number: sku,
       catalog_type: skuCatalog.get(sku) ?? null,
       weeks: weekValues,
       total: Math.round(total),
       avg_weekly: Math.round(avgWeekly),
+      historical_avg_weekly: Math.round(historicalAvgWeekly),
+      historical_months_observed: monthsObservedLast12,
+      delta_vs_historical_pct: deltaVsHistorical !== null ? Math.round(deltaVsHistorical * 10) / 10 : null,
       driver,
       monthly,
     })
