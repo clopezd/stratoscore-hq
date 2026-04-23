@@ -1,10 +1,11 @@
 'use client'
 
-import { Fragment, useEffect, useState, useMemo } from 'react'
-import { Download, Factory, Info, Search, Loader2, RefreshCw, AlertCircle } from 'lucide-react'
+import { Fragment, useEffect, useState, useMemo, useRef } from 'react'
+import { Download, Factory, Info, Search, Loader2, RefreshCw, AlertCircle, Gauge, ListChecks, Target, ChevronDown, ChevronUp } from 'lucide-react'
 
 interface WeekLabel {
   num: number
+  calendar_week: number
   start: string
   end: string
   short: string
@@ -32,6 +33,8 @@ interface RunRateRow {
   historical_avg_weekly: number
   historical_months_observed: number
   delta_vs_historical_pct: number | null
+  historical_mape_pct: number | null
+  mape_months_observed: number
   driver: string
   monthly: MonthBreakdown[]
 }
@@ -49,6 +52,9 @@ interface RunRateMatrix {
     total_units: number
     by_driver: Record<string, number>
     monthly_totals: number[]
+    avg_forecast_mape_pct: number | null
+    skus_with_high_mape: number
+    mape_window_months: number
   }
   assumptions: {
     start_date: string
@@ -94,10 +100,12 @@ function interpretRow(r: RunRateRow): Interpretation {
   const hist = r.historical_avg_weekly
   const plan = r.avg_weekly
   const driver = r.driver
+  const mape = r.historical_mape_pct
   const annualHist = hist * 52
 
   const isIntermittent = months > 0 && months < 6
   const noHistory = hist === 0 || months === 0
+  const highMape = mape !== null && mape > 30
 
   // Severidad por magnitud de Δ y calidad de data
   let severity: Severity = 'ok'
@@ -108,6 +116,11 @@ function interpretRow(r: RunRateRow): Interpretation {
   else if (Math.abs(delta) <= 50) severity = 'warn'
   else severity = 'alert'
   if (isIntermittent && severity === 'ok') severity = 'info'
+  // MAPE alto eleva severidad: ok → info, info → warn
+  if (highMape) {
+    if (severity === 'ok') severity = 'info'
+    else if (severity === 'info') severity = 'warn'
+  }
 
   const reasons: string[] = []
 
@@ -120,6 +133,19 @@ function interpretRow(r: RunRateRow): Interpretation {
     )
   } else if (months < 12) {
     reasons.push(`Historia parcial: ${months} de 12 meses con venta — la tendencia tiene algo de ruido.`)
+  }
+
+  // MAPE histórico del UK forecast (si está disponible)
+  if (mape !== null) {
+    if (mape <= 15) {
+      reasons.push(`UK forecast ha sido confiable en este SKU: MAPE ${mape}% (últimos ${r.mape_months_observed}m). Puedes confiar más en el plan.`)
+    } else if (mape <= 30) {
+      reasons.push(`UK forecast tiene error moderado en este SKU: MAPE ${mape}% (últimos ${r.mape_months_observed}m).`)
+    } else if (mape <= 50) {
+      reasons.push(`⚠ UK forecast ha errado ${mape}% en promedio los últimos ${r.mape_months_observed}m — confiabilidad baja. Aterriza el plan contra el histórico real.`)
+    } else {
+      reasons.push(`⚠ UK forecast ha errado ${mape}% los últimos ${r.mape_months_observed}m — no es confiable para este SKU. Prioriza el Hist/sem y OB firme.`)
+    }
   }
 
   // Driver dominante
@@ -194,6 +220,8 @@ const SEVERITY_STYLES: Record<Severity, { container: string; dot: string; label:
   alert: { container: 'bg-rose-500/10 border-rose-500/30',       dot: 'bg-rose-400',     label: 'VALIDAR',    title: 'text-rose-200' },
 }
 
+const CAPACITY_STORAGE_KEY = 'videndum_runrate_weekly_capacity'
+
 export function ProductionRunRateMatrix() {
   const [data, setData] = useState<RunRateMatrix | null>(null)
   const [loading, setLoading] = useState(true)
@@ -202,6 +230,36 @@ export function ProductionRunRateMatrix() {
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
+  const [capacityWeekly, setCapacityWeekly] = useState<number | null>(null)
+  const [actionQueueOpen, setActionQueueOpen] = useState(true)
+  const rowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map())
+
+  // Cargar capacity desde localStorage al montar
+  useEffect(() => {
+    try {
+      const stored = typeof window !== 'undefined' ? localStorage.getItem(CAPACITY_STORAGE_KEY) : null
+      if (stored) {
+        const n = parseInt(stored)
+        if (!isNaN(n) && n > 0) setCapacityWeekly(n)
+      }
+    } catch { /* ignore */ }
+  }, [])
+
+  const saveCapacity = (v: number | null) => {
+    setCapacityWeekly(v)
+    try {
+      if (v && v > 0) localStorage.setItem(CAPACITY_STORAGE_KEY, String(v))
+      else localStorage.removeItem(CAPACITY_STORAGE_KEY)
+    } catch { /* ignore */ }
+  }
+
+  const scrollToSku = (sku: string) => {
+    setExpanded(sku)
+    setTimeout(() => {
+      const el = rowRefs.current.get(sku)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 50)
+  }
 
   const load = async (w: number) => {
     setLoading(true)
@@ -251,6 +309,42 @@ export function ProductionRunRateMatrix() {
     if (!q) return data.rows
     return data.rows.filter(r => r.part_number.toUpperCase().includes(q))
   }, [data, search])
+
+  // Bandeja de Decisiones Pendientes: SKUs con severidad warn/alert, ordenados por volumen × severidad
+  const actionItems = useMemo(() => {
+    if (!data) return []
+    const severityWeight: Record<Severity, number> = { alert: 3, warn: 2, info: 1, ok: 0 }
+    return data.rows
+      .map(r => ({ row: r, interp: interpretRow(r) }))
+      .filter(x => x.interp.severity === 'alert' || x.interp.severity === 'warn')
+      .sort((a, b) => {
+        const sw = severityWeight[b.interp.severity] - severityWeight[a.interp.severity]
+        if (sw !== 0) return sw
+        return b.row.total - a.row.total
+      })
+      .slice(0, 15)
+  }, [data])
+
+  // Capacity: plan promedio semanal + peak semanal
+  const capacitySummary = useMemo(() => {
+    if (!data || !capacityWeekly) return null
+    const weeklyTotals = Array.from({ length: data.num_weeks }, (_, w) =>
+      data.rows.reduce((s, r) => s + (r.weeks[w] ?? 0), 0),
+    )
+    const peak = Math.max(...weeklyTotals)
+    const avg = weeklyTotals.reduce((s, v) => s + v, 0) / weeklyTotals.length
+    const peakWeekIdx = weeklyTotals.indexOf(peak)
+    const utilization = avg / capacityWeekly
+    const peakUtilization = peak / capacityWeekly
+    return {
+      weeklyTotals,
+      peak: Math.round(peak),
+      avg: Math.round(avg),
+      peakWeekIdx,
+      utilization,
+      peakUtilization,
+    }
+  }, [data, capacityWeekly])
 
   return (
     <div className="p-4 md:p-6 space-y-5">
@@ -353,6 +447,167 @@ export function ProductionRunRateMatrix() {
             ))}
           </div>
 
+          {/* ─── Capacity Check ─── */}
+          <div className="p-4 bg-white/[0.03] border border-white/10 rounded-lg">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Gauge size={16} className="text-cyan-400" />
+                <div>
+                  <div className="text-xs uppercase tracking-wider text-white/60 font-medium">Capacity Check</div>
+                  <div className="text-[11px] text-white/40">Plan vs capacidad productiva semanal</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-[11px] text-white/50">Capacidad (u/sem):</label>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="Ej: 50000"
+                  value={capacityWeekly ?? ''}
+                  onChange={e => {
+                    const n = parseInt(e.target.value)
+                    saveCapacity(isNaN(n) ? null : n)
+                  }}
+                  className="w-28 px-2 py-1 bg-white/5 border border-white/15 rounded text-sm text-white text-right focus:outline-none focus:border-cyan-500/50"
+                />
+                {capacityWeekly && (
+                  <button
+                    onClick={() => saveCapacity(null)}
+                    className="text-[10px] text-white/40 hover:text-white/70 px-2 py-1"
+                    title="Limpiar"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {capacitySummary && capacityWeekly ? (
+              <div className="mt-4 space-y-2">
+                {/* Barra de utilización promedio */}
+                <div>
+                  <div className="flex justify-between text-[11px] text-white/60 mb-1">
+                    <span>Utilización promedio: {fmt(capacitySummary.avg)} u/sem ({(capacitySummary.utilization * 100).toFixed(0)}%)</span>
+                    <span className="text-white/40">Capacidad: {fmt(capacityWeekly)} u/sem</span>
+                  </div>
+                  <div className="h-3 bg-white/5 rounded overflow-hidden border border-white/10">
+                    <div
+                      className={`h-full transition-all ${
+                        capacitySummary.utilization > 1 ? 'bg-rose-500' :
+                        capacitySummary.utilization > 0.9 ? 'bg-amber-500' :
+                        capacitySummary.utilization >= 0.6 ? 'bg-emerald-500' :
+                        'bg-sky-500'
+                      }`}
+                      style={{ width: `${Math.min(100, capacitySummary.utilization * 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Peak */}
+                <div className="flex justify-between text-[11px] text-white/50">
+                  <span>
+                    Peak semanal: <span className="text-white font-medium">{fmt(capacitySummary.peak)}</span> en <span className="text-white/70">S{data.week_labels[capacitySummary.peakWeekIdx]?.num} ({data.week_labels[capacitySummary.peakWeekIdx]?.short})</span>
+                    — <span className={capacitySummary.peakUtilization > 1 ? 'text-rose-400 font-semibold' : capacitySummary.peakUtilization > 0.9 ? 'text-amber-400' : 'text-emerald-400'}>
+                      {(capacitySummary.peakUtilization * 100).toFixed(0)}%
+                    </span>
+                  </span>
+                  {capacitySummary.peakUtilization > 1 && (
+                    <span className="text-rose-400 text-[10px] font-semibold uppercase tracking-wider">⚠ Excede capacidad</span>
+                  )}
+                  {capacitySummary.peakUtilization <= 1 && capacitySummary.utilization < 0.6 && (
+                    <span className="text-sky-400 text-[10px] uppercase tracking-wider">Capacidad ociosa</span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-3 text-[11px] text-white/40">
+                Ingresa la capacidad semanal de la planta para ver utilización y alertas automáticas de sobrecarga u ociosidad.
+              </div>
+            )}
+
+            {/* MAPE global */}
+            {data.summary.avg_forecast_mape_pct !== null && (
+              <div className="mt-3 pt-3 border-t border-white/10 flex items-center gap-3 flex-wrap text-[11px]">
+                <Target size={12} className="text-white/40" />
+                <span className="text-white/60">
+                  MAPE histórico del UK forecast ({data.summary.mape_window_months}m):{' '}
+                  <span className={`font-semibold ${
+                    data.summary.avg_forecast_mape_pct <= 15 ? 'text-emerald-400' :
+                    data.summary.avg_forecast_mape_pct <= 30 ? 'text-amber-400' :
+                    'text-rose-400'
+                  }`}>
+                    {data.summary.avg_forecast_mape_pct}%
+                  </span>
+                </span>
+                {data.summary.skus_with_high_mape > 0 && (
+                  <span className="text-white/50">
+                    · <span className="text-rose-400 font-semibold">{data.summary.skus_with_high_mape}</span> SKUs con MAPE &gt; 30%
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ─── Bandeja de Decisiones Pendientes ─── */}
+          {actionItems.length > 0 && (
+            <div className="border border-amber-500/30 bg-amber-500/5 rounded-lg">
+              <button
+                onClick={() => setActionQueueOpen(!actionQueueOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-amber-500/10 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <ListChecks size={18} className="text-amber-400" />
+                  <div>
+                    <div className="text-sm font-semibold text-amber-200">
+                      Decisiones Pendientes · {actionItems.length} SKU{actionItems.length > 1 ? 's' : ''} requieren atención
+                    </div>
+                    <div className="text-[11px] text-amber-300/70">
+                      {fmt(actionItems.reduce((s, a) => s + a.row.total, 0))} unidades en los próximos {data.num_weeks} semanas
+                      · {((actionItems.reduce((s, a) => s + a.row.total, 0) / data.summary.total_units) * 100).toFixed(1)}% del plan total
+                    </div>
+                  </div>
+                </div>
+                {actionQueueOpen ? <ChevronUp size={16} className="text-amber-400" /> : <ChevronDown size={16} className="text-amber-400" />}
+              </button>
+
+              {actionQueueOpen && (
+                <div className="border-t border-amber-500/20">
+                  <div className="divide-y divide-amber-500/10">
+                    {actionItems.map(({ row: r, interp }) => {
+                      const sev = SEVERITY_STYLES[interp.severity]
+                      return (
+                        <button
+                          key={r.part_number}
+                          onClick={() => scrollToSku(r.part_number)}
+                          className="w-full flex items-start gap-3 px-4 py-3 hover:bg-amber-500/10 transition-colors text-left"
+                        >
+                          <span className={`mt-1.5 h-2 w-2 rounded-full ${sev.dot} shrink-0`} />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-mono text-sm text-white">{r.part_number}</span>
+                              <span className="text-[10px] text-white/40">{r.catalog_type}</span>
+                              <span className={`text-[9px] uppercase tracking-wider font-semibold ${sev.title}`}>{sev.label}</span>
+                              {r.historical_mape_pct !== null && r.historical_mape_pct > 30 && (
+                                <span className="text-[9px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-300">
+                                  MAPE {r.historical_mape_pct}%
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-white/70 mt-0.5 truncate">{interp.headline}</div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-[11px] text-white/90 font-semibold tabular-nums">{fmt(r.total)}</div>
+                            <div className="text-[10px] text-white/40">unid 3M</div>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Search + leyenda */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex items-center gap-2 max-w-md w-full md:w-auto">
@@ -409,7 +664,7 @@ export function ProductionRunRateMatrix() {
                   <th className="px-2 py-2 border-b border-white/10 font-medium text-white/70">Cat</th>
                   {data.week_labels.map(wl => (
                     <th key={wl.num} className="px-2 py-2 border-b border-white/10 font-medium text-white/70 text-center whitespace-nowrap" title={`${wl.start} → ${wl.end}`}>
-                      <div className="text-[10px] text-white/40">S{wl.num}</div>
+                      <div className="text-[10px] text-white/40">S{wl.calendar_week}</div>
                       <div>{wl.short}</div>
                     </th>
                   ))}
@@ -435,9 +690,14 @@ export function ProductionRunRateMatrix() {
                   const isExpanded = expanded === r.part_number
                   const rowInterp = interpretRow(r)
                   const rowSev = SEVERITY_STYLES[rowInterp.severity]
+                  const mapeHigh = r.historical_mape_pct !== null && r.historical_mape_pct > 30
                   return (
                     <Fragment key={r.part_number}>
                       <tr
+                        ref={el => {
+                          if (el) rowRefs.current.set(r.part_number, el)
+                          else rowRefs.current.delete(r.part_number)
+                        }}
                         className={`${i % 2 === 1 ? 'bg-white/[0.02]' : ''} hover:bg-white/[0.05] cursor-pointer`}
                         onClick={() => setExpanded(isExpanded ? null : r.part_number)}
                         title={`Click para ver interpretación: ${rowInterp.headline}`}
@@ -446,6 +706,14 @@ export function ProductionRunRateMatrix() {
                           <div className="flex items-center gap-2">
                             <span className={`inline-block h-1.5 w-1.5 rounded-full ${rowSev.dot} shrink-0`} title={rowSev.label} />
                             <span>{r.part_number}</span>
+                            {mapeHigh && (
+                              <span
+                                className="text-[9px] font-semibold px-1 py-0.5 rounded bg-rose-500/15 text-rose-300 shrink-0"
+                                title={`UK forecast ha errado ${r.historical_mape_pct}% en este SKU los últimos ${r.mape_months_observed}m`}
+                              >
+                                MAPE {r.historical_mape_pct}%
+                              </span>
+                            )}
                             <Info size={10} className="text-white/25 ml-auto shrink-0" />
                           </div>
                         </td>
