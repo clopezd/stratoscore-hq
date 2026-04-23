@@ -24,6 +24,10 @@ interface MonthBreakdown {
   demand: number
 }
 
+type AbcClass = 'A' | 'B' | 'C'
+type XyzClass = 'X' | 'Y' | 'Z' | 'N/A'
+type LifecycleStage = 'Sin historia' | 'Nuevo' | 'Intermitente' | 'Crecimiento' | 'Declive' | 'Establecido'
+
 interface RunRateRow {
   part_number: string
   catalog_type: string | null
@@ -35,6 +39,12 @@ interface RunRateRow {
   delta_vs_historical_pct: number | null
   historical_mape_pct: number | null
   mape_months_observed: number
+  abc_class: AbcClass
+  xyz_class: XyzClass
+  lifecycle_stage: LifecycleStage
+  volume_share_pct: number
+  cumulative_share_pct: number
+  cv_pct: number | null
   driver: string
   monthly: MonthBreakdown[]
 }
@@ -51,6 +61,9 @@ interface RunRateMatrix {
     total_skus: number
     total_units: number
     by_driver: Record<string, number>
+    by_abc: Record<AbcClass, { skus: number; units: number }>
+    by_xyz: Record<XyzClass, { skus: number; units: number }>
+    by_lifecycle: Record<LifecycleStage, { skus: number; units: number }>
     monthly_totals: number[]
     avg_forecast_mape_pct: number | null
     skus_with_high_mape: number
@@ -222,6 +235,38 @@ const SEVERITY_STYLES: Record<Severity, { container: string; dot: string; label:
 
 const CAPACITY_STORAGE_KEY = 'videndum_runrate_weekly_capacity'
 
+const ABC_STYLES: Record<AbcClass, string> = {
+  A: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
+  B: 'bg-sky-500/15 text-sky-300 border-sky-500/40',
+  C: 'bg-white/5 text-white/50 border-white/15',
+}
+const XYZ_STYLES: Record<XyzClass, string> = {
+  X: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
+  Y: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
+  Z: 'bg-rose-500/15 text-rose-300 border-rose-500/40',
+  'N/A': 'bg-white/5 text-white/40 border-white/10',
+}
+const LIFECYCLE_STYLES: Record<LifecycleStage, string> = {
+  'Crecimiento':   'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
+  'Establecido':   'bg-sky-500/10 text-sky-300 border-sky-500/30',
+  'Intermitente':  'bg-amber-500/10 text-amber-300 border-amber-500/30',
+  'Declive':       'bg-rose-500/10 text-rose-300 border-rose-500/30',
+  'Nuevo':         'bg-purple-500/10 text-purple-300 border-purple-500/30',
+  'Sin historia':  'bg-white/5 text-white/40 border-white/10',
+}
+
+const ABC_TOOLTIPS: Record<AbcClass, string> = {
+  A: 'Clase A — SKUs que acumulan hasta 80% del volumen 3M. Core del negocio, revisión prioritaria.',
+  B: 'Clase B — siguiente 15% del volumen (entre 80% y 95% acumulado). Importantes pero no críticos.',
+  C: 'Clase C — cola 5% del volumen. Long tail, revisión periódica.',
+}
+const XYZ_TOOLTIPS: Record<XyzClass, string> = {
+  X: 'Clase X — demanda estable (CV < 25%). Producción estándar, run rate confiable.',
+  Y: 'Clase Y — variabilidad moderada (CV 25-50%). Requiere monitoreo.',
+  Z: 'Clase Z — demanda errática (CV > 50%). Requiere buffer alto o make-to-order.',
+  'N/A': 'Sin suficiente historia (< 3 meses con venta) para calcular variabilidad.',
+}
+
 export function ProductionRunRateMatrix() {
   const [data, setData] = useState<RunRateMatrix | null>(null)
   const [loading, setLoading] = useState(true)
@@ -232,7 +277,26 @@ export function ProductionRunRateMatrix() {
   const [downloading, setDownloading] = useState(false)
   const [capacityWeekly, setCapacityWeekly] = useState<number | null>(null)
   const [actionQueueOpen, setActionQueueOpen] = useState(false)
+  const [filterAbc, setFilterAbc] = useState<Set<AbcClass>>(new Set())
+  const [filterXyz, setFilterXyz] = useState<Set<XyzClass>>(new Set())
+  const [filterLifecycle, setFilterLifecycle] = useState<Set<LifecycleStage>>(new Set())
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const rowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map())
+
+  const toggleInSet = <T,>(set: Set<T>, value: T): Set<T> => {
+    const n = new Set(set)
+    if (n.has(value)) n.delete(value)
+    else n.add(value)
+    return n
+  }
+
+  const clearFilters = () => {
+    setFilterAbc(new Set())
+    setFilterXyz(new Set())
+    setFilterLifecycle(new Set())
+  }
+
+  const hasActiveFilters = filterAbc.size > 0 || filterXyz.size > 0 || filterLifecycle.size > 0
 
   // Cargar capacity desde localStorage al montar
   useEffect(() => {
@@ -306,9 +370,14 @@ export function ProductionRunRateMatrix() {
   const filteredRows = useMemo(() => {
     if (!data) return []
     const q = search.trim().toUpperCase()
-    if (!q) return data.rows
-    return data.rows.filter(r => r.part_number.toUpperCase().includes(q))
-  }, [data, search])
+    return data.rows.filter(r => {
+      if (q && !r.part_number.toUpperCase().includes(q)) return false
+      if (filterAbc.size > 0 && !filterAbc.has(r.abc_class)) return false
+      if (filterXyz.size > 0 && !filterXyz.has(r.xyz_class)) return false
+      if (filterLifecycle.size > 0 && !filterLifecycle.has(r.lifecycle_stage)) return false
+      return true
+    })
+  }, [data, search, filterAbc, filterXyz, filterLifecycle])
 
   // Bandeja de Decisiones Pendientes: SKUs con severidad warn/alert, ordenados por volumen × severidad
   const actionItems = useMemo(() => {
@@ -608,6 +677,126 @@ export function ProductionRunRateMatrix() {
             </div>
           )}
 
+          {/* ─── Clasificación ABC-XYZ + filtros ─── */}
+          <div className="border border-white/10 rounded-lg bg-white/[0.02]">
+            <button
+              onClick={() => setFiltersOpen(!filtersOpen)}
+              className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/[0.03] transition-colors"
+            >
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-xs uppercase tracking-wider text-white/60 font-semibold">Clasificación ABC-XYZ</span>
+                {/* Resumen compacto */}
+                <div className="flex items-center gap-1.5 text-[10px]">
+                  {(['A', 'B', 'C'] as AbcClass[]).map(c => (
+                    <span key={c} className={`px-1.5 py-0.5 rounded border ${ABC_STYLES[c]}`} title={ABC_TOOLTIPS[c]}>
+                      {c}: {data.summary.by_abc[c].skus}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px]">
+                  {(['X', 'Y', 'Z'] as XyzClass[]).map(c => (
+                    <span key={c} className={`px-1.5 py-0.5 rounded border ${XYZ_STYLES[c]}`} title={XYZ_TOOLTIPS[c]}>
+                      {c}: {data.summary.by_xyz[c].skus}
+                    </span>
+                  ))}
+                  {data.summary.by_xyz['N/A'].skus > 0 && (
+                    <span className={`px-1.5 py-0.5 rounded border ${XYZ_STYLES['N/A']}`} title={XYZ_TOOLTIPS['N/A']}>
+                      N/A: {data.summary.by_xyz['N/A'].skus}
+                    </span>
+                  )}
+                </div>
+                {hasActiveFilters && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                    {filterAbc.size + filterXyz.size + filterLifecycle.size} filtros activos
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {hasActiveFilters && (
+                  <button
+                    onClick={e => { e.stopPropagation(); clearFilters() }}
+                    className="text-[11px] text-cyan-400 hover:text-cyan-300 underline"
+                  >
+                    limpiar
+                  </button>
+                )}
+                {filtersOpen ? <ChevronUp size={14} className="text-white/50" /> : <ChevronDown size={14} className="text-white/50" />}
+              </div>
+            </button>
+
+            {filtersOpen && (
+              <div className="border-t border-white/10 p-4 space-y-3">
+                <div>
+                  <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1.5">ABC (volumen)</div>
+                  <div className="flex flex-wrap gap-2">
+                    {(['A', 'B', 'C'] as AbcClass[]).map(c => {
+                      const agg = data.summary.by_abc[c]
+                      const active = filterAbc.has(c)
+                      const pct = data.summary.total_units > 0 ? (agg.units / data.summary.total_units) * 100 : 0
+                      return (
+                        <button
+                          key={c}
+                          onClick={() => setFilterAbc(toggleInSet(filterAbc, c))}
+                          title={ABC_TOOLTIPS[c]}
+                          className={`px-2.5 py-1 text-[11px] rounded border transition-all ${
+                            active ? ABC_STYLES[c] + ' ring-2 ring-white/20' : 'bg-white/[0.03] text-white/50 border-white/10 hover:text-white hover:border-white/20'
+                          }`}
+                        >
+                          <strong>{c}</strong> · {agg.skus} SKUs · {pct.toFixed(0)}% vol
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1.5">XYZ (variabilidad)</div>
+                  <div className="flex flex-wrap gap-2">
+                    {(['X', 'Y', 'Z', 'N/A'] as XyzClass[]).map(c => {
+                      const agg = data.summary.by_xyz[c]
+                      if (agg.skus === 0) return null
+                      const active = filterXyz.has(c)
+                      return (
+                        <button
+                          key={c}
+                          onClick={() => setFilterXyz(toggleInSet(filterXyz, c))}
+                          title={XYZ_TOOLTIPS[c]}
+                          className={`px-2.5 py-1 text-[11px] rounded border transition-all ${
+                            active ? XYZ_STYLES[c] + ' ring-2 ring-white/20' : 'bg-white/[0.03] text-white/50 border-white/10 hover:text-white hover:border-white/20'
+                          }`}
+                        >
+                          <strong>{c}</strong> · {agg.skus} SKUs
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1.5">Lifecycle</div>
+                  <div className="flex flex-wrap gap-2">
+                    {(Object.keys(data.summary.by_lifecycle) as LifecycleStage[]).map(c => {
+                      const agg = data.summary.by_lifecycle[c]
+                      if (agg.skus === 0) return null
+                      const active = filterLifecycle.has(c)
+                      return (
+                        <button
+                          key={c}
+                          onClick={() => setFilterLifecycle(toggleInSet(filterLifecycle, c))}
+                          className={`px-2.5 py-1 text-[11px] rounded border transition-all ${
+                            active ? LIFECYCLE_STYLES[c] + ' ring-2 ring-white/20' : 'bg-white/[0.03] text-white/50 border-white/10 hover:text-white hover:border-white/20'
+                          }`}
+                        >
+                          {c} · {agg.skus}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Search + leyenda */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex items-center gap-2 max-w-md w-full md:w-auto">
@@ -703,9 +892,21 @@ export function ProductionRunRateMatrix() {
                         title={`Click para ver interpretación: ${rowInterp.headline}`}
                       >
                         <td className="sticky left-0 bg-[#0d0d1a] px-3 py-2 border-b border-white/[0.06] font-mono text-white">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className={`inline-block h-1.5 w-1.5 rounded-full ${rowSev.dot} shrink-0`} title={rowSev.label} />
                             <span>{r.part_number}</span>
+                            <span
+                              className={`text-[9px] font-bold px-1 py-0.5 rounded border shrink-0 ${ABC_STYLES[r.abc_class]}`}
+                              title={`${ABC_TOOLTIPS[r.abc_class]} · ${r.volume_share_pct.toFixed(2)}% del volumen 3M (acumulado ${r.cumulative_share_pct.toFixed(1)}%)`}
+                            >
+                              {r.abc_class}
+                            </span>
+                            <span
+                              className={`text-[9px] font-bold px-1 py-0.5 rounded border shrink-0 ${XYZ_STYLES[r.xyz_class]}`}
+                              title={`${XYZ_TOOLTIPS[r.xyz_class]}${r.cv_pct !== null ? ` · CV ${r.cv_pct}%` : ''}`}
+                            >
+                              {r.xyz_class}
+                            </span>
                             {mapeHigh && (
                               <span
                                 className="text-[9px] font-semibold px-1 py-0.5 rounded bg-rose-500/15 text-rose-300 shrink-0"

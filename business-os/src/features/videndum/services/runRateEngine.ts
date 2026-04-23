@@ -45,6 +45,10 @@ export interface MonthBreakdown {
   demand: number
 }
 
+export type AbcClass = 'A' | 'B' | 'C'
+export type XyzClass = 'X' | 'Y' | 'Z' | 'N/A'
+export type LifecycleStage = 'Sin historia' | 'Nuevo' | 'Intermitente' | 'Crecimiento' | 'Declive' | 'Establecido'
+
 export interface RunRateRow {
   part_number: string
   catalog_type: string | null
@@ -54,6 +58,13 @@ export interface RunRateRow {
   historical_avg_weekly: number // promedio semanal solo basado en ventas últimos 12m (sin OB, sin pipeline, sin momentum)
   historical_months_observed: number // meses con ventas > 0 dentro de la ventana 12m
   delta_vs_historical_pct: number | null // % diferencia avg_weekly vs historical_avg_weekly
+  // Clasificación multi-dimensión
+  abc_class: AbcClass // A=top 80% volumen, B=siguiente 15%, C=cola 5%
+  xyz_class: XyzClass // X=estable (CV<0.25), Y=moderado (0.25-0.5), Z=errático (>0.5), N/A=<3 meses
+  lifecycle_stage: LifecycleStage
+  volume_share_pct: number // % individual del volumen total 3M
+  cumulative_share_pct: number // % acumulado (Pareto)
+  cv_pct: number | null // coeficiente de variación de ventas mensuales históricas × 100
   driver: string
   monthly: MonthBreakdown[]
 }
@@ -79,6 +90,9 @@ export interface RunRateMatrix {
     total_skus: number
     total_units: number
     by_driver: Record<string, number>
+    by_abc: Record<AbcClass, { skus: number; units: number }>
+    by_xyz: Record<XyzClass, { skus: number; units: number }>
+    by_lifecycle: Record<LifecycleStage, { skus: number; units: number }>
     monthly_totals: number[]
   }
   assumptions: {
@@ -256,6 +270,7 @@ export function calculateRunRateMatrix(input: RunRateInput): RunRateMatrix {
     // Avg ventas últimos 12m (todos los meses)
     let salesLast12 = 0, salesPrev12 = 0
     let monthsObservedLast12 = 0
+    let firstSaleDate: Date | null = null
     const last12Start = new Date(today); last12Start.setMonth(last12Start.getMonth() - 12)
     const prev12Start = new Date(today); prev12Start.setMonth(prev12Start.getMonth() - 24)
     for (const [k, qty] of salesByKey) {
@@ -267,7 +282,40 @@ export function calculateRunRateMatrix(input: RunRateInput): RunRateMatrix {
         if (qty > 0) monthsObservedLast12++
       }
       else if (d >= prev12Start && d < last12Start) salesPrev12 += qty
+      if (qty > 0 && (!firstSaleDate || d < firstSaleDate)) firstSaleDate = d
     }
+
+    // Construir serie mensual completa 12m (meses sin venta = 0) para CV
+    const monthlySeries12m: number[] = []
+    const cursor = new Date(today.getFullYear(), today.getMonth() - 12, 1)
+    for (let i = 0; i < 12; i++) {
+      const qty = salesByKey.get(`${sku}|${cursor.getFullYear()}|${cursor.getMonth() + 1}`) ?? 0
+      monthlySeries12m.push(qty)
+      cursor.setMonth(cursor.getMonth() + 1)
+    }
+    const meanMonthly = monthlySeries12m.reduce((s, v) => s + v, 0) / 12
+    let cv: number | null = null
+    if (monthsObservedLast12 >= 3 && meanMonthly > 0) {
+      const variance = monthlySeries12m.reduce((s, v) => s + (v - meanMonthly) ** 2, 0) / 12
+      cv = Math.sqrt(variance) / meanMonthly
+    }
+
+    // Lifecycle stage
+    let lifecycle: LifecycleStage
+    if (monthsObservedLast12 === 0) {
+      lifecycle = 'Sin historia'
+    } else if (firstSaleDate && (today.getTime() - firstSaleDate.getTime()) < 365 * 24 * 60 * 60 * 1000) {
+      lifecycle = 'Nuevo'
+    } else if (monthsObservedLast12 < 6) {
+      lifecycle = 'Intermitente'
+    } else if (salesPrev12 > 0 && salesLast12 > salesPrev12 * 1.3) {
+      lifecycle = 'Crecimiento'
+    } else if (salesPrev12 > 0 && salesLast12 < salesPrev12 * 0.7) {
+      lifecycle = 'Declive'
+    } else {
+      lifecycle = 'Establecido'
+    }
+
     // Run rate semanal 100% histórico: ventas últimos 12m / 52 semanas
     const historicalAvgWeekly = salesLast12 / 52
     const yoyRaw = salesPrev12 > 0 ? (salesLast12 - salesPrev12) / salesPrev12 : 0
@@ -364,6 +412,14 @@ export function calculateRunRateMatrix(input: RunRateInput): RunRateMatrix {
       ? ((avgWeekly - historicalAvgWeekly) / historicalAvgWeekly) * 100
       : null
 
+    // XYZ: variabilidad de la demanda histórica
+    let xyz: XyzClass = 'N/A'
+    if (cv !== null) {
+      if (cv < 0.25) xyz = 'X'
+      else if (cv < 0.5) xyz = 'Y'
+      else xyz = 'Z'
+    }
+
     rows.push({
       part_number: sku,
       catalog_type: skuCatalog.get(sku) ?? null,
@@ -373,6 +429,12 @@ export function calculateRunRateMatrix(input: RunRateInput): RunRateMatrix {
       historical_avg_weekly: Math.round(historicalAvgWeekly),
       historical_months_observed: monthsObservedLast12,
       delta_vs_historical_pct: deltaVsHistorical !== null ? Math.round(deltaVsHistorical * 10) / 10 : null,
+      abc_class: 'C', // placeholder — se asigna después del sort por Pareto
+      xyz_class: xyz,
+      lifecycle_stage: lifecycle,
+      volume_share_pct: 0, // placeholder
+      cumulative_share_pct: 0, // placeholder
+      cv_pct: cv !== null ? Math.round(cv * 1000) / 10 : null,
       driver,
       monthly,
     })
@@ -382,6 +444,45 @@ export function calculateRunRateMatrix(input: RunRateInput): RunRateMatrix {
   rows.sort((a, b) => b.total - a.total)
 
   const totalUnits = rows.reduce((s, r) => s + r.total, 0)
+
+  // Clasificación ABC por Pareto acumulado
+  if (totalUnits > 0) {
+    let cumulative = 0
+    for (const r of rows) {
+      cumulative += r.total
+      const cumShare = cumulative / totalUnits
+      r.volume_share_pct = Math.round((r.total / totalUnits) * 10000) / 100
+      r.cumulative_share_pct = Math.round(cumShare * 10000) / 100
+      if (cumShare <= 0.8) r.abc_class = 'A'
+      else if (cumShare <= 0.95) r.abc_class = 'B'
+      else r.abc_class = 'C'
+    }
+  }
+
+  // Agregaciones por clase
+  const emptyAgg = () => ({ skus: 0, units: 0 })
+  const byAbc: Record<AbcClass, { skus: number; units: number }> = {
+    A: emptyAgg(), B: emptyAgg(), C: emptyAgg(),
+  }
+  const byXyz: Record<XyzClass, { skus: number; units: number }> = {
+    X: emptyAgg(), Y: emptyAgg(), Z: emptyAgg(), 'N/A': emptyAgg(),
+  }
+  const byLifecycle: Record<LifecycleStage, { skus: number; units: number }> = {
+    'Sin historia': emptyAgg(),
+    'Nuevo': emptyAgg(),
+    'Intermitente': emptyAgg(),
+    'Crecimiento': emptyAgg(),
+    'Declive': emptyAgg(),
+    'Establecido': emptyAgg(),
+  }
+  for (const r of rows) {
+    byAbc[r.abc_class].skus++
+    byAbc[r.abc_class].units += r.total
+    byXyz[r.xyz_class].skus++
+    byXyz[r.xyz_class].units += r.total
+    byLifecycle[r.lifecycle_stage].skus++
+    byLifecycle[r.lifecycle_stage].units += r.total
+  }
 
   return {
     generated_at: new Date().toISOString(),
@@ -395,6 +496,9 @@ export function calculateRunRateMatrix(input: RunRateInput): RunRateMatrix {
       total_skus: rows.length,
       total_units: totalUnits,
       by_driver: driverTotals,
+      by_abc: byAbc,
+      by_xyz: byXyz,
+      by_lifecycle: byLifecycle,
       monthly_totals: monthlyTotals.map(n => Math.round(n)),
     },
     assumptions: {
