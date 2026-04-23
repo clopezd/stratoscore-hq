@@ -253,7 +253,7 @@ export async function GET(req: Request) {
         mape_window_months: 6,
       },
     }, {
-      headers: { 'Cache-Control': 'private, max-age=60' },
+      headers: { 'Cache-Control': 'private, no-store' },
     })
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Error generando run rate matrix'

@@ -60,6 +60,7 @@ export interface RunRateRow {
 
 export interface WeekLabel {
   num: number
+  calendar_week: number  // semana del año (calendario US: domingo primer día, semana 1 contiene 1-enero)
   start: string      // ISO date
   end: string        // ISO date
   short: string      // "27-Abr"
@@ -108,6 +109,13 @@ function toISO(date: Date): string {
 
 function fmtShort(date: Date): string {
   return `${String(date.getDate()).padStart(2, '0')}-${MONTH_ES[date.getMonth()]}`
+}
+
+/** Semana del año estilo calendario (domingo primer día, semana 1 contiene el 1-enero). */
+function calendarWeek(date: Date): number {
+  const start = new Date(date.getFullYear(), 0, 1)
+  const dayOfYear = Math.floor((date.getTime() - start.getTime()) / 86400000) + 1
+  return Math.ceil((dayOfYear + start.getDay()) / 7)
 }
 
 function clamp(v: number, min: number, max: number): number {
@@ -175,6 +183,7 @@ export function calculateRunRateMatrix(input: RunRateInput): RunRateMatrix {
     const wEnd = addDays(wStart, 6)
     weekLabels.push({
       num: w + 1,
+      calendar_week: calendarWeek(wStart),
       start: toISO(wStart),
       end: toISO(wEnd),
       short: fmtShort(wStart),

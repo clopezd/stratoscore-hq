@@ -231,7 +231,7 @@ export function ProductionRunRateMatrix() {
   const [expanded, setExpanded] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
   const [capacityWeekly, setCapacityWeekly] = useState<number | null>(null)
-  const [actionQueueOpen, setActionQueueOpen] = useState(true)
+  const [actionQueueOpen, setActionQueueOpen] = useState(false)
   const rowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map())
 
   // Cargar capacity desde localStorage al montar
@@ -664,7 +664,7 @@ export function ProductionRunRateMatrix() {
                   <th className="px-2 py-2 border-b border-white/10 font-medium text-white/70">Cat</th>
                   {data.week_labels.map(wl => (
                     <th key={wl.num} className="px-2 py-2 border-b border-white/10 font-medium text-white/70 text-center whitespace-nowrap" title={`${wl.start} → ${wl.end}`}>
-                      <div className="text-[10px] text-white/40">S{wl.calendar_week}</div>
+                      <div className="text-[10px] text-white/40">S{wl.calendar_week ?? wl.num}</div>
                       <div>{wl.short}</div>
                     </th>
                   ))}

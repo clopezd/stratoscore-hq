@@ -161,7 +161,7 @@ export async function buildRunRateExcelBuffer(matrix: RunRateMatrix): Promise<Bu
     cell('Catálogo', S.COL_HEADER),
   ]
   for (const wl of matrix.week_labels) {
-    headerRow.push(cell(`S${wl.num}\n${wl.short}`, S.COL_HEADER))
+    headerRow.push(cell(`S${wl.calendar_week}\n${wl.short}`, S.COL_HEADER))
   }
   headerRow.push(
     cell(`Total ${matrix.num_months}M`, S.COL_HEADER),
