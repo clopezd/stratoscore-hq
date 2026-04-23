@@ -93,6 +93,29 @@ function computeMapeBySku(
   return out
 }
 
+/**
+ * Pagina resultados de Supabase en chunks de 1000 filas (el max default del REST API).
+ * Continúa llamando al builder hasta que la página devuelva menos de `pageSize` filas.
+ */
+async function fetchAllPaginated<T>(
+  label: string,
+  buildQuery: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>,
+  pageSize = 1000,
+): Promise<T[]> {
+  const out: T[] = []
+  let from = 0
+  // Guard: max 50 páginas (50k filas) para evitar loops infinitos por bugs
+  for (let page = 0; page < 50; page++) {
+    const { data, error } = await buildQuery(from, from + pageSize - 1)
+    if (error) throw new Error(`[${label}] ${error.message}`)
+    if (!data || data.length === 0) break
+    out.push(...data)
+    if (data.length < pageSize) break
+    from += pageSize
+  }
+  return out
+}
+
 async function fetchInputs(opts: { startDate: Date; numWeeks: number }) {
   const supabase = await createClient()
   const { startDate, numWeeks } = opts
@@ -126,74 +149,85 @@ async function fetchInputs(opts: { startDate: Date; numWeeks: number }) {
   }
   const pastOr = pastMonths.map(mm => `and(year.eq.${mm.year},month.eq.${mm.month})`).join(',')
 
-  const [forecastsRes, orderBookRes, orderIntakeRes, opportunitiesRes, salesRes, inventoryRes, pastForecastsRes] = await Promise.all([
-    // Forecast: solo meses futuros del horizonte
-    supabase
-      .from('planning_forecasts')
-      .select('part_number, year, month, quantity')
-      .eq('tenant_id', 'videndum')
-      .or(futureOr),
-
-    // Order book: todo el backlog reciente (>= hoy año-2)
-    supabase
-      .from('order_book')
-      .select('part_number, catalog_type, year, month, quantity')
-      .eq('organization_id', 'videndum')
-      .gte('year', today.getFullYear() - 1),
-
-    // Order intake: últimos 6 meses para momentum
-    supabase
-      .from('order_intake')
-      .select('part_number, year, month, quantity')
-      .eq('organization_id', 'videndum')
-      .gte('year', today.getFullYear() - 1),
-
-    // Opportunities: ponderadas, en meses futuros
-    supabase
-      .from('opportunities')
-      .select('part_number, catalog_type, year, month, quantity, probability_pct')
-      .eq('organization_id', 'videndum')
-      .or(futureOr),
-
-    // Ventas histórico: 24 meses
-    supabase
-      .from('videndum_records')
-      .select('part_number, catalog_type, year, month, quantity')
-      .eq('tenant_id', 'videndum')
-      .eq('metric_type', 'revenue')
-      .not('month', 'is', null)
-      .gte('year', historyStart.getFullYear()),
-
-    // Inventario: snapshot actual
-    supabase
-      .from('global_inventory')
-      .select('part_number, year, month, quantity, updated_at')
-      .eq('organization_id', 'videndum'),
-
-    // Forecasts pasados (últimos 6 meses completos) — para calcular MAPE histórico del UK forecast
-    supabase
-      .from('planning_forecasts')
-      .select('part_number, year, month, quantity')
-      .eq('tenant_id', 'videndum')
-      .or(pastOr),
+  // Todas las queries con paginación real (Supabase REST default page size = 1000).
+  // Se ejecutan en paralelo; cada una internamente pagina hasta traer todas las filas.
+  const [forecasts, orderBook, orderIntake, opportunities, sales, inventory, pastForecasts] = await Promise.all([
+    fetchAllPaginated<ForecastRow>('planning_forecasts.future', (from, to) =>
+      supabase
+        .from('planning_forecasts')
+        .select('part_number, year, month, quantity')
+        .eq('tenant_id', 'videndum')
+        .or(futureOr)
+        .range(from, to),
+    ),
+    fetchAllPaginated<OrderBookRow>('order_book', (from, to) =>
+      supabase
+        .from('order_book')
+        .select('part_number, catalog_type, year, month, quantity')
+        .eq('organization_id', 'videndum')
+        .gte('year', today.getFullYear() - 1)
+        .range(from, to),
+    ),
+    fetchAllPaginated<OrderIntakeRow>('order_intake', (from, to) =>
+      supabase
+        .from('order_intake')
+        .select('part_number, year, month, quantity')
+        .eq('organization_id', 'videndum')
+        .gte('year', today.getFullYear() - 1)
+        .range(from, to),
+    ),
+    fetchAllPaginated<OpportunityRow>('opportunities', (from, to) =>
+      supabase
+        .from('opportunities')
+        .select('part_number, catalog_type, year, month, quantity, probability_pct')
+        .eq('organization_id', 'videndum')
+        .or(futureOr)
+        .range(from, to),
+    ),
+    fetchAllPaginated<SaleRow>('videndum_records.sales_24m', (from, to) =>
+      supabase
+        .from('videndum_records')
+        .select('part_number, catalog_type, year, month, quantity')
+        .eq('tenant_id', 'videndum')
+        .eq('metric_type', 'revenue')
+        .not('month', 'is', null)
+        .gte('year', historyStart.getFullYear())
+        .range(from, to),
+    ),
+    fetchAllPaginated<InventoryRow>('global_inventory', (from, to) =>
+      supabase
+        .from('global_inventory')
+        .select('part_number, year, month, quantity, updated_at')
+        .eq('organization_id', 'videndum')
+        .range(from, to),
+    ),
+    fetchAllPaginated<{ part_number: string; year: number; month: number; quantity: number }>('planning_forecasts.past', (from, to) =>
+      supabase
+        .from('planning_forecasts')
+        .select('part_number, year, month, quantity')
+        .eq('tenant_id', 'videndum')
+        .or(pastOr)
+        .range(from, to),
+    ),
   ])
 
-  if (forecastsRes.error) throw forecastsRes.error
-  if (orderBookRes.error) throw orderBookRes.error
-  if (orderIntakeRes.error) throw orderIntakeRes.error
-  if (opportunitiesRes.error) throw opportunitiesRes.error
-  if (salesRes.error) throw salesRes.error
-  if (inventoryRes.error) throw inventoryRes.error
-  if (pastForecastsRes.error) throw pastForecastsRes.error
-
   return {
-    forecasts: (forecastsRes.data ?? []) as ForecastRow[],
-    orderBook: (orderBookRes.data ?? []) as OrderBookRow[],
-    orderIntake: (orderIntakeRes.data ?? []) as OrderIntakeRow[],
-    opportunities: (opportunitiesRes.data ?? []) as OpportunityRow[],
-    sales: (salesRes.data ?? []) as SaleRow[],
-    inventory: (inventoryRes.data ?? []) as InventoryRow[],
-    pastForecasts: (pastForecastsRes.data ?? []) as { part_number: string; year: number; month: number; quantity: number }[],
+    forecasts,
+    orderBook,
+    orderIntake,
+    opportunities,
+    sales,
+    inventory,
+    pastForecasts,
+    counts: {
+      forecasts: forecasts.length,
+      orderBook: orderBook.length,
+      orderIntake: orderIntake.length,
+      opportunities: opportunities.length,
+      sales: sales.length,
+      inventory: inventory.length,
+      pastForecasts: pastForecasts.length,
+    },
   }
 }
 
@@ -252,6 +286,7 @@ export async function GET(req: Request) {
         skus_with_high_mape: skusWithHighMape,
         mape_window_months: 6,
       },
+      data_counts: inputs.counts,
     }, {
       headers: { 'Cache-Control': 'private, no-store' },
     })
