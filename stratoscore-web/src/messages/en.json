@@ -1,0 +1,160 @@
+{
+  "meta": {
+    "title": "StratosCore — AI software factory",
+    "description": "We design and operate world-class software, 10× faster, with AI agents that work for you."
+  },
+  "nav": {
+    "capabilities": "Capabilities",
+    "agents": "AI Agents",
+    "cases": "Cases",
+    "stack": "Technology",
+    "contact": "Let's talk",
+    "cta": "Book a demo"
+  },
+  "hero": {
+    "eyebrow": "Software factory · Medellín → World",
+    "titleLine1": "We build what",
+    "titleLine2": "others imagine.",
+    "subtitle": "StratosCore is where serious companies turn ideas into living platforms. AI, automation, world-class design — in one system.",
+    "ctaPrimary": "Start my project",
+    "ctaSecondary": "See how we work",
+    "scrollHint": "Scroll"
+  },
+  "manifesto": {
+    "tag": "Manifesto",
+    "text": "Software is no longer a cost. It's your competitive edge — or your bottleneck. We make it your edge.",
+    "signature": "— The StratosCore team"
+  },
+  "clients": {
+    "tag": "Trusted by",
+    "title": "Companies building their future with us",
+    "items": {
+      "videndum": {
+        "name": "Videndum",
+        "sector": "Manufacturing · ML Forecasting"
+      },
+      "mobility": {
+        "name": "Mobility",
+        "sector": "Healthcare · Physical Therapy · Conversational AI"
+      },
+      "bidhunter": {
+        "name": "Bidhunter",
+        "sector": "B2B · Opportunity scraping + scoring"
+      },
+      "medcare": {
+        "name": "MedCare",
+        "sector": "Medical Imaging · Clinical scheduling"
+      },
+      "totalcom": {
+        "name": "Totalcom",
+        "sector": "Communications · Analytics"
+      }
+    }
+  },
+  "capabilities": {
+    "tag": "What we do",
+    "title": "A complete operating system for your business",
+    "subtitle": "We don't sell isolated features. We design infrastructure that grows with your company.",
+    "items": {
+      "platforms": {
+        "title": "Custom platforms",
+        "description": "Web, mobile, dashboards, APIs. Multi-tenant architecture ready to scale from day one."
+      },
+      "automation": {
+        "title": "Deep automation",
+        "description": "Flows that eliminate repetitive work. WhatsApp, Telegram, email, voice — integrated with your operation."
+      },
+      "agents": {
+        "title": "Operational AI agents",
+        "description": "Not chatbots. Digital collaborators that execute tasks, make decisions, and learn."
+      },
+      "intelligence": {
+        "title": "Real-time intelligence",
+        "description": "Dashboards that don't just show metrics — they tell you what to do before the problem grows."
+      }
+    }
+  },
+  "agents": {
+    "tag": "Our edge",
+    "title": "An 11-agent AI team working for you",
+    "subtitle": "While you sleep, your operation keeps running. Each agent has a specialty, persistent memory, and secure access to your data.",
+    "roles": {
+      "architect": "Architect",
+      "analyst": "Data Analyst",
+      "copywriter": "Copywriter",
+      "reviewer": "Code Reviewer",
+      "security": "Security",
+      "designer": "Designer",
+      "researcher": "Researcher",
+      "operator": "Operator",
+      "sales": "Sales",
+      "support": "Support",
+      "strategist": "Strategist"
+    }
+  },
+  "case": {
+    "tag": "Featured case",
+    "client": "Videndum",
+    "title": "From spreadsheets to AI-powered predictions — in 6 weeks",
+    "body": "We replaced a manual planning process with a platform featuring ML forecasting, real-time variance analysis, and competitive radar. The team went from reacting to anticipating.",
+    "metrics": {
+      "speed": { "value": "10×", "label": "faster than the previous process" },
+      "accuracy": { "value": "94%", "label": "ML forecast accuracy" },
+      "savings": { "value": "40h", "label": "saved per week" }
+    },
+    "cta": "See more cases"
+  },
+  "numbers": {
+    "tag": "Impact",
+    "title": "The math of working with us",
+    "items": {
+      "speed": { "value": "10×", "label": "faster than a traditional agency" },
+      "cost": { "value": "5×", "label": "less cost per feature delivered" },
+      "uptime": { "value": "99.99%", "label": "guaranteed uptime" },
+      "security": { "value": "SOC 2", "label": "certified infrastructure" }
+    }
+  },
+  "stack": {
+    "tag": "Technology",
+    "title": "Built with the best in every category",
+    "subtitle": "No shortcuts, no exotic stacks. Tools proven by the world's most demanding companies.",
+    "categories": {
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "ai": "Artificial Intelligence",
+      "infra": "Infrastructure"
+    }
+  },
+  "cta": {
+    "tag": "Let's talk",
+    "title": "Your next platform starts with a conversation.",
+    "subtitle": "Tell us what you're building. We reply in under 24 hours with a concrete plan.",
+    "button": "Book a call",
+    "secondary": "Or email us at hello@stratoscore.com"
+  },
+  "footer": {
+    "tagline": "AI software factory.",
+    "location": "Medellín, Colombia",
+    "rights": "All rights reserved.",
+    "sections": {
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal"
+    },
+    "links": {
+      "capabilities": "Capabilities",
+      "cases": "Cases",
+      "agents": "AI Agents",
+      "about": "About",
+      "contact": "Contact",
+      "privacy": "Privacy",
+      "security": "Security",
+      "terms": "Terms"
+    }
+  },
+  "locale": {
+    "label": "Language",
+    "es": "Español",
+    "en": "English"
+  }
+}

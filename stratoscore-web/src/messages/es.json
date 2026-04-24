@@ -1,0 +1,160 @@
+{
+  "meta": {
+    "title": "StratosCore — Fábrica de software con IA",
+    "description": "Diseñamos y operamos software de clase mundial, 10× más rápido, con agentes de IA que trabajan por ti."
+  },
+  "nav": {
+    "capabilities": "Capacidades",
+    "agents": "Agentes IA",
+    "cases": "Casos",
+    "stack": "Tecnología",
+    "contact": "Hablemos",
+    "cta": "Agendar demo"
+  },
+  "hero": {
+    "eyebrow": "Fábrica de software · Medellín → Mundo",
+    "titleLine1": "Construimos lo que",
+    "titleLine2": "otros imaginan.",
+    "subtitle": "StratosCore es la fábrica donde empresas serias transforman ideas en plataformas vivas. IA, automatización, diseño de clase mundial — todo en un solo sistema.",
+    "ctaPrimary": "Empezar mi proyecto",
+    "ctaSecondary": "Ver cómo trabajamos",
+    "scrollHint": "Desplázate"
+  },
+  "manifesto": {
+    "tag": "Manifiesto",
+    "text": "El software dejó de ser un costo. Es tu ventaja competitiva — o tu cuello de botella. Nosotros lo hacemos tu ventaja.",
+    "signature": "— El equipo de StratosCore"
+  },
+  "clients": {
+    "tag": "Confían en nosotros",
+    "title": "Empresas que construyen su futuro con nosotros",
+    "items": {
+      "videndum": {
+        "name": "Videndum",
+        "sector": "Manufactura · Forecasting ML"
+      },
+      "mobility": {
+        "name": "Mobility",
+        "sector": "Salud · Terapia física · IA conversacional"
+      },
+      "bidhunter": {
+        "name": "Bidhunter",
+        "sector": "B2B · Scraping + scoring de oportunidades"
+      },
+      "medcare": {
+        "name": "MedCare",
+        "sector": "Imagenología · Agenda clínica"
+      },
+      "totalcom": {
+        "name": "Totalcom",
+        "sector": "Comunicaciones · Analytics"
+      }
+    }
+  },
+  "capabilities": {
+    "tag": "Qué hacemos",
+    "title": "Un sistema operativo completo para tu negocio",
+    "subtitle": "No vendemos features sueltos. Diseñamos infraestructura que crece con tu empresa.",
+    "items": {
+      "platforms": {
+        "title": "Plataformas a medida",
+        "description": "Web, móvil, dashboards, APIs. Arquitectura multi-tenant lista para escalar desde el día uno."
+      },
+      "automation": {
+        "title": "Automatización profunda",
+        "description": "Flujos que eliminan trabajo repetitivo. WhatsApp, Telegram, email, voz — integrados con tu operación."
+      },
+      "agents": {
+        "title": "Agentes de IA operativos",
+        "description": "No son chatbots. Son colaboradores digitales que ejecutan tareas, toman decisiones y aprenden."
+      },
+      "intelligence": {
+        "title": "Inteligencia en tiempo real",
+        "description": "Dashboards que no solo muestran métricas — te avisan qué hacer antes de que el problema crezca."
+      }
+    }
+  },
+  "agents": {
+    "tag": "Diferenciador",
+    "title": "Un equipo de 11 agentes IA trabajando para ti",
+    "subtitle": "Mientras duermes, tu operación no se detiene. Cada agente tiene una especialidad, memoria persistente y acceso seguro a tus datos.",
+    "roles": {
+      "architect": "Arquitecto",
+      "analyst": "Analista de datos",
+      "copywriter": "Copywriter",
+      "reviewer": "Revisor de código",
+      "security": "Seguridad",
+      "designer": "Diseñador",
+      "researcher": "Investigador",
+      "operator": "Operador",
+      "sales": "Ventas",
+      "support": "Soporte",
+      "strategist": "Estratega"
+    }
+  },
+  "case": {
+    "tag": "Caso destacado",
+    "client": "Videndum",
+    "title": "De hojas de cálculo a predicciones con IA — en 6 semanas",
+    "body": "Reemplazamos el proceso manual de planificación por una plataforma con forecasting de machine learning, análisis de varianza en tiempo real y radar competitivo. El equipo pasó de reaccionar a anticipar.",
+    "metrics": {
+      "speed": { "value": "10×", "label": "más rápido que el proceso anterior" },
+      "accuracy": { "value": "94%", "label": "precisión del forecast ML" },
+      "savings": { "value": "40h", "label": "ahorradas por semana" }
+    },
+    "cta": "Ver más casos"
+  },
+  "numbers": {
+    "tag": "Impacto",
+    "title": "La matemática de trabajar con nosotros",
+    "items": {
+      "speed": { "value": "10×", "label": "más rápido que una agencia tradicional" },
+      "cost": { "value": "5×", "label": "menos costo por feature entregada" },
+      "uptime": { "value": "99.99%", "label": "de disponibilidad garantizada" },
+      "security": { "value": "SOC 2", "label": "infraestructura certificada" }
+    }
+  },
+  "stack": {
+    "tag": "Tecnología",
+    "title": "Construido con lo mejor de cada categoría",
+    "subtitle": "Sin atajos, sin stacks exóticos. Herramientas probadas por las empresas más exigentes del mundo.",
+    "categories": {
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "ai": "Inteligencia Artificial",
+      "infra": "Infraestructura"
+    }
+  },
+  "cta": {
+    "tag": "Hablemos",
+    "title": "Tu próxima plataforma empieza con una conversación.",
+    "subtitle": "Cuéntanos qué estás construyendo. Te respondemos en menos de 24 horas con un plan concreto.",
+    "button": "Agendar llamada",
+    "secondary": "O escríbenos a hello@stratoscore.com"
+  },
+  "footer": {
+    "tagline": "Fábrica de software con IA.",
+    "location": "Medellín, Colombia",
+    "rights": "Todos los derechos reservados.",
+    "sections": {
+      "product": "Producto",
+      "company": "Empresa",
+      "legal": "Legal"
+    },
+    "links": {
+      "capabilities": "Capacidades",
+      "cases": "Casos",
+      "agents": "Agentes IA",
+      "about": "Nosotros",
+      "contact": "Contacto",
+      "privacy": "Privacidad",
+      "security": "Seguridad",
+      "terms": "Términos"
+    }
+  },
+  "locale": {
+    "label": "Idioma",
+    "es": "Español",
+    "en": "English"
+  }
+}
