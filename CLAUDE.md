@@ -99,6 +99,22 @@ cd agent-server && npx tsx src/schedule-cli.ts list
 
 **Nota:** Cleanxpress (lavandería) es un proyecto separado con su propio Supabase (`noxdpibbmaujvhvhobef.supabase.co`). NO vive en Business OS.
 
+---
+
+## ⛔ ZONA CERRADA — NO TOCAR
+
+**`laundry-logistics/` (C&C Clean — https://lavanderia.stratoscore.app/logistica)**
+
+- ✅ **Única app en PRODUCCIÓN real** del ecosistema.
+- 💰 Cliente familiar (pagó USD 100 como piloto validado).
+- 🗄️ Supabase propio: `noxdpibbmaujvhvhobef.supabase.co` (separado de Business OS).
+- 🚀 Deploy Vercel separado.
+- 🚫 **Regla:** no editar archivos dentro de `laundry-logistics/`, no correr migraciones contra su Supabase, no tocar su deploy. Nada.
+- 🧯 Si Carlos pide cambios en C&C Clean, **confirmar explícitamente** antes de tocar un solo archivo y hacer snapshot del DB primero.
+- 🗺️ El hipotético directorio hermano `laundry-app/` también pertenece a esta zona cerrada.
+
+> Business OS = laboratorio activo. `laundry-logistics/` = caja fuerte cerrada. No se mezclan.
+
 ### Bugs conocidos
 
 | ID | Descripción | Efecto |

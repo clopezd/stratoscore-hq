@@ -5,8 +5,11 @@ import { type NextRequest, NextResponse } from 'next/server'
 // ── Routing table ─────────────────────────────────────────────────────────
 //
 //  stratoscore.app / www.stratoscore.app  → landing (/) pública, resto protegido
-//  lavanderia.stratoscore.app             → rewrite a /lavanderia
-//  lavanderia-logistica-*.vercel.app      → siempre landing (/)
+//  trestoration.stratoscore.app           → rewrite a /tico-restoration
+//  fitsync.stratoscore.app                → rewrite a /fitsync-landing y /fitsync
+//
+//  NOTA: lavanderia.stratoscore.app NO se sirve desde business-os.
+//  Vive en el proyecto separado `laundry-logistics/` (Vercel + Supabase propio).
 //
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -30,10 +33,6 @@ const PUBLIC_PATHS = [
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))
-}
-
-function isLavanderiaSubdomain(hostname: string): boolean {
-  return hostname.startsWith('lavanderia.') && !hostname.startsWith('lavanderia-')
 }
 
 function isFitSyncSubdomain(hostname: string): boolean {
@@ -96,29 +95,12 @@ export function middleware(request: NextRequest) {
     return addSecurityHeaders(NextResponse.rewrite(new URL('/fitsync-landing', request.url), { request: { headers: requestHeaders } }))
   }
 
-  // ── 1. Subdominio lavanderia → rewrite a /lavanderia ─────────────────────
-  if (isLavanderiaSubdomain(hostname)) {
-    if (pathname.startsWith('/_next') || pathname.startsWith('/api')) return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
-    const rewritePath = pathname === '/' ? '/lavanderia' : `/lavanderia${pathname}`
-    return addSecurityHeaders(NextResponse.rewrite(new URL(rewritePath, request.url)))
-  }
-
-  // ── 2. Preview URLs de lavanderia-logistica → forzar landing ─────────────
-  if (hostname.includes('lavanderia-logistica')) {
-    if (pathname !== '/') {
-      const url = request.nextUrl.clone()
-      url.pathname = '/'
-      return addSecurityHeaders(NextResponse.rewrite(url))
-    }
-    return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
-  }
-
-  // ── 3. Dominios raíz (stratoscore.app, www.) ─────────────────────────────
+  // ── 1. Dominios raíz (stratoscore.app, www.) ─────────────────────────────
   if (MAIN_HOSTNAMES.has(hostname)) {
     if (pathname === '/') {
       return addSecurityHeaders(NextResponse.rewrite(new URL('/landing.html', request.url), { request: { headers: requestHeaders } }))
     }
-    if (isPublicPath(pathname) || pathname === '/landing.html' || pathname.startsWith('/api/') || pathname.startsWith('/lavanderia')) {
+    if (isPublicPath(pathname) || pathname === '/landing.html' || pathname.startsWith('/api/')) {
       return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }))
     }
     if (!hasSession(request)) {

@@ -153,6 +153,17 @@ business-os/
 
 ---
 
+## ⛔ ZONA CERRADA — NO TOCAR
+
+**C&C Clean (lavandería)** vive en `../laundry-logistics/` (proyecto separado, Supabase `noxdpibbmaujvhvhobef`, deploy Vercel propio, URL en producción `https://lavanderia.stratoscore.app/logistica`).
+
+- 🚫 No editar nada fuera de `business-os/` — ni `laundry-logistics/` ni `laundry-app/`.
+- 🚫 No correr migraciones contra el Supabase de lavandería.
+- 🧯 Si Carlos pide cambios en C&C Clean, confirmar explícitamente antes de tocar y hacer snapshot del DB primero.
+- ℹ️ El middleware de business-os ya NO rutea `lavanderia.stratoscore.app` — ese subdominio apunta directo al deploy de `laundry-logistics/`.
+
+---
+
 ## Reglas de Implementación
 
 ### 1. Multi-Tenancy SIEMPRE
