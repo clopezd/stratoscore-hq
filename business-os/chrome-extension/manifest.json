@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "BidHunter — BC Scraper",
+  "description": "Scrape BuildingConnected Bid Board and send to BidHunter",
+  "version": "1.2.0",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": [
+    "http://localhost:*/*",
+    "https://*.vercel.app/*",
+    "https://*.stratoscore.app/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://app.buildingconnected.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
