@@ -102,6 +102,7 @@ const dict = {
   loss_reason: { en: 'Loss Reason', es: 'Razón de Pérdida' },
   loss_reason_placeholder: { en: 'Price, timing, competitor...', es: 'Precio, tiempos, competidor...' },
   commission: { en: 'Commission', es: 'Comisión' },
+  commission_pct: { en: 'Commission %', es: 'Comisión %' },
   confirm: { en: 'Confirm', es: 'Confirmar' },
 
   // ── Draft (Agente Redactor) ──
