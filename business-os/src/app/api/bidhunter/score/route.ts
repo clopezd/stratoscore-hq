@@ -305,7 +305,7 @@ async function notifyTelegram(
     }
 
     lines.push(``)
-    lines.push(`📋 Descargar Bid Form → BidHunter`)
+    lines.push(`📋 [Ver brief y bid form](${siteUrl}/bidhunter/brief/${item.id})`)
 
     try {
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
