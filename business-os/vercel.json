@@ -18,6 +18,10 @@
     {
       "path": "/api/medcare/cron/reengagement",
       "schedule": "0 16 * * *"
+    },
+    {
+      "path": "/api/bidhunter/cron/weekly-report",
+      "schedule": "0 13 * * 1"
     }
   ]
 }
