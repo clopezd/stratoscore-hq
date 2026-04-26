@@ -1,10 +1,12 @@
 /**
  * GET /api/bidhunter/bid-form?opportunity_id=xxx
+ *           or ?title=xxx (used by Chrome extension on BC pages)
  *
  * Generates and downloads a filled bid form Excel for an opportunity.
  * Uses extracted PDF data (finish schedule sqft) when available,
  * falls back to geometric estimation from building sqft + height.
  *
+ * Auth: Supabase session OR X-Extension-Key header (Chrome extension).
  * Returns: .xlsx file download
  */
 import { NextRequest, NextResponse } from 'next/server'
@@ -16,6 +18,19 @@ import type { Opportunity, BidEstimate } from '@/features/bidhunter/types'
 
 export const runtime = 'nodejs'
 
+const EXTENSION_API_KEY = process.env.BIDHUNTER_EXTENSION_KEY || ''
+
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Extension-Key',
+  'Access-Control-Expose-Headers': 'Content-Disposition, X-Bid-Total, X-Commission, X-Opportunity-Id',
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, { headers: CORS_HEADERS })
+}
+
 function getAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,34 +39,55 @@ function getAdmin() {
   )
 }
 
-export async function GET(req: NextRequest) {
+async function authenticate(req: NextRequest): Promise<{ ok: true } | { ok: false; response: NextResponse }> {
+  const extKey = req.headers.get('x-extension-key')
+  if (extKey) {
+    if (!EXTENSION_API_KEY || extKey !== EXTENSION_API_KEY) {
+      return { ok: false, response: NextResponse.json({ error: 'Invalid extension key' }, { status: 401, headers: CORS_HEADERS }) }
+    }
+    return { ok: true }
+  }
   const auth = await requireAuth()
-  if (auth.response) return auth.response
+  if (auth.response) return { ok: false, response: auth.response }
+  return { ok: true }
+}
+
+export async function GET(req: NextRequest) {
+  const auth = await authenticate(req)
+  if (!auth.ok) return auth.response
 
   const opportunityId = req.nextUrl.searchParams.get('opportunity_id')
-  if (!opportunityId) {
-    return NextResponse.json({ error: 'opportunity_id required' }, { status: 400 })
+  const title = req.nextUrl.searchParams.get('title')
+  if (!opportunityId && !title) {
+    return NextResponse.json({ error: 'opportunity_id or title required' }, { status: 400, headers: CORS_HEADERS })
   }
 
   try {
     const supabase = getAdmin()
 
-    // Get opportunity with score
-    const { data: opp, error } = await supabase
+    // Get opportunity with score — match by id or by title (case-insensitive)
+    let oppQuery = supabase
       .from('bh_opportunities')
       .select('*, bh_opportunity_scores(bid_estimate)')
-      .eq('id', opportunityId)
-      .single()
+
+    if (opportunityId) {
+      oppQuery = oppQuery.eq('id', opportunityId)
+    } else if (title) {
+      oppQuery = oppQuery.ilike('title', title.trim())
+    }
+
+    const { data: opp, error } = await oppQuery.limit(1).maybeSingle()
 
     if (error || !opp) {
-      return NextResponse.json({ error: 'Opportunity not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Opportunity not found' }, { status: 404, headers: CORS_HEADERS })
     }
 
     const opportunity = opp as Opportunity & { bh_opportunity_scores?: { bid_estimate: BidEstimate } }
     const bidEstimate = opportunity.bh_opportunity_scores?.bid_estimate ?? null
+    const resolvedId = opportunity.id
 
     // Get aggregated extraction data (from all PDFs)
-    const extraction = await getAggregatedExtraction(opportunityId)
+    const extraction = await getAggregatedExtraction(resolvedId)
 
     // Build form data (PDF extraction > AI bid_estimate > geometric fallback)
     const formData = buildBidFormData(opportunity, extraction, bidEstimate)
@@ -63,24 +99,27 @@ export async function GET(req: NextRequest) {
     await supabase.from('bh_pipeline_log').insert({
       action: 'bid_form_generated',
       details: {
-        opportunity_id: opportunityId,
+        opportunity_id: resolvedId,
         title: opportunity.title,
         pricing: result.pricing,
+        source: opportunityId ? 'id' : 'title',
       },
     })
 
     // Return as file download
     return new NextResponse(result.buffer, {
       headers: {
+        ...CORS_HEADERS,
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Disposition': `attachment; filename="${result.filename}"`,
         'X-Bid-Total': result.pricing.total.toString(),
         'X-Commission': result.pricing.commission5pct.toString(),
+        'X-Opportunity-Id': resolvedId,
       },
     })
   } catch (err) {
     console.error('Bid form generation error:', err)
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return NextResponse.json({ error: (err as Error).message }, { status: 500, headers: CORS_HEADERS })
   }
 }
 

@@ -184,6 +184,73 @@ function formatOpp(raw) {
   };
 }
 
+// Try to extract the project title from a single-opportunity BC page.
+// Strategy: prefer a visible <h1>, fallback to document.title minus app suffixes.
+function bhExtractProjectTitle() {
+  var h1s = document.querySelectorAll('h1');
+  for (var i = 0; i < h1s.length; i++) {
+    var t = (h1s[i].innerText || '').trim();
+    if (t && t.length > 3 && t.length < 200 && !/Bid Board|Pipeline|Opportunities/i.test(t)) {
+      return t;
+    }
+  }
+  var dt = (document.title || '').trim();
+  dt = dt.replace(/\s*[\|\-—]\s*BuildingConnected.*$/i, '').trim();
+  return dt || null;
+}
+
+// Download the bid form .xlsx from BidHunter for the current page's opportunity.
+function bhDownloadBidForm(serverUrl, extensionKey) {
+  var title = bhExtractProjectTitle();
+  if (!title) {
+    showToast('Could not detect project title on this page.', 'error');
+    return;
+  }
+  showToast('Generating Bid Form for: ' + title.slice(0, 60) + '…', 'success');
+
+  fetch(serverUrl + '/api/bidhunter/bid-form?title=' + encodeURIComponent(title), {
+    method: 'GET',
+    headers: { 'X-Extension-Key': extensionKey || '' },
+  }).then(function(res) {
+    if (res.status === 404) {
+      showToast('Opportunity not found in BidHunter. Scrape & score it first.', 'error');
+      return null;
+    }
+    if (!res.ok) {
+      return res.text().then(function(t) {
+        showToast('Bid Form error (' + res.status + '): ' + t.slice(0, 120), 'error');
+        return null;
+      });
+    }
+    var dispo = res.headers.get('Content-Disposition') || '';
+    var match = dispo.match(/filename="?([^"]+)"?/);
+    var filename = (match && match[1]) || 'bid-form.xlsx';
+    var total = res.headers.get('X-Bid-Total');
+    var commission = res.headers.get('X-Commission');
+    return res.blob().then(function(blob) {
+      return { blob: blob, filename: filename, total: total, commission: commission };
+    });
+  }).then(function(r) {
+    if (!r) return;
+    var url = URL.createObjectURL(r.blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = r.filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+      URL.revokeObjectURL(url);
+      a.remove();
+    }, 1000);
+    var msg = '✓ Bid Form descargado: ' + r.filename;
+    if (r.total) msg += ' — Total $' + Number(r.total).toLocaleString();
+    if (r.commission) msg += ' — Comisión $' + Number(r.commission).toLocaleString();
+    showToast(msg, 'success');
+  }).catch(function(err) {
+    showToast('BidHunter error: ' + err.message, 'error');
+  });
+}
+
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   if (message.action === 'scrape') {
@@ -193,6 +260,16 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     } catch (err) {
       sendResponse({ success: false, error: err.message });
     }
+  }
+
+  if (message.action === 'downloadBidForm') {
+    try {
+      bhDownloadBidForm(message.serverUrl, message.extensionKey);
+      sendResponse({ success: true });
+    } catch (err) {
+      sendResponse({ success: false, error: err.message });
+    }
+    return false;
   }
 
   // Scrape AND send to server (all in content script, so popup closing doesn't kill it)
@@ -254,11 +331,34 @@ function showToast(msg, type) {
 }
 
 // Floating badge — show on Bid Board, Pipeline, and Opportunities
-if (/(bid-board|opportunities|pipeline)/.test(window.location.href)) {
+if (/(bid-board|opportunities|pipeline|projects)/.test(window.location.href)) {
   if (!document.querySelector('#bidhunter-fab')) {
     var fab = document.createElement('div');
     fab.id = 'bidhunter-fab';
-    fab.innerHTML = '<div style="position:fixed;bottom:24px;right:24px;z-index:99999;padding:8px 14px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:white;border-radius:10px;font-family:system-ui;font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(139,92,246,0.4);pointer-events:none;opacity:0.8;">🎯 BidHunter Ready</div>';
+    fab.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px;font-family:system-ui;';
+
+    var badge = document.createElement('div');
+    badge.style.cssText = 'padding:8px 14px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:white;border-radius:10px;font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(139,92,246,0.4);text-align:center;';
+    badge.textContent = '🎯 BidHunter Ready';
+    fab.appendChild(badge);
+
+    var dlBtn = document.createElement('button');
+    dlBtn.id = 'bidhunter-dl-bid-form';
+    dlBtn.style.cssText = 'padding:10px 14px;background:#10b981;color:white;border:none;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(16,185,129,0.4);';
+    dlBtn.textContent = '📥 Bid Form';
+    dlBtn.addEventListener('click', function() {
+      chrome.storage.local.get(['serverUrl', 'extensionKey'], function(data) {
+        var serverUrl = (data.serverUrl || 'http://localhost:3000').replace(/\/+$/, '');
+        var extensionKey = data.extensionKey || '';
+        if (!extensionKey) {
+          showToast('Set the Extension Key in the popup first.', 'error');
+          return;
+        }
+        bhDownloadBidForm(serverUrl, extensionKey);
+      });
+    });
+    fab.appendChild(dlBtn);
+
     document.body.appendChild(fab);
   }
 }
