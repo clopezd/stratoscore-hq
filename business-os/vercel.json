@@ -22,6 +22,10 @@
     {
       "path": "/api/bidhunter/cron/weekly-report",
       "schedule": "0 13 * * 1"
+    },
+    {
+      "path": "/api/daily-brief/cron",
+      "schedule": "0 13 * * *"
     }
   ]
 }
