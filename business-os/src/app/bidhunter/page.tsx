@@ -86,6 +86,7 @@ export default function BidHunterPage() {
   const [wonModal, setWonModal] = useState<{ id: string; title: string } | null>(null)
   const [lostModal, setLostModal] = useState<{ id: string; title: string } | null>(null)
   const [wonValue, setWonValue] = useState('')
+  const [wonCommissionPct, setWonCommissionPct] = useState('5')
   const [lostReason, setLostReason] = useState('')
   const [linkBcModal, setLinkBcModal] = useState<{ id: string; title: string } | null>(null)
   const [bcLinkInput, setBcLinkInput] = useState('')
@@ -174,7 +175,7 @@ export default function BidHunterPage() {
     if (!wonModal) return
     try {
       const actualVal = wonValue ? Number(wonValue) : null
-      const commissionPct = 10
+      const commissionPct = wonCommissionPct ? Number(wonCommissionPct) : 5
       const commissionEarned = actualVal ? actualVal * (commissionPct / 100) : null
 
       const res = await fetch('/api/bidhunter/opportunities', {
@@ -184,6 +185,7 @@ export default function BidHunterPage() {
           id: wonModal.id,
           status: 'won',
           actual_value: actualVal,
+          commission_pct: commissionPct,
           commission_earned: commissionEarned,
           won_at: new Date().toISOString(),
         }),
@@ -191,6 +193,7 @@ export default function BidHunterPage() {
       if (!res.ok) throw new Error('Failed to update')
       setWonModal(null)
       setWonValue('')
+      setWonCommissionPct('5')
       load()
     } catch (err) {
       console.error(err)
@@ -473,9 +476,20 @@ export default function BidHunterPage() {
                 className="w-full px-3 py-2 text-sm bg-white/[0.06] border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/20"
                 autoFocus
               />
-              {wonValue && (
+            </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-wider text-white/30 block mb-1">{t('commission_pct', lang)}</label>
+              <input
+                type="number"
+                step="0.1"
+                value={wonCommissionPct}
+                onChange={e => setWonCommissionPct(e.target.value)}
+                placeholder="5"
+                className="w-full px-3 py-2 text-sm bg-white/[0.06] border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/20"
+              />
+              {wonValue && wonCommissionPct && (
                 <p className="text-[10px] text-emerald-400 mt-1">
-                  {t('commission', lang)}: {formatValue(Number(wonValue) * 0.1)} (10%)
+                  {t('commission', lang)}: {formatValue(Number(wonValue) * Number(wonCommissionPct) / 100)} ({wonCommissionPct}%)
                 </p>
               )}
             </div>
