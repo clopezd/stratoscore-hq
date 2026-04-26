@@ -18,11 +18,37 @@ export function computeNextRun(cronExpression: string): number {
   return Math.floor(interval.next().getTime() / 1000)
 }
 
+// Verifica si el dev server de Next.js (business-os) está respondiendo.
+// Tasks programados que llaman a localhost:3000 se saltan limpiamente cuando
+// el server está caído, en lugar de quemar tokens en runs que terminarán en error.
+async function isLocalNextUp(): Promise<boolean> {
+  try {
+    const ctrl = new AbortController()
+    const t = setTimeout(() => ctrl.abort(), 1500)
+    const res = await fetch('http://localhost:3000', { method: 'HEAD', signal: ctrl.signal })
+    clearTimeout(t)
+    return res.status < 500
+  } catch {
+    return false
+  }
+}
+
 export async function runDueTasks(): Promise<void> {
   const tasks = getDueTasks()
   if (tasks.length === 0) return
 
+  // Si alguno depende de :3000, verificar una sola vez por ciclo.
+  const anyNeedsNext = tasks.some((t) => t.prompt.includes('localhost:3000'))
+  const nextUp = anyNeedsNext ? await isLocalNextUp() : true
+
   for (const task of tasks) {
+    if (task.prompt.includes('localhost:3000') && !nextUp) {
+      const nextRun = computeNextRun(task.schedule)
+      logger.warn({ taskId: task.id, nextRun }, 'skipping task — local Next.js (:3000) unreachable')
+      updateTaskAfterRun(task.id, '(skipped — Next.js dev server down)', nextRun)
+      continue
+    }
+
     logger.info({ taskId: task.id, prompt: task.prompt.slice(0, 80) }, 'running scheduled task')
 
     try {
@@ -95,16 +121,8 @@ Keep it concise and actionable.`,
 
 Format: Markdown with clear status indicators.`,
     },
-    {
-      id: 'bidhunter-weekly-report',
-      chat_id: DM,
-      thread_id: null,
-      schedule: '0 7 * * *', // Daily 7 AM
-      prompt: `Generate and send the BidHunter daily pipeline report by calling:
-curl -s -X POST http://localhost:3000/api/bidhunter/weekly-report
-
-Then format the response for Telegram: pipeline value, bids sent, won/lost, win rate, top opportunities, and expiring deadlines.`,
-    },
+    // bidhunter-weekly-report removido — manejado por Vercel cron (vercel.json)
+    // para evitar duplicación de notificaciones a Telegram.
     {
       id: 'csuite-daily-pipeline',
       chat_id: DM,

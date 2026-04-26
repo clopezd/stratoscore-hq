@@ -28,23 +28,44 @@ process.on('uncaughtException', (error, origin) => {
 })
 
 const PID_FILE = join(STORE_DIR, 'agent-server.pid')
+const LOCK_MARKER = 'agent-server/dist/index.js'
 
 // ─── Lock ────────────────────────────────────────────────────────────────────
+
+// Lee /proc/<pid>/cmdline en Linux. Si el archivo no existe o no se puede leer,
+// devolvemos null (no podemos verificar identidad → tratamos como stale).
+function readCmdline(pid: number): string | null {
+  try {
+    return readFileSync(`/proc/${pid}/cmdline`, 'utf8').replace(/\0/g, ' ')
+  } catch {
+    return null
+  }
+}
 
 function acquireLock(): void {
   mkdirSync(STORE_DIR, { recursive: true })
   if (existsSync(PID_FILE)) {
-    const existingPid = readFileSync(PID_FILE, 'utf8').trim()
-    // Verificar si el proceso aún corre
-    try {
-      process.kill(parseInt(existingPid, 10), 0)
+    const existingPid = parseInt(readFileSync(PID_FILE, 'utf8').trim(), 10)
+    let aliveAndOurs = false
+    if (Number.isFinite(existingPid)) {
+      try {
+        process.kill(existingPid, 0)
+        // El PID existe — pero verificar que sea el agente, no un PID reciclado
+        const cmdline = readCmdline(existingPid)
+        if (cmdline && cmdline.includes(LOCK_MARKER)) {
+          aliveAndOurs = true
+        } else {
+          logger.warn({ pid: existingPid, cmdline }, 'PID alive but not agent-server (recycled). Removing stale lock.')
+        }
+      } catch {
+        logger.warn({ pid: existingPid }, 'Stale PID file found, removing.')
+      }
+    }
+    if (aliveAndOurs) {
       logger.error({ pid: existingPid }, 'Another instance is already running. Exiting.')
       process.exit(1)
-    } catch {
-      // El proceso no existe — PID file stale
-      logger.warn({ pid: existingPid }, 'Stale PID file found, removing.')
-      unlinkSync(PID_FILE)
     }
+    unlinkSync(PID_FILE)
   }
   writeFileSync(PID_FILE, String(process.pid))
   logger.debug({ pid: process.pid, pidFile: PID_FILE }, 'lock acquired')
