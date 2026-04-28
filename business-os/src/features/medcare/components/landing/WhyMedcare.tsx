@@ -1,11 +1,17 @@
-import { BreastIcon } from './BreastIcon'
+import Image from 'next/image'
 
 export function WhyMedcare() {
   return (
     <section className="relative bg-gradient-to-b from-white via-[#FEEBF5]/30 to-white py-12 sm:py-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="flex justify-center mb-4">
-          <BreastIcon className="w-10 h-10" color="#E50995" />
+          <Image
+            src="/medcare/simbolo-target-pink.png"
+            alt=""
+            width={56}
+            height={56}
+            className="h-12 w-12 object-contain"
+          />
         </div>
         <h2 className="text-2xl sm:text-3xl font-bold text-[#0F1820] text-center mb-3 tracking-tight">
           Por qué hacerte tu mamografía en MedCare
@@ -44,7 +50,7 @@ export function WhyMedcare() {
             },
           ].map((item, i) => (
             <div key={i} className="group bg-white rounded-2xl p-6 border border-gray-200 hover:border-[#E50995]/40 hover:shadow-xl hover:shadow-[#E50995]/10 hover:-translate-y-1 transition-all">
-              <div className="w-14 h-14 bg-gradient-to-br from-[#FEEBF5] to-[#FCAFD9]/40 text-[#E50995] rounded-xl flex items-center justify-center mb-4 group-hover:from-[#E50995] group-hover:to-[#B11C28] group-hover:text-white transition-all">
+              <div className="w-14 h-14 bg-gradient-to-br from-[#FEEBF5] to-[#FCAFD9]/40 text-[#E50995] rounded-xl flex items-center justify-center mb-4 group-hover:from-[#E50995] group-hover:to-[#EC52B4] group-hover:text-white transition-all">
                 {item.icon}
               </div>
               <h3 className="text-lg font-bold text-[#0F1820] mb-2">{item.title}</h3>

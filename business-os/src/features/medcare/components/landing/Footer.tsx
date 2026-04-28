@@ -17,7 +17,7 @@ export function Footer() {
               className="h-11 w-auto mb-4"
             />
             <p className="text-sm text-gray-400 leading-relaxed">
-              {B.contact.fullName}. Más de 7 años brindando diagnóstico de alta precisión en Costa Rica.
+              {B.contact.fullName}. Más de 10 años brindando diagnóstico de alta precisión en Costa Rica.
             </p>
           </div>
           <div>

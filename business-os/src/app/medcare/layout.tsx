@@ -20,7 +20,7 @@ const encodeSans = Encode_Sans({
 const SITE_URL = 'https://portal.medcare.cr'
 const OG_IMAGE = `${SITE_URL}/medcare/og-image.jpg`
 const TITLE = 'MedCare — Centro Médico Especializado'
-const DESC = 'Mamografía Digital 3D + Ultrasonido de mama en San José, Costa Rica. Tomosíntesis con IA. Agendá tu cita en línea — Promo abril ₡65.000.'
+const DESC = 'Mamografía Digital 3D + Ultrasonido de mama en San José, Costa Rica. Tomosíntesis con IA. Agendá tu cita en línea — Promo mayo ₡65.000.'
 
 export const metadata: Metadata = {
   title: TITLE,

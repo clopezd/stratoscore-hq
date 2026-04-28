@@ -16,7 +16,7 @@ export function PricingSection() {
             className="group block relative overflow-hidden border-2 border-[#E50995]/40 bg-gradient-to-br from-[#FEEBF5] via-white to-[#FCAFD9]/40 rounded-2xl p-6 hover:shadow-xl hover:shadow-[#E50995]/15 transition-all"
           >
             <div className="absolute top-0 right-0 bg-gradient-to-r from-[#E50995] to-[#EC52B4] text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl tracking-wider">
-              PROMO ABRIL
+              PROMO MAYO
             </div>
             <div className="flex items-center justify-between">
               <div className="flex-1 pr-4">
@@ -29,7 +29,7 @@ export function PricingSection() {
               </div>
               <div className="text-right shrink-0">
                 <p className="text-xs text-slate-400 line-through">₡84,000</p>
-                <p className="text-3xl font-black bg-gradient-to-r from-[#E50995] to-[#B11C28] bg-clip-text text-transparent">₡65,000</p>
+                <p className="text-3xl font-black bg-gradient-to-r from-[#E50995] to-[#EC52B4] bg-clip-text text-transparent">₡65,000</p>
                 <p className="text-[10px] text-[#E50995] font-bold uppercase tracking-wider">Ahorrás ₡19,000</p>
               </div>
             </div>
@@ -39,11 +39,11 @@ export function PricingSection() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <a
               href="#agendar"
-              className="group border-2 border-gray-200 rounded-2xl p-5 hover:border-red-300 hover:shadow-md transition-all"
+              className="group border-2 border-gray-200 rounded-2xl p-5 hover:border-[#FCAFD9] hover:shadow-md transition-all"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-bold text-gray-900 group-hover:text-red-700">Mamografía Digital 3D</h3>
+                  <h3 className="text-base font-bold text-gray-900 group-hover:text-[#E50995]">Mamografía Digital 3D</h3>
                   <p className="text-xs text-gray-500 mt-1">Tomosíntesis con IA — 15 min</p>
                 </div>
                 <p className="text-xl font-bold text-gray-900 shrink-0 ml-3">₡35,000</p>

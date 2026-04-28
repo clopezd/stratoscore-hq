@@ -157,7 +157,7 @@ export function FormularioAgendarEstudio() {
   // ── Estado: Enviado / Confirmado ────────────────────────────
   if (enviado) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-[#FEEBF5] to-slate-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,8 +171,8 @@ export function FormularioAgendarEstudio() {
           {bookingResult && selectedDay && selectedSlot && (
             <div className="bg-green-50 border border-green-200 rounded-xl p-4 mt-4 text-left space-y-2">
               {esPromo && (
-                <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-1.5 mb-2 inline-block">
-                  <span className="text-xs font-bold text-red-700">PROMO ABRIL — ₡65,000</span>
+                <div className="bg-[#FEEBF5] border border-[#FCAFD9] rounded-lg px-3 py-1.5 mb-2 inline-block">
+                  <span className="text-xs font-bold text-[#C70880]">PROMO MAYO — ₡65,000</span>
                 </div>
               )}
               <div className="flex items-center gap-2">
@@ -272,26 +272,38 @@ export function FormularioAgendarEstudio() {
             </p>
           </div>
 
-          {/* Progress bar */}
+          {/* Progress bar — shape "seno" (simbolo oficial) en lugar de círculo */}
           <div className="flex items-center justify-center gap-2 mb-8">
-            {['Estudio', 'Servicio', 'Horario', 'Datos'].map((label, i) => (
-              <div key={label} className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition ${
-                  step > i + 1 ? 'bg-green-500 text-white' : step === i + 1 ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-500'
-                }`}>
-                  {step > i + 1 ? '✓' : i + 1}
+            {['Estudio', 'Servicio', 'Horario', 'Datos'].map((label, i) => {
+              const active = step === i + 1
+              const done = step > i + 1
+              const fillColor = active || done ? '#E50995' : '#E5E7EB'
+              const textColor = active || done ? '#FFFFFF' : '#6B7280'
+              return (
+                <div key={label} className="flex items-center gap-2">
+                  <div className="relative w-11 h-10 flex items-center justify-center transition">
+                    <svg viewBox="0 0 100 95" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet">
+                      <path
+                        d="M50 5 C 22 5, 8 30, 8 52 C 8 75, 28 90, 50 90 C 72 90, 92 75, 92 52 C 92 30, 78 5, 50 5 Z"
+                        fill={fillColor}
+                      />
+                    </svg>
+                    <span className="relative z-10 text-xs font-bold" style={{ color: textColor }}>
+                      {done ? '✓' : i + 1}
+                    </span>
+                  </div>
+                  <span className={`text-xs hidden sm:inline ${active ? 'text-[#E50995] font-medium' : 'text-gray-400'}`}>{label}</span>
+                  {i < 3 && <div className={`w-8 h-0.5 ${done ? 'bg-[#E50995]' : 'bg-gray-200'}`} />}
                 </div>
-                <span className={`text-xs hidden sm:inline ${step === i + 1 ? 'text-red-600 font-medium' : 'text-gray-400'}`}>{label}</span>
-                {i < 3 && <div className={`w-8 h-0.5 ${step > i + 1 ? 'bg-green-500' : 'bg-gray-200'}`} />}
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
             {error && (
-              <div className="mx-6 mt-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="mx-6 mt-6 bg-[#FEEBF5] border border-[#FCAFD9] text-[#C70880] px-4 py-3 rounded-lg text-sm">
                 {error}
-                <button onClick={() => setError(null)} className="ml-2 text-red-500 hover:text-red-700">✕</button>
+                <button onClick={() => setError(null)} className="ml-2 text-[#E50995] hover:text-[#C70880]">✕</button>
               </div>
             )}
 
@@ -303,22 +315,22 @@ export function FormularioAgendarEstudio() {
                 {/* Promo destacada */}
                 <button
                   onClick={() => { setTipoSeleccionado('mamografia'); setEsPromo(true); setFormData({ ...formData, servicio_id: undefined }); setStep(3) }}
-                  className="group w-full p-5 border-2 border-red-400 bg-red-50 rounded-xl hover:bg-red-100 transition-all text-left mb-4 relative overflow-hidden"
+                  className="group w-full p-5 border-2 border-[#EC52B4] bg-[#FEEBF5] rounded-xl hover:bg-[#FBCFE8] transition-all text-left mb-4 relative overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                    PROMO ABRIL
+                  <div className="absolute top-0 right-0 bg-[#E50995] text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                    PROMO MAYO
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-red-600 rounded-xl flex items-center justify-center shrink-0">
+                    <div className="w-14 h-14 bg-[#E50995] rounded-xl flex items-center justify-center shrink-0">
                       <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                     </div>
                     <div>
-                      <h4 className="text-lg font-bold text-red-700">Mamografía + Ultrasonido de mama</h4>
-                      <p className="text-sm text-red-600 mt-0.5">
+                      <h4 className="text-lg font-bold text-[#C70880]">Mamografía + Ultrasonido de mama</h4>
+                      <p className="text-sm text-[#E50995] mt-0.5">
                         <span className="line-through text-gray-400 mr-1">₡84,000</span>
-                        Paquete completo por solo <strong className="text-red-800 text-base">₡65,000</strong>
+                        Paquete completo por solo <strong className="text-[#A40771] text-base">₡65,000</strong>
                       </p>
                     </div>
                   </div>
@@ -329,14 +341,14 @@ export function FormularioAgendarEstudio() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <button
                     onClick={() => { setTipoSeleccionado('mamografia'); setEsPromo(false); setStep(2) }}
-                    className="group p-6 border-2 border-gray-200 rounded-xl hover:border-red-400 hover:bg-red-50 transition-all text-left"
+                    className="group p-6 border-2 border-gray-200 rounded-xl hover:border-[#EC52B4] hover:bg-[#FEEBF5] transition-all text-left"
                   >
-                    <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-3">
-                      <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-12 h-12 bg-[#FBCFE8] rounded-xl flex items-center justify-center mb-3">
+                      <svg className="w-6 h-6 text-[#E50995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                     </div>
-                    <h4 className="text-lg font-bold text-gray-900 group-hover:text-red-700">Mamografía</h4>
+                    <h4 className="text-lg font-bold text-gray-900 group-hover:text-[#C70880]">Mamografía</h4>
                     <p className="text-sm text-gray-500 mt-1">Tomosíntesis 3D digital — <strong>₡35,000</strong></p>
                   </button>
                   <button
@@ -371,11 +383,11 @@ export function FormularioAgendarEstudio() {
                       key={s.id}
                       onClick={() => { setFormData({ ...formData, servicio_id: s.id }); setStep(3) }}
                       className={`w-full flex items-start gap-3 p-4 border-2 rounded-xl transition-all text-left ${
-                        formData.servicio_id === s.id ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                        formData.servicio_id === s.id ? 'border-[#E50995] bg-[#FEEBF5]' : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                        <span className="text-red-600 font-bold text-sm">{s.duracion_minutos}m</span>
+                      <div className="w-10 h-10 bg-[#FBCFE8] rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-[#E50995] font-bold text-sm">{s.duracion_minutos}m</span>
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-900">{s.nombre}</span>
@@ -400,13 +412,13 @@ export function FormularioAgendarEstudio() {
 
                 {loadingSlots ? (
                   <div className="text-center py-8">
-                    <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <div className="w-8 h-8 border-2 border-[#E50995] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                     <p className="text-sm text-gray-500">Consultando disponibilidad...</p>
                   </div>
                 ) : days.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-gray-500">No hay horarios disponibles en este momento.</p>
-                    <button onClick={loadAvailability} className="mt-3 text-sm text-red-600 hover:text-red-700 font-medium">Reintentar</button>
+                    <button onClick={loadAvailability} className="mt-3 text-sm text-[#E50995] hover:text-[#C70880] font-medium">Reintentar</button>
                   </div>
                 ) : (
                   <>
@@ -417,7 +429,7 @@ export function FormularioAgendarEstudio() {
                           onClick={() => { setSelectedDay(d.date); setSelectedSlot(null) }}
                           className={`shrink-0 px-4 py-3 rounded-xl border-2 text-center transition-all ${
                             selectedDay === d.date
-                              ? 'border-red-500 bg-red-50 text-red-700'
+                              ? 'border-[#E50995] bg-[#FEEBF5] text-[#C70880]'
                               : 'border-gray-200 hover:border-gray-300 text-gray-700'
                           }`}
                         >
@@ -438,7 +450,7 @@ export function FormularioAgendarEstudio() {
                             <button
                               key={i}
                               onClick={() => { setSelectedSlot(slot); setStep(4) }}
-                              className="px-3 py-2.5 rounded-lg border-2 text-sm font-medium transition-all border-gray-200 hover:border-red-500 hover:bg-red-50 text-gray-700"
+                              className="px-3 py-2.5 rounded-lg border-2 text-sm font-medium transition-all border-gray-200 hover:border-[#E50995] hover:bg-[#FEEBF5] text-gray-700"
                             >
                               {slot.time}
                             </button>
@@ -480,20 +492,20 @@ export function FormularioAgendarEstudio() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre completo <span className="text-red-500">*</span>
+                      Nombre completo <span className="text-[#E50995]">*</span>
                     </label>
                     <input type="text" required value={formData.nombre}
                       onChange={e => setFormData({ ...formData, nombre: e.target.value })}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm text-gray-900 bg-white"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E50995] focus:border-transparent text-sm text-gray-900 bg-white"
                       placeholder="María García" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Teléfono <span className="text-red-500">*</span>
+                      Teléfono <span className="text-[#E50995]">*</span>
                     </label>
                     <input type="tel" required value={formData.telefono}
                       onChange={e => setFormData({ ...formData, telefono: e.target.value })}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm text-gray-900 bg-white"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E50995] focus:border-transparent text-sm text-gray-900 bg-white"
                       placeholder="+506 8888 7777" />
                   </div>
                 </div>
@@ -502,7 +514,7 @@ export function FormularioAgendarEstudio() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email (opcional)</label>
                   <input type="email" value={formData.email}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm text-gray-900 bg-white"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E50995] focus:border-transparent text-sm text-gray-900 bg-white"
                     placeholder="correo@ejemplo.com" />
                 </div>
 
@@ -510,7 +522,7 @@ export function FormularioAgendarEstudio() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Médico que la refiere (opcional)</label>
                   <input type="text" value={formData.medico_referente}
                     onChange={e => setFormData({ ...formData, medico_referente: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm text-gray-900 bg-white"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E50995] focus:border-transparent text-sm text-gray-900 bg-white"
                     placeholder="Dr. Nombre Apellido" />
                 </div>
 
@@ -518,7 +530,7 @@ export function FormularioAgendarEstudio() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">¿Cómo nos conoció?</label>
                   <select value={formData.fuente}
                     onChange={e => setFormData({ ...formData, fuente: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm text-gray-900 bg-white">
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E50995] focus:border-transparent text-sm text-gray-900 bg-white">
                     <option value="web">Página web</option>
                     <option value="google_ads">Google</option>
                     <option value="facebook">Facebook / Instagram</option>
@@ -529,7 +541,7 @@ export function FormularioAgendarEstudio() {
                 </div>
 
                 <button type="submit" disabled={loading}
-                  className="w-full px-6 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-base transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-600/25">
+                  className="w-full px-6 py-4 bg-[#E50995] hover:bg-[#C70880] text-white rounded-xl font-semibold text-base transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#E50995]/25">
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -549,7 +561,7 @@ export function FormularioAgendarEstudio() {
             {/* ── STEP 5: Procesando ── */}
             {step === 5 && !enviado && (
               <div className="p-6 sm:p-8 text-center py-12">
-                <div className="w-12 h-12 border-3 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <div className="w-12 h-12 border-3 border-[#E50995]-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                 <p className="text-gray-600 font-medium">Creando tu cita en MedCare...</p>
                 <p className="text-sm text-gray-400 mt-1">Esto toma unos segundos</p>
               </div>

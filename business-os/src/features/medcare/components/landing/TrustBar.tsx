@@ -1,7 +1,7 @@
 export function TrustBar() {
   const items = [
     {
-      label: '+7 años',
+      label: '+10 años',
       sub: 'de experiencia',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
@@ -45,7 +45,7 @@ export function TrustBar() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {items.map((item, i) => (
             <div key={i} className="flex flex-col items-center">
-              <div className="text-red-600 mb-1">{item.icon}</div>
+              <div className="text-[#E50995] mb-1">{item.icon}</div>
               <p className="text-sm font-bold text-gray-900">{item.label}</p>
               <p className="text-xs text-gray-500">{item.sub}</p>
             </div>

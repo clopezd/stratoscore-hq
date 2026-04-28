@@ -81,7 +81,7 @@ export function TechSection() {
               },
             ].map((item, i) => (
               <div key={i} className="flex gap-4">
-                <div className="w-12 h-12 bg-red-600/20 text-red-400 rounded-xl flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 bg-[#E50995]/20 text-[#FCAFD9] rounded-xl flex items-center justify-center shrink-0">
                   {item.icon}
                 </div>
                 <div>
