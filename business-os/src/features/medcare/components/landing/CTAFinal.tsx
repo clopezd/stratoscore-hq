@@ -46,7 +46,7 @@ export function CTAFinal() {
 
         <p className="text-lg sm:text-xl text-white mb-10 max-w-2xl mx-auto leading-relaxed drop-shadow-sm">
           + Ultrasonido de mama por solo{' '}
-          <strong className="font-extrabold">₡65.000</strong> — resultados el mismo día.
+          <strong className="font-extrabold">₡65.000</strong>.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

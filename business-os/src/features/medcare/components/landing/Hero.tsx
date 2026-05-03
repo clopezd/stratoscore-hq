@@ -99,7 +99,7 @@ export function Hero() {
             <TechChip icon="cube" label="Tomosíntesis 3D" sublabel="Capa a capa" />
             <TechChip icon="ai" label="IA integrada" sublabel="Detección asistida" />
             <TechChip icon="clock" label="10 segundos" sublabel="Captura 3D" />
-            <TechChip icon="check" label="Mismo día" sublabel="Resultados" />
+            <TechChip icon="check" label="Sin dolor" sublabel="Comfort Comp" />
           </div>
         </div>
       </section>

@@ -29,6 +29,7 @@ const BookSchema = z.object({
   fuente: z.string().max(40).optional(),
   notas: z.string().max(500).optional(),
   esPromo: z.boolean().optional(),
+  doctor_id: z.union([z.string().regex(/^\d+$/), z.number().int().positive()]).optional(),
 })
 
 /**
@@ -69,23 +70,29 @@ export async function POST(request: NextRequest) {
       medico_referente, horario_preferido,
       fuente, notas,
       esPromo,
+      doctor_id,
     } = parsed.data
 
     const huli = HuliConnector.getInstance()
 
+    // Doctor: para US viene del radiólogo elegido; para mamo siempre el equipo
+    const doctorId = tipo_estudio === 'ultrasonido' && doctor_id
+      ? Number(doctor_id)
+      : MAMOGRAFIA_DOCTOR_ID
+
     // 1. Buscar/crear paciente
     const patient = await huli.findOrCreatePatient(nombre, telefono, email)
 
-    // 2. Crear cita de mamografía
+    // 2. Crear cita
     const mamoAppointment = await huli.createAppointment({
-      id_doctor: MAMOGRAFIA_DOCTOR_ID,
+      id_doctor: doctorId,
       id_clinic: CLINIC_ID,
       id_patient_file: Number(patient.id),
       start_date: fecha,
       time_from: hora,
       source_event: sourceEvent ? Number(sourceEvent) : undefined,
       notes: esPromo
-        ? 'Promo Abril: Mamografía + US de mama ₡65,000 — Agendado desde web'
+        ? 'Promo Mayo: Mamografía + US de mama ₡65,000 — Agendado desde web'
         : (notas || `Agendado desde web — ${tipo_estudio || 'mamografía'}`),
       is_first_time_patient: true,
     })
@@ -112,11 +119,12 @@ export async function POST(request: NextRequest) {
         fecha_preferida: fecha,
         horario_preferido: horario_preferido || null,
         fuente: fuente || 'web',
-        notas: esPromo ? 'Promo Abril: Mamografía + US de mama ₡65,000' : (notas || null),
+        notas: esPromo ? 'Promo Mayo: Mamografía + US de mama ₡65,000' : (notas || null),
         estado: 'cita_agendada',
         huli_patient_id: patient.id,
         huli_appointment_id: mamoAppointment.idEvent,
         huli_appointment_status: mamoAppointment.statusAppointment,
+        huli_doctor_id: String(doctorId),
         fecha_cita: `${mamoAppointment.startDate}T${mamoAppointment.timeFrom}`,
         utm_source: params.get('utm_source') || null,
         utm_medium: params.get('utm_medium') || null,

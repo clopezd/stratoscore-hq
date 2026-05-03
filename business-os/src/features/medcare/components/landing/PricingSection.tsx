@@ -6,7 +6,7 @@ export function PricingSection() {
           Nuestros estudios
         </h2>
         <p className="text-gray-500 text-center mb-10">
-          Resultados el mismo día. Sin filas. Agenda desde tu celular.
+          Sin filas. Agenda desde tu celular.
         </p>
 
         <div className="space-y-3">

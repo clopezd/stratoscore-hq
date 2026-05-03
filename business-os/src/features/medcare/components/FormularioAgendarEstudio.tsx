@@ -8,9 +8,18 @@ import {
   Navbar, Hero, TrustBar, PricingSection, TechSection,
   HowItWorks, WhyMedcare, FAQ, Testimonials,
   CTAFinal, Footer, WhatsAppFloat,
+  UltrasonidoWordmark,
 } from './landing'
 
 const B = MedCareBrand
+
+// Radiólogos que operan ultrasonido de mama (ver CLIENT.md)
+const RADIOLOGOS_US: { id: string; nombre: string }[] = [
+  { id: '49493', nombre: 'Dr. Solís' },
+  { id: '18828', nombre: 'Dr. Pastora' },
+  { id: '14145', nombre: 'Dr. Hernández' },
+  { id: '97620', nombre: 'Dr. Marden' },
+]
 
 interface SlotInfo {
   time: string
@@ -46,9 +55,10 @@ export function FormularioAgendarEstudio() {
   const [selectedSlot, setSelectedSlot] = useState<SlotInfo | null>(null)
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null)
 
-  // Paso del formulario: 1=tipo, 2=servicio, 3=slot, 4=datos, 5=confirmando
+  // Paso del formulario: 1=tipo, 2=servicio o doctor, 3=slot, 4=datos, 5=confirmando
   const [step, setStep] = useState(1)
   const [esPromo, setEsPromo] = useState(false)
+  const [selectedDoctor, setSelectedDoctor] = useState<{ id: string; nombre: string } | null>(null)
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -82,7 +92,12 @@ export function FormularioAgendarEstudio() {
       const fromStr = from.toISOString().split('T')[0]
       const toStr = to.toISOString().split('T')[0]
 
-      const res = await fetch(`/api/medcare/availability?from=${fromStr}&to=${toStr}`)
+      const params = new URLSearchParams({ from: fromStr, to: toStr })
+      if (tipoSeleccionado === 'ultrasonido' && selectedDoctor) {
+        params.set('doctor_id', selectedDoctor.id)
+      }
+
+      const res = await fetch(`/api/medcare/availability?${params}`)
       if (!res.ok) {
         const errText = await res.text()
         console.error(`Availability API ${res.status}:`, errText)
@@ -97,7 +112,7 @@ export function FormularioAgendarEstudio() {
     } finally {
       setLoadingSlots(false)
     }
-  }, [])
+  }, [tipoSeleccionado, selectedDoctor])
 
   useEffect(() => {
     if (step === 3 && days.length === 0) {
@@ -135,6 +150,7 @@ export function FormularioAgendarEstudio() {
           fuente: formData.fuente,
           notas: formData.notas || undefined,
           esPromo,
+          doctor_id: tipoSeleccionado === 'ultrasonido' && selectedDoctor ? selectedDoctor.id : undefined,
         }),
       })
 
@@ -201,6 +217,14 @@ export function FormularioAgendarEstudio() {
                   {days.find(d => d.date === selectedDay)?.labelFull || selectedDay}
                 </span>
               </div>
+              {tipoSeleccionado === 'ultrasonido' && selectedDoctor && (
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span className="text-sm text-gray-700">{selectedDoctor.nombre}</span>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
                 <span className="text-sm text-gray-700">{B.contact.fullName}<br/>{B.contact.address}</span>
@@ -239,6 +263,7 @@ export function FormularioAgendarEstudio() {
               setDays([])
               setBookingResult(null)
               setEsPromo(false)
+              setSelectedDoctor(null)
             }}
             className="mt-3 text-sm text-gray-500 hover:text-gray-700 transition"
           >
@@ -274,7 +299,10 @@ export function FormularioAgendarEstudio() {
 
           {/* Progress bar — shape "seno" (simbolo oficial) en lugar de círculo */}
           <div className="flex items-center justify-center gap-2 mb-8">
-            {['Estudio', 'Servicio', 'Horario', 'Datos'].map((label, i) => {
+            {(tipoSeleccionado === 'ultrasonido'
+              ? ['Estudio', 'Doctor', 'Horario', 'Datos']
+              : ['Estudio', 'Servicio', 'Horario', 'Datos']
+            ).map((label, i) => {
               const active = step === i + 1
               const done = step > i + 1
               const fillColor = active || done ? '#E50995' : '#E5E7EB'
@@ -352,30 +380,35 @@ export function FormularioAgendarEstudio() {
                     <p className="text-sm text-gray-500 mt-1">Tomosíntesis 3D digital — <strong>₡35,000</strong></p>
                   </button>
                   <button
-                    onClick={() => { setTipoSeleccionado('ultrasonido'); setEsPromo(false); setStep(2) }}
-                    className="group p-6 border-2 border-gray-200 rounded-xl hover:border-slate-400 hover:bg-slate-50 transition-all text-left"
+                    onClick={() => {
+                      setTipoSeleccionado('ultrasonido')
+                      setEsPromo(false)
+                      setSelectedDoctor(null)
+                      setDays([])
+                      setSelectedDay(null)
+                      setSelectedSlot(null)
+                      setStep(2)
+                    }}
+                    className="group p-6 border-2 border-gray-200 rounded-xl hover:border-[#EC52B4] hover:bg-[#FEEBF5] transition-all text-left"
                   >
-                    <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mb-3">
-                      <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
+                    <div className="mb-3">
+                      <UltrasonidoWordmark size="sm" />
                     </div>
-                    <h4 className="text-lg font-bold text-gray-900 group-hover:text-slate-700">Ultrasonido de mama</h4>
-                    <p className="text-sm text-gray-500 mt-1">Complemento diagnóstico — <strong>₡49,000</strong></p>
+                    <p className="text-sm text-gray-500">Estudio complementario — <strong>₡49,000</strong></p>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* ── STEP 2: Selección de servicio ── */}
-            {step === 2 && (
+            {/* ── STEP 2A: Selección de servicio (mamografía) ── */}
+            {step === 2 && tipoSeleccionado === 'mamografia' && (
               <div className="p-6 sm:p-8">
                 <button type="button" onClick={() => { setStep(1); setTipoSeleccionado('') }} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-4">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                   Cambiar tipo
                 </button>
                 <h3 className="text-base font-semibold text-gray-900 mb-4">
-                  Tipo de {tipoSeleccionado === 'mamografia' ? 'mamografía' : 'ultrasonido'}
+                  Tipo de mamografía
                 </h3>
                 <div className="space-y-2">
                   {serviciosFiltrados.map(s => (
@@ -401,14 +434,70 @@ export function FormularioAgendarEstudio() {
               </div>
             )}
 
+            {/* ── STEP 2B: Selección de radiólogo (ultrasonido de mama) ── */}
+            {step === 2 && tipoSeleccionado === 'ultrasonido' && (
+              <div className="p-6 sm:p-8">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep(1)
+                    setTipoSeleccionado('')
+                    setSelectedDoctor(null)
+                    setDays([])
+                  }}
+                  className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-4"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  Cambiar tipo
+                </button>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">
+                  Seleccioná el radiólogo
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  Cada especialista tiene su propia agenda — al elegir uno, te mostramos sus horarios disponibles.
+                </p>
+                <div className="space-y-2">
+                  {RADIOLOGOS_US.map(doc => (
+                    <button
+                      key={doc.id}
+                      onClick={() => {
+                        setSelectedDoctor(doc)
+                        setDays([])
+                        setSelectedDay(null)
+                        setSelectedSlot(null)
+                        setStep(3)
+                      }}
+                      className="w-full flex items-center gap-3 p-4 border-2 rounded-xl transition-all text-left border-gray-200 hover:border-[#EC52B4] hover:bg-[#FEEBF5]"
+                    >
+                      <div className="w-10 h-10 bg-[#FBCFE8] rounded-lg flex items-center justify-center shrink-0">
+                        <svg className="w-5 h-5 text-[#E50995]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{doc.nombre}</p>
+                        <p className="text-xs text-gray-500">Radiólogo — Ultrasonido de mama</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* ── STEP 3: Selección de fecha y hora ── */}
             {step === 3 && (
               <div className="p-6 sm:p-8">
                 <button type="button" onClick={() => esPromo ? setStep(1) : setStep(2)} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-4">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                  {esPromo ? 'Cambiar estudio' : 'Cambiar servicio'}
+                  {esPromo ? 'Cambiar estudio' : tipoSeleccionado === 'ultrasonido' ? 'Cambiar doctor' : 'Cambiar servicio'}
                 </button>
-                <h3 className="text-base font-semibold text-gray-900 mb-4">Seleccioná fecha y hora</h3>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">Seleccioná fecha y hora</h3>
+                {tipoSeleccionado === 'ultrasonido' && selectedDoctor && (
+                  <p className="text-sm text-gray-500 mb-4">
+                    Agenda de <strong className="text-[#E50995]">{selectedDoctor.nombre}</strong>
+                  </p>
+                )}
+                {!(tipoSeleccionado === 'ultrasonido' && selectedDoctor) && <div className="mb-4" />}
 
                 {loadingSlots ? (
                   <div className="text-center py-8">
@@ -417,8 +506,36 @@ export function FormularioAgendarEstudio() {
                   </div>
                 ) : days.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-gray-500">No hay horarios disponibles en este momento.</p>
-                    <button onClick={loadAvailability} className="mt-3 text-sm text-[#E50995] hover:text-[#C70880] font-medium">Reintentar</button>
+                    {tipoSeleccionado === 'ultrasonido' && selectedDoctor ? (
+                      <>
+                        <p className="text-gray-700 font-medium mb-1">
+                          {selectedDoctor.nombre} no tiene horarios disponibles esta semana.
+                        </p>
+                        <p className="text-sm text-gray-500 mb-4">
+                          Probá con otro radiólogo o intentá de nuevo más tarde.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                          <button
+                            onClick={() => {
+                              setSelectedDoctor(null)
+                              setDays([])
+                              setStep(2)
+                            }}
+                            className="px-4 py-2 bg-[#E50995] hover:bg-[#C70880] text-white rounded-lg text-sm font-semibold transition"
+                          >
+                            Cambiar radiólogo
+                          </button>
+                          <button onClick={loadAvailability} className="px-4 py-2 border border-gray-300 hover:border-gray-400 rounded-lg text-sm text-gray-700 font-medium transition">
+                            Reintentar
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-gray-500">No hay horarios disponibles en este momento.</p>
+                        <button onClick={loadAvailability} className="mt-3 text-sm text-[#E50995] hover:text-[#C70880] font-medium">Reintentar</button>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <>

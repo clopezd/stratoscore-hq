@@ -1,18 +1,14 @@
-// Wordmark "Mam[●]grafía con tomosíntesis 3D" — Libro de Marca Mamo
-// Render HTML/CSS (resolución infinita) + isotipo PNG en 735×720.
-// El antiguo PNG del wordmark completo se pixelaba en Retina porque era 960×213.
+// Wordmark "Ultrasonid[●] de mama" — Render HTML/CSS (resolución infinita).
+// El isotipo target reemplaza la "o" final de "Ultrasonido".
+// Pendiente: alinear al PDF oficial cuando el cliente lo entregue.
 
 import Image from 'next/image'
 
 interface Props {
   className?: string
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl'
-  /** Mostrar "con tomosíntesis 3D" debajo del wordmark */
   showSubtitle?: boolean
-  /** Versión blanca para fondos oscuros/rosa fuerte */
   inverted?: boolean
-  /** @deprecated — color queda definido por `inverted` */
-  color?: string
 }
 
 const sizes = {
@@ -23,10 +19,10 @@ const sizes = {
   '2xl': { text: 'text-7xl',  sub: 'text-xl',     icon: 68, gap: 'mt-2',   iconNudge: '-mx-1.5' },
 }
 
-export function MamografiaWordmark({
+export function UltrasonidoWordmark({
   className = '',
   size = 'md',
-  showSubtitle = true,
+  showSubtitle = false,
   inverted = false,
 }: Props) {
   const s = sizes[size]
@@ -38,7 +34,7 @@ export function MamografiaWordmark({
       <div
         className={`flex items-center ${textColor} ${s.text} font-bold tracking-tight leading-none`}
       >
-        <span>Mam</span>
+        <span>Ultrasonid</span>
         <Image
           src={iconSrc}
           alt=""
@@ -48,13 +44,13 @@ export function MamografiaWordmark({
           aria-hidden
           priority
         />
-        <span>grafía</span>
+        <span className="ml-1">de mama</span>
       </div>
       {showSubtitle && (
         <span
           className={`${textColor} ${s.sub} font-medium tracking-[0.18em] ${s.gap} opacity-95`}
         >
-          con tomosíntesis 3D
+          imagen complementaria
         </span>
       )}
     </div>

@@ -25,7 +25,7 @@ export function HowItWorks() {
             {
               step: '3',
               title: 'Hacete tu estudio',
-              desc: 'Vení a MedCare, tu estudio toma 15-30 minutos y recibís resultados el mismo día.',
+              desc: 'Vení a MedCare, tu estudio toma solo 15-30 minutos.',
               color: 'bg-gradient-to-br from-[#FB7185] to-[#E50995]',
             },
           ].map((item) => (

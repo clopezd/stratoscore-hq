@@ -2,7 +2,7 @@ export function Testimonials() {
   const testimonials = [
     {
       name: 'María L.',
-      text: 'Me hice mi mamografía en MedCare y fue súper rápida. El equipo es muy profesional y me entregaron los resultados el mismo día. Muy tranquila con la atención.',
+      text: 'Me hice mi mamografía en MedCare y fue súper rápida. El equipo es muy profesional y la atención excelente. Muy tranquila con todo el proceso.',
       age: '45 años',
     },
     {

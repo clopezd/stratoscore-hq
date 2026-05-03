@@ -22,7 +22,7 @@
 | Mamografía digital 3D | ₡35,000 |
 | Mamografía + Ultrasonido mamario | ₡65,000 |
 
-### Promoción Abril 2026
+### Promoción Mayo 2026
 
 | Promo | Precio | Ahorro |
 |-------|--------|--------|

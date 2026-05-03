@@ -13,11 +13,11 @@ const faqs = [
   },
   {
     q: '¿Cuánto tiempo toma el estudio?',
-    a: 'La mamografía toma aproximadamente 15-20 minutos. El ultrasonido entre 20-30 minutos. Los resultados se entregan el mismo día.',
+    a: 'La mamografía toma aproximadamente 15-20 minutos. El ultrasonido entre 20-30 minutos.',
   },
   {
     q: '¿Necesito referencia médica?',
-    a: 'Para mamografía de screening (preventiva), no necesitas referencia. Si tu médico te ordenó una mamografía diagnóstica, traé la orden. Para ultrasonido, recomendamos traer la orden médica.',
+    a: 'Para mamografía de screening (preventiva), no necesitas referencia. Si tu médico te ordenó una mamografía diagnóstica, traé la orden.',
   },
   {
     q: '¿Cada cuánto debo hacerme la mamografía?',
