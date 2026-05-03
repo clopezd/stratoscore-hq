@@ -13,18 +13,11 @@ import {
 
 const B = MedCareBrand
 
-// Radiólogos que operan ultrasonido de mama (ver CLIENT.md)
-const RADIOLOGOS_US: { id: string; nombre: string }[] = [
-  { id: '49493', nombre: 'Dr. Solís' },
-  { id: '18828', nombre: 'Dr. Pastora' },
-  { id: '14145', nombre: 'Dr. Hernández' },
-  { id: '97620', nombre: 'Dr. Marden' },
-]
-
 interface SlotInfo {
   time: string
   dateTime: string
   sourceEvent: string
+  doctors?: { id: string; nombre: string }[]
 }
 
 interface DaySlots {
@@ -48,14 +41,20 @@ export function FormularioAgendarEstudio() {
   const [servicios, setServicios] = useState<ServicioMedcare[]>([])
   const [tipoSeleccionado, setTipoSeleccionado] = useState<TipoEstudio | ''>('')
 
-  // Disponibilidad Huli
+  // Disponibilidad Huli — slot principal (mamógrafo o estudio único)
   const [days, setDays] = useState<DaySlots[]>([])
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [selectedSlot, setSelectedSlot] = useState<SlotInfo | null>(null)
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null)
 
-  // Paso del formulario: 1=tipo, 2=servicio o doctor, 3=slot, 4=datos, 5=confirmando
+  // Disponibilidad US — solo para PROMO (segunda fase, después del mamo)
+  const [daysUS, setDaysUS] = useState<DaySlots[]>([])
+  const [loadingUSSlots, setLoadingUSSlots] = useState(false)
+  const [selectedUSDay, setSelectedUSDay] = useState<string | null>(null)
+  const [selectedUSSlot, setSelectedUSSlot] = useState<SlotInfo | null>(null)
+
+  // Paso del formulario: 1=tipo, 2=servicio, 3=slot (+US sub-fase si promo), 4=datos, 5=confirmando
   const [step, setStep] = useState(1)
   const [esPromo, setEsPromo] = useState(false)
   const [selectedDoctor, setSelectedDoctor] = useState<{ id: string; nombre: string } | null>(null)
@@ -93,8 +92,9 @@ export function FormularioAgendarEstudio() {
       const toStr = to.toISOString().split('T')[0]
 
       const params = new URLSearchParams({ from: fromStr, to: toStr })
-      if (tipoSeleccionado === 'ultrasonido' && selectedDoctor) {
-        params.set('doctor_id', selectedDoctor.id)
+      if (tipoSeleccionado === 'ultrasonido') {
+        // Agenda fusionada de los 4 radiólogos — cada slot trae los doctores libres
+        params.set('mode', 'us-merged')
       }
 
       const res = await fetch(`/api/medcare/availability?${params}`)
@@ -112,7 +112,7 @@ export function FormularioAgendarEstudio() {
     } finally {
       setLoadingSlots(false)
     }
-  }, [tipoSeleccionado, selectedDoctor])
+  }, [tipoSeleccionado])
 
   useEffect(() => {
     if (step === 3 && days.length === 0) {
@@ -120,7 +120,31 @@ export function FormularioAgendarEstudio() {
     }
   }, [step, days.length, loadAvailability])
 
+  // Carga la agenda fusionada de US — solo se llama en flujo PROMO después de elegir slot mamo
+  const loadUSAvailability = useCallback(async () => {
+    setLoadingUSSlots(true)
+    try {
+      const from = new Date()
+      from.setDate(from.getDate() + 1)
+      const to = new Date()
+      to.setDate(to.getDate() + 6)
+      const fromStr = from.toISOString().split('T')[0]
+      const toStr = to.toISOString().split('T')[0]
+      const params = new URLSearchParams({ from: fromStr, to: toStr, mode: 'us-merged' })
+      const res = await fetch(`/api/medcare/availability?${params}`)
+      if (!res.ok) throw new Error(`Error ${res.status}`)
+      const data = await res.json()
+      setDaysUS(data.days || [])
+    } catch (err) {
+      console.error('Error cargando US slots:', err)
+      setDaysUS([])
+    } finally {
+      setLoadingUSSlots(false)
+    }
+  }, [])
+
   const selectedDaySlots = days.find(d => d.date === selectedDay)
+  const selectedUSDaySlots = daysUS.find(d => d.date === selectedUSDay)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -133,6 +157,11 @@ export function FormularioAgendarEstudio() {
     try {
       const [hora] = selectedSlot.dateTime.split('T')[1]?.split('Z') || []
       const timeFormatted = hora?.substring(0, 8) || selectedSlot.time
+
+      // En PROMO: el slot US y el radiólogo viajan como us_*
+      const usHora = esPromo && selectedUSSlot
+        ? (selectedUSSlot.dateTime.split('T')[1]?.split('Z')[0]?.substring(0, 8) || selectedUSSlot.time)
+        : undefined
 
       const res = await fetch('/api/medcare/book', {
         method: 'POST',
@@ -150,7 +179,11 @@ export function FormularioAgendarEstudio() {
           fuente: formData.fuente,
           notas: formData.notas || undefined,
           esPromo,
-          doctor_id: tipoSeleccionado === 'ultrasonido' && selectedDoctor ? selectedDoctor.id : undefined,
+          // doctor_id = radiólogo de US (en US solo o en PROMO)
+          doctor_id: selectedDoctor ? selectedDoctor.id : undefined,
+          // PROMO: segunda cita US
+          us_fecha: esPromo ? selectedUSDay || undefined : undefined,
+          us_hora: usHora,
         }),
       })
 
@@ -264,6 +297,9 @@ export function FormularioAgendarEstudio() {
               setBookingResult(null)
               setEsPromo(false)
               setSelectedDoctor(null)
+              setSelectedUSDay(null)
+              setSelectedUSSlot(null)
+              setDaysUS([])
             }}
             className="mt-3 text-sm text-gray-500 hover:text-gray-700 transition"
           >
@@ -298,34 +334,43 @@ export function FormularioAgendarEstudio() {
           </div>
 
           {/* Progress bar — shape "seno" (simbolo oficial) en lugar de círculo */}
-          <div className="flex items-center justify-center gap-2 mb-8">
-            {(tipoSeleccionado === 'ultrasonido'
-              ? ['Estudio', 'Doctor', 'Horario', 'Datos']
+          {(() => {
+            // US salta el step 2 (no hay sub-tipo ni elección previa de doctor) → 3 pasos
+            const labels = tipoSeleccionado === 'ultrasonido'
+              ? ['Estudio', 'Horario', 'Datos']
               : ['Estudio', 'Servicio', 'Horario', 'Datos']
-            ).map((label, i) => {
-              const active = step === i + 1
-              const done = step > i + 1
-              const fillColor = active || done ? '#E50995' : '#E5E7EB'
-              const textColor = active || done ? '#FFFFFF' : '#6B7280'
-              return (
-                <div key={label} className="flex items-center gap-2">
-                  <div className="relative w-11 h-10 flex items-center justify-center transition">
-                    <svg viewBox="0 0 100 95" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet">
-                      <path
-                        d="M50 5 C 22 5, 8 30, 8 52 C 8 75, 28 90, 50 90 C 72 90, 92 75, 92 52 C 92 30, 78 5, 50 5 Z"
-                        fill={fillColor}
-                      />
-                    </svg>
-                    <span className="relative z-10 text-xs font-bold" style={{ color: textColor }}>
-                      {done ? '✓' : i + 1}
-                    </span>
-                  </div>
-                  <span className={`text-xs hidden sm:inline ${active ? 'text-[#E50995] font-medium' : 'text-gray-400'}`}>{label}</span>
-                  {i < 3 && <div className={`w-8 h-0.5 ${done ? 'bg-[#E50995]' : 'bg-gray-200'}`} />}
-                </div>
-              )
-            })}
-          </div>
+            // Mapeamos el step interno (1,3,4) al índice visual (0,1,2) para US
+            const visualIndex = tipoSeleccionado === 'ultrasonido'
+              ? (step === 1 ? 0 : step === 3 ? 1 : step === 4 ? 2 : step >= 5 ? 3 : 0)
+              : step - 1
+            return (
+              <div className="flex items-center justify-center gap-2 mb-8">
+                {labels.map((label, i) => {
+                  const active = visualIndex === i
+                  const done = visualIndex > i
+                  const fillColor = active || done ? '#E50995' : '#E5E7EB'
+                  const textColor = active || done ? '#FFFFFF' : '#6B7280'
+                  return (
+                    <div key={label} className="flex items-center gap-2">
+                      <div className="relative w-11 h-10 flex items-center justify-center transition">
+                        <svg viewBox="0 0 100 95" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet">
+                          <path
+                            d="M50 5 C 22 5, 8 30, 8 52 C 8 75, 28 90, 50 90 C 72 90, 92 75, 92 52 C 92 30, 78 5, 50 5 Z"
+                            fill={fillColor}
+                          />
+                        </svg>
+                        <span className="relative z-10 text-xs font-bold" style={{ color: textColor }}>
+                          {done ? '✓' : i + 1}
+                        </span>
+                      </div>
+                      <span className={`text-xs hidden sm:inline ${active ? 'text-[#E50995] font-medium' : 'text-gray-400'}`}>{label}</span>
+                      {i < labels.length - 1 && <div className={`w-8 h-0.5 ${done ? 'bg-[#E50995]' : 'bg-gray-200'}`} />}
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })()}
 
           <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
             {error && (
@@ -387,7 +432,8 @@ export function FormularioAgendarEstudio() {
                       setDays([])
                       setSelectedDay(null)
                       setSelectedSlot(null)
-                      setStep(2)
+                      // US no tiene sub-tipos — saltamos directo a horarios (agenda fusionada de los 4 radiólogos)
+                      setStep(3)
                     }}
                     className="group p-6 border-2 border-gray-200 rounded-xl hover:border-[#EC52B4] hover:bg-[#FEEBF5] transition-all text-left"
                   >
@@ -434,70 +480,31 @@ export function FormularioAgendarEstudio() {
               </div>
             )}
 
-            {/* ── STEP 2B: Selección de radiólogo (ultrasonido de mama) ── */}
-            {step === 2 && tipoSeleccionado === 'ultrasonido' && (
+            {/* ── STEP 3: Selección de fecha y hora ── */}
+            {step === 3 && (
               <div className="p-6 sm:p-8">
                 <button
                   type="button"
                   onClick={() => {
-                    setStep(1)
-                    setTipoSeleccionado('')
-                    setSelectedDoctor(null)
-                    setDays([])
+                    if (esPromo || tipoSeleccionado === 'ultrasonido') {
+                      setStep(1)
+                      setSelectedDoctor(null)
+                    } else {
+                      setStep(2)
+                    }
                   }}
                   className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-4"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                  Cambiar tipo
-                </button>
-                <h3 className="text-base font-semibold text-gray-900 mb-1">
-                  Seleccioná el radiólogo
-                </h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  Cada especialista tiene su propia agenda — al elegir uno, te mostramos sus horarios disponibles.
-                </p>
-                <div className="space-y-2">
-                  {RADIOLOGOS_US.map(doc => (
-                    <button
-                      key={doc.id}
-                      onClick={() => {
-                        setSelectedDoctor(doc)
-                        setDays([])
-                        setSelectedDay(null)
-                        setSelectedSlot(null)
-                        setStep(3)
-                      }}
-                      className="w-full flex items-center gap-3 p-4 border-2 rounded-xl transition-all text-left border-gray-200 hover:border-[#EC52B4] hover:bg-[#FEEBF5]"
-                    >
-                      <div className="w-10 h-10 bg-[#FBCFE8] rounded-lg flex items-center justify-center shrink-0">
-                        <svg className="w-5 h-5 text-[#E50995]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">{doc.nombre}</p>
-                        <p className="text-xs text-gray-500">Radiólogo — Ultrasonido de mama</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* ── STEP 3: Selección de fecha y hora ── */}
-            {step === 3 && (
-              <div className="p-6 sm:p-8">
-                <button type="button" onClick={() => esPromo ? setStep(1) : setStep(2)} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-4">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                  {esPromo ? 'Cambiar estudio' : tipoSeleccionado === 'ultrasonido' ? 'Cambiar doctor' : 'Cambiar servicio'}
+                  {esPromo || tipoSeleccionado === 'ultrasonido' ? 'Cambiar estudio' : 'Cambiar servicio'}
                 </button>
                 <h3 className="text-base font-semibold text-gray-900 mb-1">Seleccioná fecha y hora</h3>
-                {tipoSeleccionado === 'ultrasonido' && selectedDoctor && (
+                {tipoSeleccionado === 'ultrasonido' && (
                   <p className="text-sm text-gray-500 mb-4">
-                    Agenda de <strong className="text-[#E50995]">{selectedDoctor.nombre}</strong>
+                    Agenda combinada de los 4 radiólogos — al elegir el horario te mostramos quién está disponible.
                   </p>
                 )}
-                {!(tipoSeleccionado === 'ultrasonido' && selectedDoctor) && <div className="mb-4" />}
+                {tipoSeleccionado !== 'ultrasonido' && <div className="mb-4" />}
 
                 {loadingSlots ? (
                   <div className="text-center py-8">
@@ -506,36 +513,8 @@ export function FormularioAgendarEstudio() {
                   </div>
                 ) : days.length === 0 ? (
                   <div className="text-center py-8">
-                    {tipoSeleccionado === 'ultrasonido' && selectedDoctor ? (
-                      <>
-                        <p className="text-gray-700 font-medium mb-1">
-                          {selectedDoctor.nombre} no tiene horarios disponibles esta semana.
-                        </p>
-                        <p className="text-sm text-gray-500 mb-4">
-                          Probá con otro radiólogo o intentá de nuevo más tarde.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                          <button
-                            onClick={() => {
-                              setSelectedDoctor(null)
-                              setDays([])
-                              setStep(2)
-                            }}
-                            className="px-4 py-2 bg-[#E50995] hover:bg-[#C70880] text-white rounded-lg text-sm font-semibold transition"
-                          >
-                            Cambiar radiólogo
-                          </button>
-                          <button onClick={loadAvailability} className="px-4 py-2 border border-gray-300 hover:border-gray-400 rounded-lg text-sm text-gray-700 font-medium transition">
-                            Reintentar
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-gray-500">No hay horarios disponibles en este momento.</p>
-                        <button onClick={loadAvailability} className="mt-3 text-sm text-[#E50995] hover:text-[#C70880] font-medium">Reintentar</button>
-                      </>
-                    )}
+                    <p className="text-gray-500">No hay horarios disponibles en este momento.</p>
+                    <button onClick={loadAvailability} className="mt-3 text-sm text-[#E50995] hover:text-[#C70880] font-medium">Reintentar</button>
                   </div>
                 ) : (
                   <>
@@ -543,7 +522,7 @@ export function FormularioAgendarEstudio() {
                       {days.map(d => (
                         <button
                           key={d.date}
-                          onClick={() => { setSelectedDay(d.date); setSelectedSlot(null) }}
+                          onClick={() => { setSelectedDay(d.date); setSelectedSlot(null); setSelectedDoctor(null) }}
                           className={`shrink-0 px-4 py-3 rounded-xl border-2 text-center transition-all ${
                             selectedDay === d.date
                               ? 'border-[#E50995] bg-[#FEEBF5] text-[#C70880]'
@@ -563,16 +542,181 @@ export function FormularioAgendarEstudio() {
                           Horarios disponibles — <span className="font-medium">{selectedDaySlots.labelFull}</span>
                         </p>
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[300px] overflow-y-auto">
-                          {selectedDaySlots.slots.map((slot, i) => (
-                            <button
-                              key={i}
-                              onClick={() => { setSelectedSlot(slot); setStep(4) }}
-                              className="px-3 py-2.5 rounded-lg border-2 text-sm font-medium transition-all border-gray-200 hover:border-[#E50995] hover:bg-[#FEEBF5] text-gray-700"
-                            >
-                              {slot.time}
-                            </button>
-                          ))}
+                          {selectedDaySlots.slots.map((slot, i) => {
+                            const isSelected = selectedSlot?.dateTime === slot.dateTime
+                            return (
+                              <button
+                                key={i}
+                                onClick={() => {
+                                  setSelectedSlot(slot)
+                                  if (tipoSeleccionado === 'ultrasonido') {
+                                    const docs = slot.doctors || []
+                                    if (docs.length === 1) {
+                                      // Solo 1 radiólogo libre a esa hora — auto-asigna y avanza
+                                      setSelectedDoctor(docs[0])
+                                      setStep(4)
+                                    } else {
+                                      // Varios disponibles — mostramos mini-picker debajo del slot
+                                      setSelectedDoctor(null)
+                                    }
+                                  } else if (esPromo) {
+                                    // PROMO: ya elegimos slot mamógrafo. Cargamos agenda US fusionada para 2da fase.
+                                    setSelectedDoctor(null)
+                                    setSelectedUSDay(null)
+                                    setSelectedUSSlot(null)
+                                    setDaysUS([])
+                                    loadUSAvailability()
+                                  } else {
+                                    setStep(4)
+                                  }
+                                }}
+                                className={`px-3 py-2.5 rounded-lg border-2 text-sm font-medium transition-all ${
+                                  isSelected
+                                    ? 'border-[#E50995] bg-[#FEEBF5] text-[#C70880]'
+                                    : 'border-gray-200 hover:border-[#E50995] hover:bg-[#FEEBF5] text-gray-700'
+                                }`}
+                              >
+                                {slot.time}
+                              </button>
+                            )
+                          })}
                         </div>
+
+                        {/* Mini-picker de radiólogo: aparece cuando el slot tiene varios doctores libres */}
+                        {tipoSeleccionado === 'ultrasonido' && selectedSlot && (selectedSlot.doctors?.length || 0) > 1 && (
+                          <div className="mt-6 p-4 bg-[#FEEBF5] border border-[#FCAFD9] rounded-xl">
+                            <p className="text-sm font-semibold text-[#C70880] mb-3">
+                              A las {selectedSlot.time} están disponibles:
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {selectedSlot.doctors!.map(doc => (
+                                <button
+                                  key={doc.id}
+                                  onClick={() => {
+                                    setSelectedDoctor(doc)
+                                    setStep(4)
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-2.5 bg-white rounded-lg border-2 border-transparent hover:border-[#E50995] transition-all text-left"
+                                >
+                                  <div className="w-8 h-8 bg-[#FBCFE8] rounded-lg flex items-center justify-center shrink-0">
+                                    <svg className="w-4 h-4 text-[#E50995]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                  </div>
+                                  <span className="text-sm font-medium text-gray-900">{doc.nombre}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* ── PROMO sub-fase: agendar el Ultrasonido ── */}
+                    {esPromo && selectedSlot && (
+                      <div className="mt-8 pt-6 border-t-2 border-[#FCAFD9]">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="bg-[#E50995] text-white text-xs font-bold px-2 py-0.5 rounded">PASO 2 DE 2</span>
+                          <h3 className="text-base font-semibold text-gray-900">Ahora tu ultrasonido</h3>
+                        </div>
+                        <p className="text-sm text-gray-500 mb-4">
+                          Agenda combinada de los 4 radiólogos — al elegir el horario te mostramos quién está disponible.
+                        </p>
+
+                        {loadingUSSlots ? (
+                          <div className="text-center py-6">
+                            <div className="w-7 h-7 border-2 border-[#E50995] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                            <p className="text-sm text-gray-500">Consultando agenda de los radiólogos...</p>
+                          </div>
+                        ) : daysUS.length === 0 ? (
+                          <div className="text-center py-6">
+                            <p className="text-gray-500 text-sm">No hay horarios de ultrasonido disponibles esta semana.</p>
+                            <button onClick={loadUSAvailability} className="mt-2 text-sm text-[#E50995] hover:text-[#C70880] font-medium">Reintentar</button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex gap-2 overflow-x-auto pb-3 mb-4">
+                              {daysUS.map(d => (
+                                <button
+                                  key={d.date}
+                                  onClick={() => { setSelectedUSDay(d.date); setSelectedUSSlot(null); setSelectedDoctor(null) }}
+                                  className={`shrink-0 px-4 py-3 rounded-xl border-2 text-center transition-all ${
+                                    selectedUSDay === d.date
+                                      ? 'border-[#E50995] bg-[#FEEBF5] text-[#C70880]'
+                                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                                  }`}
+                                >
+                                  <p className="text-xs font-medium uppercase">{d.label?.split(' ')[0]}</p>
+                                  <p className="text-lg font-bold">{d.date?.split('-')[2]}</p>
+                                  <p className="text-xs text-gray-500">{d.slots.length} slots</p>
+                                </button>
+                              ))}
+                            </div>
+
+                            {selectedUSDay && selectedUSDaySlots && (
+                              <div>
+                                <p className="text-sm text-gray-600 mb-3">
+                                  Horarios disponibles — <span className="font-medium">{selectedUSDaySlots.labelFull}</span>
+                                </p>
+                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[260px] overflow-y-auto">
+                                  {selectedUSDaySlots.slots.map((slot, i) => {
+                                    const isSelected = selectedUSSlot?.dateTime === slot.dateTime
+                                    return (
+                                      <button
+                                        key={i}
+                                        onClick={() => {
+                                          setSelectedUSSlot(slot)
+                                          const docs = slot.doctors || []
+                                          if (docs.length === 1) {
+                                            setSelectedDoctor(docs[0])
+                                            setStep(4)
+                                          } else {
+                                            setSelectedDoctor(null)
+                                          }
+                                        }}
+                                        className={`px-3 py-2.5 rounded-lg border-2 text-sm font-medium transition-all ${
+                                          isSelected
+                                            ? 'border-[#E50995] bg-[#FEEBF5] text-[#C70880]'
+                                            : 'border-gray-200 hover:border-[#E50995] hover:bg-[#FEEBF5] text-gray-700'
+                                        }`}
+                                      >
+                                        {slot.time}
+                                      </button>
+                                    )
+                                  })}
+                                </div>
+
+                                {/* Mini-picker de radiólogo para el slot US del PROMO */}
+                                {selectedUSSlot && (selectedUSSlot.doctors?.length || 0) > 1 && (
+                                  <div className="mt-6 p-4 bg-[#FEEBF5] border border-[#FCAFD9] rounded-xl">
+                                    <p className="text-sm font-semibold text-[#C70880] mb-3">
+                                      A las {selectedUSSlot.time} están disponibles:
+                                    </p>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                      {selectedUSSlot.doctors!.map(doc => (
+                                        <button
+                                          key={doc.id}
+                                          onClick={() => {
+                                            setSelectedDoctor(doc)
+                                            setStep(4)
+                                          }}
+                                          className="flex items-center gap-2 px-3 py-2.5 bg-white rounded-lg border-2 border-transparent hover:border-[#E50995] transition-all text-left"
+                                        >
+                                          <div className="w-8 h-8 bg-[#FBCFE8] rounded-lg flex items-center justify-center shrink-0">
+                                            <svg className="w-4 h-4 text-[#E50995]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                          </div>
+                                          <span className="text-sm font-medium text-gray-900">{doc.nombre}</span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </>
+                        )}
                       </div>
                     )}
                   </>
@@ -583,26 +727,36 @@ export function FormularioAgendarEstudio() {
             {/* ── STEP 4: Datos personales ── */}
             {step === 4 && (
               <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-5">
-                <button type="button" onClick={() => setStep(3)} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
+                <button type="button" onClick={() => {
+                  setStep(3)
+                  // En US: limpiar selección de doctor para que pueda re-elegir slot
+                  if (tipoSeleccionado === 'ultrasonido') setSelectedDoctor(null)
+                }} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                   Cambiar horario
                 </button>
 
                 {selectedSlot && selectedDay && (
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
-                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-green-800">
-                        {esPromo ? 'Promo: Mamografía + US de mama — ₡65,000' : (servicioSeleccionado?.nombre || (tipoSeleccionado === 'mamografia' ? 'Mamografía — ₡35,000' : 'Ultrasonido de mama — ₡49,000'))}
-                      </p>
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-2">
+                    <p className="text-sm font-semibold text-green-800">
+                      {esPromo ? 'Promo: Mamografía + US de mama — ₡65,000' : (servicioSeleccionado?.nombre || (tipoSeleccionado === 'mamografia' ? 'Mamografía — ₡35,000' : 'Ultrasonido de mama — ₡49,000'))}
+                    </p>
+                    <p className="text-sm text-green-700">
+                      <span className="font-medium">{esPromo ? 'Mamografía: ' : ''}</span>
+                      {days.find(d => d.date === selectedDay)?.labelFull} — {selectedSlot.time}
+                    </p>
+                    {esPromo && selectedUSSlot && selectedUSDay && (
                       <p className="text-sm text-green-700">
-                        {days.find(d => d.date === selectedDay)?.labelFull} — {selectedSlot.time}
+                        <span className="font-medium">Ultrasonido: </span>
+                        {daysUS.find(d => d.date === selectedUSDay)?.labelFull} — {selectedUSSlot.time}
+                        {selectedDoctor && <span className="text-gray-600"> · {selectedDoctor.nombre}</span>}
                       </p>
-                    </div>
+                    )}
+                    {!esPromo && tipoSeleccionado === 'ultrasonido' && selectedDoctor && (
+                      <p className="text-sm text-green-700">
+                        <span className="font-medium">Radiólogo: </span>{selectedDoctor.nombre}
+                      </p>
+                    )}
                   </div>
                 )}
 

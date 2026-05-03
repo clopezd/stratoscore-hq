@@ -30,6 +30,9 @@ const BookSchema = z.object({
   notas: z.string().max(500).optional(),
   esPromo: z.boolean().optional(),
   doctor_id: z.union([z.string().regex(/^\d+$/), z.number().int().positive()]).optional(),
+  // PROMO: segunda cita US (radiólogo + slot)
+  us_fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'us_fecha YYYY-MM-DD').optional(),
+  us_hora: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, 'us_hora HH:MM[:SS]').optional(),
 })
 
 /**
@@ -71,11 +74,15 @@ export async function POST(request: NextRequest) {
       fuente, notas,
       esPromo,
       doctor_id,
+      us_fecha, us_hora,
     } = parsed.data
 
     const huli = HuliConnector.getInstance()
 
-    // Doctor: para US viene del radiólogo elegido; para mamo siempre el equipo
+    // Doctor de la cita PRINCIPAL:
+    // - PROMO: el equipo mamógrafo (la US es la segunda cita, con radiólogo)
+    // - US solo: el radiólogo elegido
+    // - Mamo solo: el equipo mamógrafo
     const doctorId = tipo_estudio === 'ultrasonido' && doctor_id
       ? Number(doctor_id)
       : MAMOGRAFIA_DOCTOR_ID
@@ -83,7 +90,7 @@ export async function POST(request: NextRequest) {
     // 1. Buscar/crear paciente
     const patient = await huli.findOrCreatePatient(nombre, telefono, email)
 
-    // 2. Crear cita
+    // 2. Crear cita principal (mamógrafo en promo y mamo solo, radiólogo en US solo)
     const mamoAppointment = await huli.createAppointment({
       id_doctor: doctorId,
       id_clinic: CLINIC_ID,
@@ -92,13 +99,29 @@ export async function POST(request: NextRequest) {
       time_from: hora,
       source_event: sourceEvent ? Number(sourceEvent) : undefined,
       notes: esPromo
-        ? 'Promo Mayo: Mamografía + US de mama ₡65,000 — Agendado desde web'
+        ? 'Promo Mayo: Mamografía + US de mama ₡65,000 — Mamografía (1/2) — Agendado desde web'
         : (notas || `Agendado desde web — ${tipo_estudio || 'mamografía'}`),
       is_first_time_patient: true,
     })
 
-    // 3. Promo: el ultrasonido se coordina por teléfono (no se agenda automáticamente)
-    const usAppointment = null
+    // 3. PROMO: crear segunda cita de US con el radiólogo elegido
+    let usAppointment: Awaited<ReturnType<typeof huli.createAppointment>> | null = null
+    if (esPromo && doctor_id && us_fecha && us_hora) {
+      try {
+        usAppointment = await huli.createAppointment({
+          id_doctor: Number(doctor_id),
+          id_clinic: CLINIC_ID,
+          id_patient_file: Number(patient.id),
+          start_date: us_fecha,
+          time_from: us_hora,
+          notes: 'Promo Mayo: Mamografía + US de mama ₡65,000 — Ultrasonido (2/2) — Agendado desde web',
+          is_first_time_patient: false,
+        })
+      } catch (e) {
+        // Si la US falla, NO revertimos la mamo (es la cita principal). Lo registramos en notas.
+        console.error('[MedCare Book] PROMO: falló crear cita US:', e)
+      }
+    }
 
     // 4. Crear lead en Supabase
     const params = new URL(request.url).searchParams

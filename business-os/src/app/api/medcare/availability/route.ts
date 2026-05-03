@@ -6,6 +6,14 @@ import type { HuliSlot, HuliSlotDate } from '@/features/medcare/lib/huli-types'
 const MAMOGRAFIA_DOCTOR_ID = process.env.HULI_MAMOGRAFIA_DOCTOR_ID || '96314'
 const CLINIC_ID = process.env.HULI_CLINIC_ID || '9694'
 
+// Radiólogos que operan ultrasonido de mama (ver CLIENT.md)
+const RADIOLOGOS_US: { id: string; nombre: string }[] = [
+  { id: '49493', nombre: 'Dr. Solís' },
+  { id: '18828', nombre: 'Dr. Pastora' },
+  { id: '14145', nombre: 'Dr. Hernández' },
+  { id: '97620', nombre: 'Dr. Marden' },
+]
+
 // Horario operativo MedCare (CLIENT.md): L-V 8am-8pm | Sáb 8am-7pm | Dom cerrado
 // Slots cada 30 min — duración estándar de US de mama
 const SLOT_MINUTES = 30
@@ -115,9 +123,70 @@ async function buildCalculatedAvailability(
 }
 
 /**
- * GET /api/medcare/availability?from=2026-04-09&to=2026-04-13&doctor_id=49493
- * - Si doctor_id == mamógrafo (o sin doctor_id) → usa availability nativa de Huli
- * - Si doctor_id == radiólogo → calcula slots desde horario operativo - citas existentes
+ * Fusiona los slots de los 4 radiólogos en una agenda combinada.
+ * Cada slot único (mismo dateTime) lleva la lista de doctores libres a esa hora.
+ */
+async function buildMergedRadiologistAvailability(
+  clinicId: string,
+  fromDate: string,
+  toDate: string,
+): Promise<HuliSlotDate[]> {
+  const perDoctor = await Promise.all(
+    RADIOLOGOS_US.map(async (doc) => ({
+      doc,
+      slotDates: await buildCalculatedAvailability(doc.id, clinicId, fromDate, toDate).catch(() => [] as HuliSlotDate[]),
+    }))
+  )
+
+  // Indexamos por fecha → por dateTime → set de doctores
+  type SlotMeta = { doctors: { id: string; nombre: string }[]; timeL10n: string }
+  const byDate = new Map<string, { dateL10n: string; dateL10nComp: string; slots: Map<string, SlotMeta> }>()
+
+  for (const { doc, slotDates } of perDoctor) {
+    for (const day of slotDates) {
+      const dateKey = day.date || ''
+      if (!byDate.has(dateKey)) {
+        byDate.set(dateKey, {
+          dateL10n: day.dateL10n || '',
+          dateL10nComp: day.dateL10nComp || '',
+          slots: new Map(),
+        })
+      }
+      const dayBucket = byDate.get(dateKey)!
+      for (const s of day.slots || []) {
+        const key = s.dateTime || ''
+        if (!dayBucket.slots.has(key)) {
+          dayBucket.slots.set(key, { doctors: [], timeL10n: s.timeL10n || '' })
+        }
+        dayBucket.slots.get(key)!.doctors.push({ id: doc.id, nombre: doc.nombre })
+      }
+    }
+  }
+
+  // Convertimos a HuliSlotDate-like (con doctors injectado en cada slot)
+  return Array.from(byDate.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([dateKey, bucket]) => ({
+      date: dateKey,
+      dateL10n: bucket.dateL10n,
+      dateL10nComp: bucket.dateL10nComp,
+      slots: Array.from(bucket.slots.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([dateTime, meta]) => ({
+          dateTime,
+          time: dateTime,
+          timeL10n: meta.timeL10n,
+          // doctors se devuelve como propiedad extra al serializar el response
+          doctors: meta.doctors,
+        } as HuliSlot & { doctors: { id: string; nombre: string }[] })),
+    }))
+}
+
+/**
+ * GET /api/medcare/availability?from=2026-04-09&to=2026-04-13[&doctor_id=49493][&mode=us-merged]
+ * - mode=us-merged → fusiona los 4 radiólogos, cada slot trae `doctors: [...]`
+ * - doctor_id == mamógrafo (o sin doctor_id) → availability nativa de Huli
+ * - doctor_id == radiólogo → calcula slots desde horario operativo - citas existentes
  * Endpoint PÚBLICO — rate limited: 30 req/min por IP
  */
 export async function GET(request: NextRequest) {
@@ -133,6 +202,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl
     const from = searchParams.get('from')
     const to = searchParams.get('to')
+    const mode = searchParams.get('mode')
     const doctorIdParam = searchParams.get('doctor_id')
     const doctorId = doctorIdParam && /^\d+$/.test(doctorIdParam)
       ? doctorIdParam
@@ -147,7 +217,10 @@ export async function GET(request: NextRequest) {
 
     let slotDates: HuliSlotDate[]
 
-    if (doctorId === MAMOGRAFIA_DOCTOR_ID) {
+    if (mode === 'us-merged') {
+      // Agenda fusionada de los 4 radiólogos — cada slot lleva los doctores disponibles
+      slotDates = await buildMergedRadiologistAvailability(CLINIC_ID, from, to)
+    } else if (doctorId === MAMOGRAFIA_DOCTOR_ID) {
       // Mamógrafo: tiene availability configurada en Huli
       const huli = HuliConnector.getInstance()
       const availability = await huli.getAvailability(
@@ -158,7 +231,7 @@ export async function GET(request: NextRequest) {
       )
       slotDates = availability.slotDates || []
     } else {
-      // Radiólogo: calculamos desde horario operativo - citas existentes
+      // Radiólogo individual: calculamos desde horario operativo - citas existentes
       slotDates = await buildCalculatedAvailability(doctorId, CLINIC_ID, from, to)
     }
 
@@ -168,11 +241,15 @@ export async function GET(request: NextRequest) {
         date: d.date?.split('T')[0],
         label: d.dateL10n,
         labelFull: d.dateL10nComp,
-        slots: (d.slots || []).map(s => ({
-          time: s.timeL10n,
-          dateTime: s.dateTime,
-          sourceEvent: s.sourceEvent,
-        })),
+        slots: (d.slots || []).map(s => {
+          const slot = s as HuliSlot & { doctors?: { id: string; nombre: string }[] }
+          return {
+            time: slot.timeL10n,
+            dateTime: slot.dateTime,
+            sourceEvent: slot.sourceEvent,
+            doctors: slot.doctors,
+          }
+        }),
       }))
 
     return NextResponse.json({ days })
